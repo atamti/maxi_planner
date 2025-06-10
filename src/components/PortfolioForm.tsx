@@ -211,24 +211,6 @@ export const PortfolioForm: React.FC<Props> = ({
         </div>
         <div>
           <label className="block font-medium mb-1">
-            Investments End Yield (BTC %):
-          </label>
-          <input
-            type="range"
-            value={formData.investmentsEndYield}
-            onChange={(e) =>
-              updateFormData({ investmentsEndYield: Number(e.target.value) })
-            }
-            className="w-full"
-            min="0"
-            max="50"
-          />
-          <span className="text-sm text-gray-600">
-            {formData.investmentsEndYield}% final yield
-          </span>
-        </div>
-        <div>
-          <label className="block font-medium mb-1">
             Speculation Start Yield (BTC %):
           </label>
           <input
@@ -243,6 +225,24 @@ export const PortfolioForm: React.FC<Props> = ({
           />
           <span className="text-sm text-gray-600">
             {formData.speculationStartYield}% initial yield
+          </span>
+        </div>
+        <div>
+          <label className="block font-medium mb-1">
+            Investments End Yield (BTC %):
+          </label>
+          <input
+            type="range"
+            value={formData.investmentsEndYield}
+            onChange={(e) =>
+              updateFormData({ investmentsEndYield: Number(e.target.value) })
+            }
+            className="w-full"
+            min="0"
+            max="50"
+          />
+          <span className="text-sm text-gray-600">
+            {formData.investmentsEndYield}% final yield
           </span>
         </div>
         <div>
