@@ -1,0 +1,42 @@
+{
+  "name": "maxi_planner",
+  "version": "1.0.0",
+  "description": "Bitcoin maximalist portfolio planning tool",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css}\"",
+    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\""
+  },
+  "author": "Chris Elam <chris.r.elam@protonmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "chart.js": "4.4.0",
+    "react-chartjs-2": "5.3.0",
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "tailwindcss": "4.1.8"
+  },
+  "devDependencies": {
+    "@types/react": "19.0.12",
+    "@types/react-dom": "19.0.4",
+    "@vitejs/plugin-react": "4.3.4",
+    "autoprefixer": "10.4.21",
+    "postcss": "8.5.3",
+    "vite": "5.2.0",
+    "typescript": "5.8.2",
+    "eslint": "9.23.0",
+    "eslint-plugin-react": "7.37.4",
+    "eslint-plugin-react-hooks": "5.2.0",
+    "prettier": "3.5.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-tailwindcss": "0.6.11",
+    "@tailwindcss/cli": "4.1.8",
+    "@tailwindcss/vite": "4.1.8"
+  }
+}

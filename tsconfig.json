@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "strict": true,
+    "moduleResolution": "node",
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
+    "baseUrl": ".",
+    "skipLibCheck": true, // Speed up compilation
+    "forceConsistentCasingInFileNames": true, // Enforce consistent import casing
+    "paths": {
+      "@backend/*": ["../backend/src/*"], // Point to source files in backend project
+      "@shared/*": ["../shared/src/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
