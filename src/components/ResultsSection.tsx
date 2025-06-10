@@ -55,18 +55,25 @@ export const ResultsSection: React.FC<Props> = ({
         fill: false,
       },
       {
-        label: "USD Income ($/year)",
-        data: usdIncome.map((v) => (v / 1000).toFixed(2)),
-        borderColor: "#1A73E8",
-        backgroundColor: "rgba(26, 115, 232, 0.2)",
-        fill: false,
-      },
-      {
         label: "BTC Income (BTC/year, Decaying)",
         data: btcIncome.map((v) => v.toFixed(3)),
         borderColor: "#333333",
         backgroundColor: "rgba(51, 51, 51, 0.2)",
         fill: false,
+      },
+    ],
+  };
+
+  const incomeChartData = {
+    labels: calculationResults.map((r) => r.year),
+    datasets: [
+      {
+        label: "USD Income ($/year)",
+        data: usdIncome.map((v) => (v / 1000).toFixed(2)),
+        borderColor: "#1A73E8",
+        backgroundColor: "rgba(26, 115, 232, 0.2)",
+        fill: true,
+        tension: 0.1,
       },
     ],
   };
@@ -203,25 +210,55 @@ export const ResultsSection: React.FC<Props> = ({
         </div>
       </div>
 
-      <div className="mt-4">
-        <Line
-          data={resultChartData}
-          options={{
-            scales: {
-              y: {
-                beginAtZero: true,
-                title: { display: true, text: "BTC or USD (thousands)" },
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+        <div>
+          <h3 className="text-lg font-semibold mb-2">BTC Stack Growth</h3>
+          <Line
+            data={resultChartData}
+            options={{
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: { display: true, text: "BTC Amount" },
+                },
+                x: { title: { display: true, text: "Years" } },
               },
-              x: { title: { display: true, text: "Years" } },
-            },
-            plugins: {
-              title: {
-                display: true,
-                text: "Stack Size and Income with BTC Decay",
+              plugins: {
+                title: {
+                  display: true,
+                  text: "Bitcoin Stack Size Over Time",
+                },
+                legend: {
+                  position: "bottom",
+                },
               },
-            },
-          }}
-        />
+            }}
+          />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2">USD Income Stream</h3>
+          <Line
+            data={incomeChartData}
+            options={{
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: { display: true, text: "USD Income (thousands)" },
+                },
+                x: { title: { display: true, text: "Years" } },
+              },
+              plugins: {
+                title: {
+                  display: true,
+                  text: "Annual USD Income Generation",
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            }}
+          />
+        </div>
       </div>
 
       <p className="text-red-600 mt-4">
