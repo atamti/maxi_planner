@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FormData } from "../types";
+import { AllocationSliders } from "./AllocationSliders";
 import { YieldChart } from "./YieldChart";
 
 interface Props {
@@ -127,67 +128,14 @@ export const PortfolioForm: React.FC<Props> = ({
         title="📊 Asset Allocation Strategy"
         defaultExpanded={true}
       >
-        <div>
-          <label className="block font-medium mb-1">
-            Savings Allocation (%):
-          </label>
-          <input
-            type="range"
-            value={formData.savingsPct}
-            onChange={(e) =>
-              updateFormData({ savingsPct: Number(e.target.value) })
-            }
-            className="w-full"
-            min="0"
-            max="100"
+        <div className="col-span-2">
+          <AllocationSliders
+            savingsPct={formData.savingsPct}
+            investmentsPct={formData.investmentsPct}
+            speculationPct={formData.speculationPct}
+            onUpdate={(updates) => updateFormData(updates)}
           />
-          <span className="text-sm text-gray-600">
-            {formData.savingsPct}% - Conservative storage
-          </span>
         </div>
-        <div>
-          <label className="block font-medium mb-1">
-            Investments Allocation (%):
-          </label>
-          <input
-            type="range"
-            value={formData.investmentsPct}
-            onChange={(e) =>
-              updateFormData({ investmentsPct: Number(e.target.value) })
-            }
-            className="w-full"
-            min="0"
-            max="100"
-          />
-          <span className="text-sm text-gray-600">
-            {formData.investmentsPct}% - Medium risk/reward
-          </span>
-        </div>
-        <div>
-          <label className="block font-medium mb-1">
-            Speculation Allocation (%):
-          </label>
-          <input
-            type="range"
-            value={formData.speculationPct}
-            onChange={(e) =>
-              updateFormData({ speculationPct: Number(e.target.value) })
-            }
-            className="w-full"
-            min="0"
-            max="100"
-          />
-          <span className="text-sm text-gray-600">
-            {formData.speculationPct}% - High risk/reward
-          </span>
-        </div>
-        {allocationError && (
-          <div className="col-span-2">
-            <p className="text-red-600 bg-red-50 p-2 rounded">
-              {allocationError}
-            </p>
-          </div>
-        )}
       </CollapsibleSection>
 
       <CollapsibleSection title="📈 Yield Assumptions">
@@ -384,12 +332,6 @@ export const PortfolioForm: React.FC<Props> = ({
       </div>
 
       <div className="flex gap-4 pt-4 border-t">
-        <button
-          onClick={() => {}}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-        >
-          📊 Calculate Results
-        </button>
         <button
           onClick={onReset}
           className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
