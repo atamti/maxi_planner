@@ -11,6 +11,10 @@ interface Props {
     priceCrash: number;
     speculationPct: number;
     collateralPct: number;
+    investmentsStartYield: number;
+    investmentsEndYield: number;
+    speculationStartYield: number;
+    speculationEndYield: number;
   };
   showUSD: boolean;
 }
@@ -34,21 +38,18 @@ export const ResultsSection: React.FC<Props> = ({
     priceCrash,
     speculationPct,
     collateralPct,
+    investmentsStartYield,
+    investmentsEndYield,
+    speculationStartYield,
+    speculationEndYield,
   } = formData;
 
   const resultChartData = {
     labels: calculationResults.map((r) => r.year),
     datasets: [
       {
-        label: "BTC Stack with Income (BTC)",
-        data: calculationResults.map((r) => r.btcWithIncome.toFixed(2)),
-        borderColor: "#F7931A",
-        backgroundColor: "rgba(247, 147, 26, 0.2)",
-        fill: false,
-      },
-      {
-        label: "BTC Stack without Income (BTC)",
-        data: calculationResults.map((r) => r.btcWithoutIncome.toFixed(2)),
+        label: "Pure growth",
+        data: calculationResults.map((r) => r.btcWithoutIncome),
         borderColor: "#666666",
         backgroundColor: "rgba(102, 102, 102, 0.2)",
         fill: false,
