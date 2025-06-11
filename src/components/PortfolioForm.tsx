@@ -268,32 +268,6 @@ export const PortfolioForm: React.FC<Props> = ({
       <CollapsibleSection title="💰 Income & Expenses">
         <div>
           <label className="block font-medium mb-1">
-            Professional Income ($):
-          </label>
-          <input
-            type="number"
-            value={formData.income}
-            onChange={(e) => updateFormData({ income: Number(e.target.value) })}
-            className="w-full p-2 border rounded"
-            min="0"
-          />
-        </div>
-        <div>
-          <label className="block font-medium mb-1">
-            Annual Living Expenses ($):
-          </label>
-          <input
-            type="number"
-            value={formData.expenses}
-            onChange={(e) =>
-              updateFormData({ expenses: Number(e.target.value) })
-            }
-            className="w-full p-2 border rounded"
-            min="0"
-          />
-        </div>
-        <div>
-          <label className="block font-medium mb-1">
             Income Bucket Yield (USD %):
           </label>
           <input

@@ -13,8 +13,6 @@ export interface FormData {
   speculationEndYield: number;
   btcGrowth: number;
   priceCrash: number;
-  expenses: number;
-  income: number;
   exchangeRate: number;
   timeHorizon: number;
   activationYear: number;
