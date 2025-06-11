@@ -209,6 +209,14 @@ export const PortfolioForm: React.FC<Props> = ({
             {formData.speculationEndYield}% final yield
           </span>
         </div>
+
+        {/* Yield Projection Chart */}
+        <div className="col-span-2 mt-4 p-3 bg-gray-50 rounded-lg">
+          <h4 className="font-semibold mb-2">📈 Yield Projection Chart</h4>
+          <div style={{ height: "300px" }}>
+            <YieldChart formData={formData} />
+          </div>
+        </div>
       </CollapsibleSection>
 
       <CollapsibleSection title="💰 Income & Expenses">
@@ -454,13 +462,6 @@ export const PortfolioForm: React.FC<Props> = ({
           </span>
         </div>
       </CollapsibleSection>
-
-      <div className="my-6 p-4 bg-gray-50 rounded-lg">
-        <h3 className="text-lg font-semibold mb-3">
-          📈 Yield Projection Chart
-        </h3>
-        <YieldChart formData={formData} />
-      </div>
 
       <div className="flex gap-4 pt-4 border-t">
         <button

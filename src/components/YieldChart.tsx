@@ -49,17 +49,22 @@ export const YieldChart: React.FC<Props> = ({ formData }) => {
     <Line
       data={yieldChartData}
       options={{
+        maintainAspectRatio: false,
+        responsive: true,
         scales: {
           y: {
             beginAtZero: true,
-            title: { display: true, text: "BTC Yield (%)" },
+            title: { display: true, text: "Yield %" },
           },
           x: { title: { display: true, text: "Years" } },
         },
         plugins: {
           title: {
             display: true,
-            text: "BTC Yield Decay for Investments and Speculation",
+            text: "Yield projections over time",
+          },
+          legend: {
+            position: "bottom",
           },
         },
       }}
