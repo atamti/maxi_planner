@@ -1,6 +1,7 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
 import { CalculationResults } from "../types";
+import { formatCurrency, formatNumber } from "../utils/formatNumber";
 
 interface Props {
   results: CalculationResults;
@@ -126,55 +127,59 @@ export const ResultsSection: React.FC<Props> = ({
         <div>
           <p>
             <strong>Ending BTC Stack (Year {timeHorizon}):</strong>{" "}
-            {calculationResults[
-              calculationResults.length - 1
-            ].btcWithIncome.toFixed(2)}{" "}
+            {formatNumber(
+              calculationResults[calculationResults.length - 1].btcWithIncome,
+            )}{" "}
             BTC
           </p>
           {showUSD && (
             <p>
               (
-              {(
+              {formatCurrency(
                 calculationResults[calculationResults.length - 1]
                   .btcWithIncome *
                 exchangeRate *
-                Math.pow(1 + btcGrowth / 100, timeHorizon)
-              ).toFixed(2)}{" "}
-              USD)
+                  Math.pow(1 + btcGrowth / 100, timeHorizon),
+                0,
+              )}
+              )
             </p>
           )}
           <p>
             <strong>Without Income Allocation:</strong>{" "}
-            {calculationResults[
-              calculationResults.length - 1
-            ].btcWithoutIncome.toFixed(2)}{" "}
+            {formatNumber(
+              calculationResults[calculationResults.length - 1]
+                .btcWithoutIncome,
+            )}{" "}
             BTC
           </p>
           {showUSD && (
             <p>
               (
-              {(
+              {formatCurrency(
                 calculationResults[calculationResults.length - 1]
                   .btcWithoutIncome *
                 exchangeRate *
-                Math.pow(1 + btcGrowth / 100, timeHorizon)
-              ).toFixed(2)}{" "}
-              USD)
+                  Math.pow(1 + btcGrowth / 100, timeHorizon),
+                0,
+              )}
+              )
             </p>
           )}
           <p>
-            <strong>USD Income (Year {timeHorizon}):</strong> $
-            {usdIncome[usdIncome.length - 1].toFixed(2)}
+            <strong>USD Income (Year {timeHorizon}):</strong>{" "}
+            {formatCurrency(usdIncome[usdIncome.length - 1], 0)}
           </p>
           <p>
             <strong>BTC Income (Year {timeHorizon}):</strong>{" "}
-            {btcIncome[btcIncome.length - 1].toFixed(3)} BTC
+            {formatNumber(btcIncome[btcIncome.length - 1], 3)} BTC
           </p>
           <p>
-            <strong>Loan Principal:</strong> ${loanPrincipal.toFixed(2)}
+            <strong>Loan Principal:</strong> {formatCurrency(loanPrincipal, 0)}
           </p>
           <p>
-            <strong>Loan Interest (Annual):</strong> ${loanInterest.toFixed(2)}
+            <strong>Loan Interest (Annual):</strong>{" "}
+            {formatCurrency(loanInterest, 0)}
           </p>
         </div>
         <div>
@@ -233,7 +238,7 @@ export const ResultsSection: React.FC<Props> = ({
                       return ""; // Remove year from title
                     },
                     label: function (context) {
-                      return `${context.parsed.y.toFixed(1)} : ${context.dataset.label}`;
+                      return `${formatNumber(context.parsed.y, 1)} : ${context.dataset.label}`;
                     },
                     labelTextColor: function (context) {
                       // Use darker colors for better contrast against tooltip background
@@ -254,7 +259,7 @@ export const ResultsSection: React.FC<Props> = ({
                           "Minus income allocation",
                         )
                       ) {
-                        return `${gap.toFixed(1)} : Gap`;
+                        return `${formatNumber(gap, 1)} : Gap`;
                       }
                       return;
                     },
@@ -336,7 +341,7 @@ export const ResultsSection: React.FC<Props> = ({
               plugins: {
                 title: {
                   display: true,
-                  text: "How much BTC your USD income can buy over time",
+                  text: "Your income in BTC terms over time",
                 },
                 legend: {
                   position: "bottom",

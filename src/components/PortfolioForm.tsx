@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FormData } from "../types";
+import { formatCurrency, formatNumber } from "../utils/formatNumber";
 import { AllocationSliders } from "./AllocationSliders";
 import { YieldChart } from "./YieldChart";
 
@@ -83,6 +84,9 @@ export const PortfolioForm: React.FC<Props> = ({
             className="w-full p-2 border rounded"
             min="0"
           />
+          <p className="text-xs text-gray-600 mt-1">
+            Current: {formatCurrency(formData.exchangeRate, 0)}
+          </p>
         </div>
         <div>
           <label className="block font-medium mb-1">
