@@ -15,6 +15,7 @@ interface Props {
     investmentsEndYield: number;
     speculationStartYield: number;
     speculationEndYield: number;
+    activationYear: number;
   };
   showUSD: boolean;
 }
@@ -28,6 +29,7 @@ export const ResultsSection: React.FC<Props> = ({
     results: calculationResults,
     usdIncome,
     btcIncome,
+    incomeAtActivationYears,
     loanPrincipal,
     loanInterest,
   } = results;
@@ -42,6 +44,7 @@ export const ResultsSection: React.FC<Props> = ({
     investmentsEndYield,
     speculationStartYield,
     speculationEndYield,
+    activationYear,
   } = formData;
 
   const resultChartData = {
@@ -74,6 +77,39 @@ export const ResultsSection: React.FC<Props> = ({
         data: usdIncome.map((v) => v / 1000),
         borderColor: "#1A73E8",
         backgroundColor: "rgba(26, 115, 232, 0.2)",
+        fill: true,
+        tension: 0.1,
+      },
+    ],
+  };
+
+  const incomePotentialChartData = {
+    labels: calculationResults.map((r) => r.year),
+    datasets: [
+      {
+        label: "Annual Income Potential ($k/year)",
+        data: incomeAtActivationYears.map((v) => v / 1000),
+        borderColor: "#10B981",
+        backgroundColor: "rgba(16, 185, 129, 0.2)",
+        fill: true,
+        tension: 0.1,
+      },
+    ],
+  };
+
+  const incomeBtcChartData = {
+    labels: calculationResults.map((r) => r.year),
+    datasets: [
+      {
+        label: "USD Income (BTC equivalent)",
+        data: usdIncome.map((income, index) => {
+          if (income === 0) return 0;
+          const btcPriceAtYear =
+            exchangeRate * Math.pow(1 + btcGrowth / 100, index);
+          return income / btcPriceAtYear;
+        }),
+        borderColor: "#EF4444",
+        backgroundColor: "rgba(239, 68, 68, 0.2)",
         fill: true,
         tension: 0.1,
       },
@@ -253,6 +289,100 @@ export const ResultsSection: React.FC<Props> = ({
               },
             }}
           />
+
+          {/* Activation Year Control */}
+          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+            <label className="block font-medium mb-2 text-sm">
+              Activation Year: {activationYear}
+            </label>
+            <input
+              type="range"
+              value={activationYear}
+              onChange={(e) =>
+                onUpdateFormData?.({ activationYear: Number(e.target.value) })
+              }
+              className="w-full"
+              min="0"
+              max={timeHorizon}
+            />
+            <span className="text-xs text-gray-600">
+              Year {activationYear} - When income starts
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Income Analysis Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <div>
+          <h3 className="text-lg font-semibold mb-2">
+            USD Income in BTC Terms (Purchasing Power Decay)
+          </h3>
+          <Line
+            data={incomeBtcChartData}
+            options={{
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: "BTC Equivalent",
+                  },
+                },
+                x: { title: { display: true, text: "Years" } },
+              },
+              plugins: {
+                title: {
+                  display: true,
+                  text: "How much BTC your USD income can buy over time",
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+            }}
+          />
+          <p className="text-xs text-gray-600 mt-2">
+            📉 Shows how USD income loses purchasing power as BTC appreciates
+          </p>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2">
+            Income Potential by Activation Year
+          </h3>
+          <Line
+            data={incomePotentialChartData}
+            options={{
+              scales: {
+                y: {
+                  type: "logarithmic",
+                  title: {
+                    display: true,
+                    text: "USD Income (thousands, log scale)",
+                  },
+                },
+                x: { title: { display: true, text: "Activation Year" } },
+              },
+              plugins: {
+                title: {
+                  display: true,
+                  text: "Annual income potential if activated in each year",
+                },
+                legend: {
+                  position: "bottom",
+                },
+              },
+              onClick: (event, elements) => {
+                if (elements.length > 0) {
+                  const elementIndex = elements[0].index;
+                  onUpdateFormData?.({ activationYear: elementIndex });
+                }
+              },
+            }}
+          />
+          <p className="text-xs text-gray-600 mt-2">
+            💡 Click on any point to set that year as your activation year
+          </p>
         </div>
       </div>
 

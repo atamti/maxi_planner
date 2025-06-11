@@ -5,6 +5,7 @@ import {
   Legend,
   LinearScale,
   LineElement,
+  LogarithmicScale,
   PointElement,
   Title,
   Tooltip,
@@ -18,6 +19,7 @@ import { FormData } from "./types";
 ChartJS.register(
   CategoryScale,
   LinearScale,
+  LogarithmicScale,
   PointElement,
   LineElement,
   BarElement,

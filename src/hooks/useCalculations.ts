@@ -104,10 +104,52 @@ export const useCalculations = (formData: FormData): CalculationResults => {
     const loanPrincipal = collateralValue * 0.4 * exchangeRate; // 40% LTV typical for BTC loans
     const loanInterest = loanPrincipal * (loanRate / 100);
 
+    // Calculate income potential for each possible activation year
+    const incomeAtActivationYears: number[] = [];
+
+    for (
+      let potentialActivationYear = 0;
+      potentialActivationYear <= timeHorizon;
+      potentialActivationYear++
+    ) {
+      // Simulate BTC growth to the potential activation year
+      let simulatedBtcStack = btcStack;
+
+      for (let year = 0; year < potentialActivationYear; year++) {
+        const yearInvestmentsYield =
+          getYield(year, investmentsStartYield, investmentsEndYield) / 100;
+        const yearSpeculationYield =
+          getYield(year, speculationStartYield, speculationEndYield) / 100;
+
+        const savings = simulatedBtcStack * (savingsPct / 100) * 1; // No additional yield
+        const investments =
+          simulatedBtcStack *
+          (investmentsPct / 100) *
+          (1 + yearInvestmentsYield);
+        const speculation =
+          simulatedBtcStack *
+          (speculationPct / 100) *
+          (1 + yearSpeculationYield);
+
+        simulatedBtcStack = savings + investments + speculation;
+      }
+
+      // Calculate the USD value at potential activation year
+      const btcToRemove = simulatedBtcStack * (incomeAllocationPct / 100);
+      const btcPriceAtActivation =
+        exchangeRate * Math.pow(1 + btcGrowth / 100, potentialActivationYear);
+      const usdPoolValue = btcToRemove * btcPriceAtActivation;
+      const effectiveRate = (incomeYield - incomeReinvestmentPct) / 100;
+      const annualIncome = usdPoolValue * effectiveRate;
+
+      incomeAtActivationYears.push(annualIncome);
+    }
+
     return {
       results,
       usdIncome,
       btcIncome,
+      incomeAtActivationYears,
       loanPrincipal,
       loanInterest,
     };
