@@ -327,23 +327,20 @@ export const PortfolioForm: React.FC<Props> = ({
             min="0"
           />
         </div>
-      </CollapsibleSection>
-
-      <CollapsibleSection title="⚠️ Risk Scenarios">
         <div>
-          <label className="block font-medium mb-1">BTC Price Crash (%):</label>
+          <label className="block font-medium mb-1">Loan Term (Years):</label>
           <input
             type="range"
-            value={formData.priceCrash}
+            value={formData.loanTermYears}
             onChange={(e) =>
-              updateFormData({ priceCrash: Number(e.target.value) })
+              updateFormData({ loanTermYears: Number(e.target.value) })
             }
             className="w-full"
-            min="0"
-            max="80"
+            min="1"
+            max="30"
           />
           <span className="text-sm text-gray-600">
-            {formData.priceCrash}% price decline scenario
+            {formData.loanTermYears} years
           </span>
         </div>
         <div>
@@ -462,7 +459,7 @@ export const PortfolioForm: React.FC<Props> = ({
         
         <div className="flex items-center p-3 bg-yellow-50 rounded border-l-4 border-yellow-400">
           <span className="text-yellow-800 text-sm">
-            📊 Stress test your portfolio with various crash scenarios
+            📊 Stress test your portfolio with various crash scenarios (TBC)
           </span>
         </div>
       </CollapsibleSection>

@@ -31,8 +31,10 @@ export const ResultsSection: React.FC<Props> = ({
   const {
     results: calculationResults,
     usdIncome,
+    usdIncomeWithLeverage,
     btcIncome,
     incomeAtActivationYears,
+    incomeAtActivationYearsWithLeverage,
     loanPrincipal,
     loanInterest,
   } = results;
@@ -83,6 +85,18 @@ export const ResultsSection: React.FC<Props> = ({
         fill: true,
         tension: 0.1,
       },
+      ...(formData.collateralPct > 0
+        ? [
+            {
+              label: "USD Income with Leverage ($k/year)",
+              data: usdIncomeWithLeverage.map((v) => v / 1000),
+              borderColor: "#8B5CF6",
+              backgroundColor: "rgba(139, 92, 246, 0.2)",
+              fill: false,
+              tension: 0.1,
+            },
+          ]
+        : []),
     ],
   };
 
@@ -97,6 +111,18 @@ export const ResultsSection: React.FC<Props> = ({
         fill: true,
         tension: 0.1,
       },
+      ...(formData.collateralPct > 0
+        ? [
+            {
+              label: "Income Potential with Leverage ($k/year)",
+              data: incomeAtActivationYearsWithLeverage.map((v) => v / 1000),
+              borderColor: "#8B5CF6",
+              backgroundColor: "rgba(139, 92, 246, 0.2)",
+              fill: false,
+              tension: 0.1,
+            },
+          ]
+        : []),
     ],
   };
 
@@ -108,7 +134,7 @@ export const ResultsSection: React.FC<Props> = ({
         data: usdIncome.map((income, index) => {
           if (income === 0) return 0;
           const btcPriceAtYear =
-            exchangeRate * Math.pow(1 + btcGrowth / 100, index);
+            exchangeRate * Math.pow(1 + formData.btcGrowth / 100, index);
           return income / btcPriceAtYear;
         }),
         borderColor: "#EF4444",
@@ -116,6 +142,23 @@ export const ResultsSection: React.FC<Props> = ({
         fill: true,
         tension: 0.1,
       },
+      ...(formData.collateralPct > 0
+        ? [
+            {
+              label: "USD Income with Leverage (BTC equivalent)",
+              data: usdIncomeWithLeverage.map((income, index) => {
+                if (income === 0) return 0;
+                const btcPriceAtYear =
+                  exchangeRate * Math.pow(1 + formData.btcGrowth / 100, index);
+                return income / btcPriceAtYear;
+              }),
+              borderColor: "#8B5CF6",
+              backgroundColor: "rgba(139, 92, 246, 0.2)",
+              fill: false,
+              tension: 0.1,
+            },
+          ]
+        : []),
     ],
   };
 
@@ -138,7 +181,7 @@ export const ResultsSection: React.FC<Props> = ({
               {formatCurrency(
                 calculationResults[calculationResults.length - 1]
                   .btcWithIncome *
-                exchangeRate *
+                  exchangeRate *
                   Math.pow(1 + btcGrowth / 100, timeHorizon),
                 0,
               )}
@@ -159,7 +202,7 @@ export const ResultsSection: React.FC<Props> = ({
               {formatCurrency(
                 calculationResults[calculationResults.length - 1]
                   .btcWithoutIncome *
-                exchangeRate *
+                  exchangeRate *
                   Math.pow(1 + btcGrowth / 100, timeHorizon),
                 0,
               )}
@@ -198,8 +241,8 @@ export const ResultsSection: React.FC<Props> = ({
             )}
             {collateralPct > 0 && (
               <li>
-                Borrowing ${loanPrincipal.toFixed(0)} risks liquidation if BTC
-                drops below ${(exchangeRate * 0.4).toFixed(0)}.
+                Borrowing {formatCurrency(loanPrincipal, 0)} risks liquidation
+                if BTC drops below {formatCurrency(exchangeRate * 0.4, 0)}.
               </li>
             )}
             <li>
