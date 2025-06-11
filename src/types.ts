@@ -29,7 +29,6 @@ export interface CalculationResults {
   results: Result[];
   usdIncome: number[];
   btcIncome: number[];
-  riskScores: number[];
   loanPrincipal: number;
   loanInterest: number;
 }

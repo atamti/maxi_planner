@@ -100,25 +100,14 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       const btcWithIncome =
         btcSavings + btcInvestments + btcSpeculation + btcIncomeAllocation;
 
-      // Calculate USD income value for this year
-      const currentBtcPrice = exchangeRate * Math.pow(1 + btcGrowthRate, year);
-      const usdIncomeValue = btcIncomeAllocation * currentBtcPrice;
+      // Calculate USD income from the separated USD pool
+      const usdIncomeValue =
+        year >= activationYear && usdIncomePool > 0
+          ? usdIncomePool * (incomeYield / 100)
+          : 0;
+      const btcIncomeValue = 0; // Income is now entirely in USD
 
-      // Calculate risk score
-      const riskScore = Math.min(
-        100,
-        Math.max(
-          0,
-          2 * investmentsPct +
-            5 * speculationPct +
-            (year >= activationYear ? 10 : 0) +
-            Math.max(0, (btcGrowth - 20) * 2) + // Higher penalty for extreme growth assumptions
-            (collateralPct > 0 ? 10 + Math.max(0, loanRate - 5) * 2 : 0) +
-            (investmentsStartYield > 0 ? 5 : 0) +
-            (speculationStartYield > 0 ? 10 : 0), // Higher penalty for speculation
-        ),
-      );
-
+      // Record current year values BEFORE applying growth
       results.push({
         year,
         btcWithIncome: Math.max(0, btcWithIncome), // Prevent negative values
@@ -147,7 +136,6 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       results,
       usdIncome,
       btcIncome,
-      riskScores,
       loanPrincipal,
       loanInterest,
     };

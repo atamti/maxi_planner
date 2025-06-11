@@ -24,7 +24,6 @@ export const ResultsSection: React.FC<Props> = ({
     results: calculationResults,
     usdIncome,
     btcIncome,
-    riskScores,
     loanPrincipal,
     loanInterest,
   } = results;
@@ -78,45 +77,9 @@ export const ResultsSection: React.FC<Props> = ({
     ],
   };
 
-  const riskChartData = {
-    labels: ["Risk Score"],
-    datasets: [
-      {
-        label: "Portfolio Risk",
-        data: [riskScores[riskScores.length - 1]],
-        backgroundColor:
-          riskScores[riskScores.length - 1] <= 33
-            ? "#22C55E"
-            : riskScores[riskScores.length - 1] <= 66
-              ? "#FBBF24"
-              : "#EF4444",
-        borderColor: "#333333",
-        borderWidth: 1,
-      },
-    ],
-  };
-
   return (
     <div className="bg-white p-4 rounded-lg shadow">
       <h2 className="text-xl font-semibold mb-2">Results</h2>
-      <div className="mb-4">
-        <Bar
-          data={riskChartData}
-          options={{
-            indexAxis: "y",
-            scales: {
-              x: {
-                beginAtZero: true,
-                max: 100,
-                title: { display: true, text: "Risk Score (0-100)" },
-              },
-            },
-            plugins: {
-              title: { display: true, text: "Portfolio Risk Assessment" },
-            },
-          }}
-        />
-      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
@@ -171,16 +134,6 @@ export const ResultsSection: React.FC<Props> = ({
           </p>
           <p>
             <strong>Loan Interest (Annual):</strong> ${loanInterest.toFixed(2)}
-          </p>
-          <p>
-            <strong>Risk Score:</strong> {riskScores[riskScores.length - 1]} /
-            100 (
-            {riskScores[riskScores.length - 1] <= 33
-              ? "Low"
-              : riskScores[riskScores.length - 1] <= 66
-                ? "Medium"
-                : "High"}
-            )
           </p>
         </div>
         <div>
