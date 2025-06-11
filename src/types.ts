@@ -7,6 +7,7 @@ export interface FormData {
   loanRate: number;
   incomeYield: number;
   incomeAllocationPct: number;
+  incomeReinvestmentPct: number;
   investmentsStartYield: number;
   investmentsEndYield: number;
   speculationStartYield: number;
@@ -28,6 +29,7 @@ export interface CalculationResults {
   results: Result[];
   usdIncome: number[];
   btcIncome: number[];
+  incomeAtActivationYears: number[];
   loanPrincipal: number;
   loanInterest: number;
 }

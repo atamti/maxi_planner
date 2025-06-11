@@ -37,6 +37,7 @@ const DEFAULT_FORM_DATA: FormData = {
   loanRate: 7,
   incomeYield: 12,
   incomeAllocationPct: 10,
+  incomeReinvestmentPct: 20,
   investmentsStartYield: 30,
   investmentsEndYield: 10,
   speculationStartYield: 40,
@@ -107,6 +108,7 @@ const App: React.FC = () => {
         results={calculationResults}
         formData={formData}
         showUSD={showUSD}
+        onUpdateFormData={updateFormData}
       />
 
       <div className="bg-gray-100 p-4 text-center mt-4">

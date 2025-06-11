@@ -248,6 +248,25 @@ export const PortfolioForm: React.FC<Props> = ({
           </p>
         </div>
         <div>
+          <label className="block font-medium mb-1">
+            Reinvestment Rate (%):
+          </label>
+          <input
+            type="range"
+            value={formData.incomeReinvestmentPct}
+            onChange={(e) =>
+              updateFormData({ incomeReinvestmentPct: Number(e.target.value) })
+            }
+            className="w-full"
+            min="0"
+            max={formData.incomeYield}
+          />
+          <span className="text-sm text-gray-600">
+            {formData.incomeReinvestmentPct}% reinvested,{" "}
+            {formData.incomeYield - formData.incomeReinvestmentPct}% income
+          </span>
+        </div>
+        <div>
           <label className="block font-medium mb-1">Activation Year:</label>
           <input
             type="range"

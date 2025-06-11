@@ -12,6 +12,7 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       loanRate,
       incomeYield,
       incomeAllocationPct,
+      incomeReinvestmentPct,
       investmentsStartYield,
       investmentsEndYield,
       speculationStartYield,
@@ -60,11 +61,21 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       }
 
       // Calculate USD income from the separated USD pool
+      const effectiveIncomeRate = (incomeYield - incomeReinvestmentPct) / 100;
       const usdIncomeValue =
         year >= activationYear && usdIncomePool > 0
-          ? usdIncomePool * (incomeYield / 100)
+          ? usdIncomePool * effectiveIncomeRate
           : 0;
-      const btcIncomeValue = 0; // Income is now entirely in USD
+
+      // Apply reinvestment to grow the USD pool
+      const reinvestmentAmount =
+        year >= activationYear && usdIncomePool > 0
+          ? usdIncomePool * (incomeReinvestmentPct / 100)
+          : 0;
+
+      if (year >= activationYear && reinvestmentAmount > 0) {
+        usdIncomePool += reinvestmentAmount;
+      }
 
       // Record current year values BEFORE applying growth
       results.push({
@@ -73,7 +84,7 @@ export const useCalculations = (formData: FormData): CalculationResults => {
         btcWithoutIncome: Math.max(0, btcWithoutIncome),
       });
       usdIncome.push(year >= activationYear ? usdIncomeValue : 0);
-      btcIncome.push(btcIncomeValue);
+      btcIncome.push(0); // Income is now entirely in USD
 
       // Apply growth to both scenarios using the same logic (for next year)
       if (year < timeHorizon) {

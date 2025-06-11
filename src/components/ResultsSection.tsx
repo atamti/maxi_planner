@@ -18,12 +18,14 @@ interface Props {
     activationYear: number;
   };
   showUSD: boolean;
+  onUpdateFormData?: (updates: { activationYear: number }) => void;
 }
 
 export const ResultsSection: React.FC<Props> = ({
   results,
   formData,
   showUSD,
+  onUpdateFormData,
 }) => {
   const {
     results: calculationResults,
