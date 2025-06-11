@@ -51,6 +51,16 @@ const DEFAULT_FORM_DATA: FormData = {
   exchangeRate: 100000,
   timeHorizon: 20,
   activationYear: 5,
+
+  // USD Inflation
+  inflationMode: "simple",
+  inflationInputType: "flat",
+  inflationFlat: 8,
+  inflationStart: 5,
+  inflationEnd: 15,
+  inflationPreset: "managed",
+  inflationCustomRates: Array(30).fill(8), // Default 8% for all years
+  inflationManualMode: false,
 };
 
 const App: React.FC = () => {

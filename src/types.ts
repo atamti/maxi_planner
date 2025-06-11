@@ -19,6 +19,16 @@ export interface FormData {
   exchangeRate: number;
   timeHorizon: number;
   activationYear: number;
+
+  // USD Inflation
+  inflationMode: "simple" | "advanced";
+  inflationInputType: "flat" | "linear" | "preset";
+  inflationFlat: number;
+  inflationStart: number;
+  inflationEnd: number;
+  inflationPreset: "managed" | "crisis" | "hyperinflation";
+  inflationCustomRates: number[]; // For advanced mode - array of 30 rates
+  inflationManualMode: boolean; // Prevents auto-updates when user is manually editing
 }
 
 export interface Result {

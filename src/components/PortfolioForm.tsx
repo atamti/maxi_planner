@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FormData } from "../types";
 import { formatCurrency, formatNumber } from "../utils/formatNumber";
 import { AllocationSliders } from "./AllocationSliders";
+import { InflationSection } from "./InflationSection";
 import { YieldChart } from "./YieldChart";
 
 interface Props {
@@ -455,8 +456,16 @@ export const PortfolioForm: React.FC<Props> = ({
         )}
       </CollapsibleSection>
 
+      <CollapsibleSection title="💵 USD Inflation Assumptions">
+        <div className="col-span-2">
+          <InflationSection
+            formData={formData}
+            updateFormData={updateFormData}
+          />
+        </div>
+      </CollapsibleSection>
+
       <CollapsibleSection title="⚠️ Risk Scenarios (TBC)">
-        
         <div className="flex items-center p-3 bg-yellow-50 rounded border-l-4 border-yellow-400">
           <span className="text-yellow-800 text-sm">
             📊 Stress test your portfolio with various crash scenarios (TBC)

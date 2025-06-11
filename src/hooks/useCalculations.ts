@@ -95,7 +95,7 @@ export const useCalculations = (formData: FormData): CalculationResults => {
 
         // Initialize leveraged pool with original pool + loan proceeds
         leveragedUsdPool = usdIncomePool + (collateralPct > 0 ? loanDetails.loanPrincipal : 0);
-        console.log(`Year ${year}: USD Income Pool = ${usdIncomePool}, Leveraged USD Pool = ${leveragedUsdPool}`);
+        // console.log(`Year ${year}: USD Income Pool = ${usdIncomePool}, Leveraged USD Pool = ${leveragedUsdPool}`);
 
         // Scale down btcWithIncome by the allocation percentage
         btcWithIncome *= (100 - incomeAllocationPct) / 100;
@@ -107,18 +107,18 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       const baseUsdIncomeValue = year >= activationYear && usdIncomePool > 0
         ? usdIncomePool * effectiveIncomeRate
         : 0;
-      console.log(`Year ${year}: Base USD Income Value = ${baseUsdIncomeValue}`);
+      // console.log(`Year ${year}: Base USD Income Value = ${baseUsdIncomeValue}`);
 
       const leveragedIncomeValue = year >= activationYear && leveragedUsdPool > 0
         ? leveragedUsdPool * effectiveIncomeRate
         : 0;
-      console.log(`Year ${year}: Leveraged USD Income Value = ${leveragedIncomeValue}`);
+      // console.log(`Year ${year}: Leveraged USD Income Value = ${leveragedIncomeValue}`);
 
       // Calculate net leveraged income after debt service
       const netLeveragedIncome = year >= activationYear && collateralPct > 0
         ? leveragedIncomeValue - loanDetails.debtService
         : baseUsdIncomeValue;
-      console.log(`Year ${year}: Net Leveraged Income = ${netLeveragedIncome}`);
+      // console.log(`Year ${year}: Net Leveraged Income = ${netLeveragedIncome}`);
 
       // Apply reinvestment to grow both pools
       if (year >= activationYear) {
