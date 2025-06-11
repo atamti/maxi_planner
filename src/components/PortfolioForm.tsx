@@ -58,9 +58,7 @@ export const PortfolioForm: React.FC<Props> = ({
         defaultExpanded={true}
       >
         <div>
-          <label className="block font-medium mb-1">
-            BTC Stack Size (₿):
-          </label>
+          <label className="block font-medium mb-1">BTC Stack Size (₿):</label>
           <input
             type="number"
             value={formData.btcStack}
@@ -74,7 +72,7 @@ export const PortfolioForm: React.FC<Props> = ({
         </div>
         <div>
           <label className="block font-medium mb-1">
-            BTC/USD Exchange Rate ($/₿):
+            Starting USD Exchange Rate ($/₿):
           </label>
           <input
             type="number"
@@ -138,7 +136,7 @@ export const PortfolioForm: React.FC<Props> = ({
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="📈 Yield Assumptions">
+      <CollapsibleSection title="📈 BTC yield assumptions">
         <div>
           <label className="block font-medium mb-1">
             Investments Start Yield (BTC %):

@@ -117,11 +117,11 @@ const App: React.FC = () => {
           USD income decays.
         </p>
         <p>
-          <a href="https://github.com" className="text-blue-600 underline">
+          <a href="https://github.com/atamti/maxi_planner" className="text-blue-600 underline">
             GitHub
           </a>{" "}
           |{" "}
-          <a href="https://x.com" className="text-blue-600 underline">
+          <a href="https://x.com/ChrisElamLearn" className="text-blue-600 underline">
             Feedback on X
           </a>{" "}
           |{" "}
