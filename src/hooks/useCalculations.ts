@@ -36,7 +36,6 @@ export const useCalculations = (formData: FormData): CalculationResults => {
     const results: Result[] = [];
     const usdIncome: number[] = [];
     const btcIncome: number[] = [];
-    const riskScores: number[] = [];
 
     for (let year = 0; year <= timeHorizon; year++) {
       // Calculate yields for the current year
