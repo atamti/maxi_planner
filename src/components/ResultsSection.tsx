@@ -1,5 +1,5 @@
 import React from "react";
-import { Bar, Line } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import { CalculationResults } from "../types";
 
 interface Props {
@@ -51,15 +51,17 @@ export const ResultsSection: React.FC<Props> = ({
         label: "Pure growth",
         data: calculationResults.map((r) => r.btcWithoutIncome),
         borderColor: "#666666",
-        backgroundColor: "rgba(102, 102, 102, 0.2)",
+        backgroundColor: "rgba(102, 102, 102, 0.1)",
         fill: false,
+        order: 2,
       },
       {
-        label: "BTC Income (BTC/year, Decaying)",
-        data: btcIncome.map((v) => v.toFixed(3)),
-        borderColor: "#333333",
-        backgroundColor: "rgba(51, 51, 51, 0.2)",
-        fill: false,
+        label: "Minus income allocation",
+        data: calculationResults.map((r) => r.btcWithIncome),
+        borderColor: "#F7931A",
+        backgroundColor: "rgba(247, 147, 26, 0.4)",
+        fill: "+1",
+        order: 1,
       },
     ],
   };
@@ -68,8 +70,8 @@ export const ResultsSection: React.FC<Props> = ({
     labels: calculationResults.map((r) => r.year),
     datasets: [
       {
-        label: "USD Income ($/year)",
-        data: usdIncome.map((v) => (v / 1000).toFixed(2)),
+        label: "USD Income ($k/year)",
+        data: usdIncome.map((v) => v / 1000),
         borderColor: "#1A73E8",
         backgroundColor: "rgba(26, 115, 232, 0.2)",
         fill: true,
@@ -146,8 +148,9 @@ export const ResultsSection: React.FC<Props> = ({
             </li>
             {speculationPct > 0 && (
               <li>
-                Speculation ({speculationPct}%) has high yields (60%→20%) but
-                greater loss risk.
+                Speculation ({speculationPct}%) has high potential yields (
+                {speculationStartYield}%→{speculationEndYield}%) but greater
+                loss risk.
               </li>
             )}
             {collateralPct > 0 && (
@@ -157,8 +160,8 @@ export const ResultsSection: React.FC<Props> = ({
               </li>
             )}
             <li>
-              USD income decays in BTC terms (e.g., 0.06 BTC/year to 0.008
-              BTC/year).
+              USD income decays in BTC terms as Bitcoin appreciates at{" "}
+              {btcGrowth}% annually.
             </li>
           </ul>
         </div>
@@ -173,18 +176,56 @@ export const ResultsSection: React.FC<Props> = ({
               scales: {
                 y: {
                   beginAtZero: true,
-                  title: { display: true, text: "BTC Amount" },
+                  title: { display: true, text: "BTC" },
                 },
                 x: { title: { display: true, text: "Years" } },
               },
               plugins: {
                 title: {
                   display: true,
-                  text: "Bitcoin Stack Size Over Time",
+                  text: "Bitcoin stack size over time",
                 },
                 legend: {
                   position: "bottom",
                 },
+                tooltip: {
+                  displayColors: true,
+                  callbacks: {
+                    title: function () {
+                      return ""; // Remove year from title
+                    },
+                    label: function (context) {
+                      return `${context.parsed.y.toFixed(1)} : ${context.dataset.label}`;
+                    },
+                    labelTextColor: function (context) {
+                      // Use darker colors for better contrast against tooltip background
+                      if (context.dataset.label?.includes("Pure growth")) {
+                        return "#EFEFEF"; // Dark gray instead of light gray
+                      }
+                      return context.dataset.borderColor as string;
+                    },
+                    afterLabel: function (context) {
+                      const year = context.dataIndex;
+                      const withIncome = calculationResults[year].btcWithIncome;
+                      const withoutIncome =
+                        calculationResults[year].btcWithoutIncome;
+                      const gap = withoutIncome - withIncome;
+
+                      if (
+                        context.dataset.label?.includes(
+                          "Minus income allocation",
+                        )
+                      ) {
+                        return `${gap.toFixed(1)} : Gap`;
+                      }
+                      return;
+                    },
+                  },
+                },
+              },
+              interaction: {
+                mode: "index",
+                intersect: false,
               },
             }}
           />
@@ -204,7 +245,7 @@ export const ResultsSection: React.FC<Props> = ({
               plugins: {
                 title: {
                   display: true,
-                  text: "Annual USD Income Generation",
+                  text: "Annual USD income generation",
                 },
                 legend: {
                   position: "bottom",

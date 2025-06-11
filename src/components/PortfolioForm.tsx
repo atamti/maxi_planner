@@ -59,7 +59,7 @@ export const PortfolioForm: React.FC<Props> = ({
       >
         <div>
           <label className="block font-medium mb-1">
-            BTC Stack Size (BTC):
+            BTC Stack Size (₿):
           </label>
           <input
             type="number"
@@ -74,7 +74,7 @@ export const PortfolioForm: React.FC<Props> = ({
         </div>
         <div>
           <label className="block font-medium mb-1">
-            BTC/USD Exchange Rate ($):
+            BTC/USD Exchange Rate ($/₿):
           </label>
           <input
             type="number"
