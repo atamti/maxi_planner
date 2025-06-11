@@ -26,27 +26,28 @@ ChartJS.register(
   Legend,
 );
 
+const DEFAULT_FORM_DATA: FormData = {
+  btcStack: 1,
+  savingsPct: 65,
+  investmentsPct: 25,
+  speculationPct: 10,
+  collateralPct: 15,
+  loanRate: 7,
+  incomeYield: 12,
+  incomeAllocationPct: 10,
+  investmentsStartYield: 30,
+  investmentsEndYield: 10,
+  speculationStartYield: 40,
+  speculationEndYield: 10,
+  btcGrowth: 50,
+  priceCrash: 0,
+  exchangeRate: 100000,
+  timeHorizon: 20,
+  activationYear: 5,
+};
+
 const App: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    btcStack: 5,
-    savingsPct: 65,
-    investmentsPct: 25,
-    speculationPct: 10,
-    collateralPct: 15,
-    loanRate: 7,
-    incomeYield: 12,
-    investmentsStartYield: 40,
-    investmentsEndYield: 15,
-    speculationStartYield: 60,
-    speculationEndYield: 20,
-    btcGrowth: 50,
-    priceCrash: 0,
-    expenses: 50000,
-    income: 80000,
-    exchangeRate: 100000,
-    timeHorizon: 20,
-    activationYear: 5,
-  });
+  const [formData, setFormData] = useState<FormData>(DEFAULT_FORM_DATA);
 
   const [showUSD, setShowUSD] = useState<boolean>(false);
   const [allocationError, setAllocationError] = useState<string>("");
@@ -56,26 +57,7 @@ const App: React.FC = () => {
   };
 
   const resetForm = () => {
-    setFormData({
-      btcStack: 5,
-      savingsPct: 65,
-      investmentsPct: 25,
-      speculationPct: 10,
-      collateralPct: 15,
-      loanRate: 7,
-      incomeYield: 12,
-      investmentsStartYield: 40,
-      investmentsEndYield: 15,
-      speculationStartYield: 60,
-      speculationEndYield: 20,
-      btcGrowth: 50,
-      priceCrash: 0,
-      expenses: 50000,
-      income: 80000,
-      exchangeRate: 100000,
-      timeHorizon: 20,
-      activationYear: 5,
-    });
+    setFormData(DEFAULT_FORM_DATA);
   };
 
   useEffect(() => {
@@ -96,10 +78,10 @@ const App: React.FC = () => {
       </div>
 
       <h1 className="text-2xl font-bold text-orange-500 mb-4">
-        BTC Portfolio Planner
+        BTC maxi portfolio planner
       </h1>
       <p className="text-gray-600 mb-4">
-        Plan your Bitcoin wealth for a fiat world
+        Balance your stack with income requirments and risk tolerance.
       </p>
 
       <label className="flex items-center mb-4">
