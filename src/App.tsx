@@ -2,6 +2,7 @@ import {
   BarElement,
   CategoryScale,
   Chart as ChartJS,
+  Filler,
   Legend,
   LinearScale,
   LineElement,
@@ -26,18 +27,21 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
+  Filler,
 );
 
 const DEFAULT_FORM_DATA: FormData = {
-  btcStack: 1,
+  btcStack: 5,
   savingsPct: 65,
   investmentsPct: 25,
   speculationPct: 10,
-  collateralPct: 15,
+  collateralPct: 50,
   loanRate: 7,
-  incomeYield: 12,
+  loanTermYears: 10,
+  interestOnly: true,
+  incomeYield: 20,
   incomeAllocationPct: 10,
-  incomeReinvestmentPct: 20,
+  incomeReinvestmentPct: 5,
   investmentsStartYield: 30,
   investmentsEndYield: 10,
   speculationStartYield: 40,
@@ -117,11 +121,17 @@ const App: React.FC = () => {
           USD income decays.
         </p>
         <p>
-          <a href="https://github.com/atamti/maxi_planner" className="text-blue-600 underline">
+          <a
+            href="https://github.com/atamti/maxi_planner"
+            className="text-blue-600 underline"
+          >
             GitHub
           </a>{" "}
           |{" "}
-          <a href="https://x.com/ChrisElamLearn" className="text-blue-600 underline">
+          <a
+            href="https://x.com/ChrisElamLearn"
+            className="text-blue-600 underline"
+          >
             Feedback on X
           </a>{" "}
           |{" "}

@@ -334,6 +334,120 @@ export const PortfolioForm: React.FC<Props> = ({
             {formData.priceCrash}% price decline scenario
           </span>
         </div>
+        <div>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.interestOnly}
+              onChange={(e) =>
+                updateFormData({ interestOnly: e.target.checked })
+              }
+              className="mr-2"
+            />
+            <span className="font-medium">Interest Only Payments</span>
+          </label>
+          <p className="text-xs text-gray-600 mt-1">
+            {formData.interestOnly
+              ? "Pay only interest, principal remains unchanged"
+              : `Amortized payments over ${formData.loanTermYears}-year term`}
+          </p>
+        </div>
+
+        {/* Live Loan Calculations */}
+        {formData.collateralPct > 0 && (
+          <div className="col-span-2 mt-4 p-3 bg-blue-50 rounded-lg border">
+            <h4 className="font-semibold text-blue-800 mb-2">
+              💰 Loan Details
+            </h4>
+            {(() => {
+              // Calculate BTC stack at activation year with growth
+              let btcStackAtActivation = formData.btcStack;
+              for (let year = 0; year < formData.activationYear; year++) {
+                const investmentsYield =
+                  formData.investmentsStartYield -
+                  (formData.investmentsStartYield -
+                    formData.investmentsEndYield) *
+                    (year / formData.timeHorizon);
+                const speculationYield =
+                  formData.speculationStartYield -
+                  (formData.speculationStartYield -
+                    formData.speculationEndYield) *
+                    (year / formData.timeHorizon);
+
+                const savings =
+                  btcStackAtActivation * (formData.savingsPct / 100);
+                const investments =
+                  btcStackAtActivation *
+                  (formData.investmentsPct / 100) *
+                  (1 + investmentsYield / 100);
+                const speculation =
+                  btcStackAtActivation *
+                  (formData.speculationPct / 100) *
+                  (1 + speculationYield / 100);
+
+                btcStackAtActivation = savings + investments + speculation;
+              }
+
+              const btcSavingsAtActivation =
+                btcStackAtActivation * (formData.savingsPct / 100);
+              const collateralBtc =
+                btcSavingsAtActivation * (formData.collateralPct / 100);
+
+              // Use BTC price at activation year
+              const btcPriceAtActivation =
+                formData.exchangeRate *
+                Math.pow(1 + formData.btcGrowth / 100, formData.activationYear);
+              const loanPrincipal = collateralBtc * 0.4 * btcPriceAtActivation;
+
+              const annualInterest = loanPrincipal * (formData.loanRate / 100);
+              const monthlyPayment = formData.interestOnly
+                ? annualInterest / 12
+                : (loanPrincipal *
+                    (formData.loanRate / 100 / 12) *
+                    Math.pow(
+                      1 + formData.loanRate / 100 / 12,
+                      formData.loanTermYears * 12,
+                    )) /
+                  (Math.pow(
+                    1 + formData.loanRate / 100 / 12,
+                    formData.loanTermYears * 12,
+                  ) -
+                    1);
+              const annualPayment = monthlyPayment * 12;
+
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <strong>Collateral BTC:</strong>{" "}
+                    {formatNumber(collateralBtc, 3)} BTC
+                  </div>
+                  <div>
+                    <strong>BTC Price (Year {formData.activationYear}):</strong>{" "}
+                    {formatCurrency(btcPriceAtActivation, 0)}
+                  </div>
+                  <div>
+                    <strong>Loan Principal:</strong>{" "}
+                    {formatCurrency(loanPrincipal, 0)}
+                  </div>
+                  <div>
+                    <strong>Annual Payment:</strong>{" "}
+                    {formatCurrency(annualPayment, 0)}
+                  </div>
+                  {formData.interestOnly && (
+                    <div className="col-span-2 text-orange-600 text-xs">
+                      ⚠️ Interest-only: Principal of{" "}
+                      {formatCurrency(loanPrincipal, 0)} remains due
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
+        )}
+      </CollapsibleSection>
+
+      <CollapsibleSection title="⚠️ Risk Scenarios (TBC)">
+        
         <div className="flex items-center p-3 bg-yellow-50 rounded border-l-4 border-yellow-400">
           <span className="text-yellow-800 text-sm">
             📊 Stress test your portfolio with various crash scenarios
