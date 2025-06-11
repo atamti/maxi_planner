@@ -307,6 +307,25 @@ export const PortfolioForm: React.FC<Props> = ({
           />
         </div>
         <div>
+          <label className="block font-medium mb-1">
+            Income Bucket Allocation (%):
+          </label>
+          <input
+            type="number"
+            value={formData.incomeAllocationPct}
+            onChange={(e) =>
+              updateFormData({ incomeAllocationPct: Number(e.target.value) })
+            }
+            className="w-full p-2 border rounded"
+            min="0"
+            max="50"
+          />
+          <p className="text-xs text-gray-600 mt-1">
+            Percentage of BTC stack to convert to USD income pool at activation
+            year
+          </p>
+        </div>
+        <div>
           <label className="block font-medium mb-1">Activation Year:</label>
           <input
             type="range"

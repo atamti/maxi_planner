@@ -11,6 +11,7 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       collateralPct,
       loanRate,
       incomeYield,
+      incomeAllocationPct,
       investmentsStartYield,
       investmentsEndYield,
       speculationStartYield,

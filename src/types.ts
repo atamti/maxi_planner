@@ -6,6 +6,7 @@ export interface FormData {
   collateralPct: number;
   loanRate: number;
   incomeYield: number;
+  incomeAllocationPct: number;
   investmentsStartYield: number;
   investmentsEndYield: number;
   speculationStartYield: number;
