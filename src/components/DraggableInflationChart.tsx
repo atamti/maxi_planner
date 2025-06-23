@@ -7,6 +7,7 @@ interface Props {
   maxYears?: number;
   maxValue?: number;
   minValue?: number;
+  yAxisLabel?: string; // New optional prop for Y-axis label
 }
 
 export const DraggableInflationChart: React.FC<Props> = ({
@@ -16,6 +17,7 @@ export const DraggableInflationChart: React.FC<Props> = ({
   maxYears = 30,
   maxValue = 100,
   minValue = 0,
+  yAxisLabel = "Value (%)", // Default label
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -265,7 +267,7 @@ export const DraggableInflationChart: React.FC<Props> = ({
           fontWeight="bold"
           transform={`rotate(-90, 15, ${height / 2})`}
         >
-          Inflation Rate (%)
+          {yAxisLabel} {/* Use the new prop for Y-axis label */}
         </text>
       </svg>
 

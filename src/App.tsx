@@ -58,9 +58,24 @@ const DEFAULT_FORM_DATA: FormData = {
   inflationFlat: 8,
   inflationStart: 5,
   inflationEnd: 15,
-  inflationPreset: "managed",
+  inflationPreset: "debasement",
   inflationCustomRates: Array(30).fill(8), // Default 8% for all years
   inflationManualMode: false,
+
+  // BTC Price Appreciation
+  btcPriceMode: "simple",
+  btcPriceInputType: "preset",
+  btcPriceFlat: 50,
+  btcPriceStart: 30,
+  btcPriceEnd: 70,
+  btcPricePreset: "debasement",
+  btcPriceCustomRates: Array(30).fill(50), // Default 50% for all years
+  btcPriceManualMode: false,
+
+  // Economic Scenario
+  economicScenario: "debasement",
+  followEconomicScenarioInflation: true,
+  followEconomicScenarioBtc: true,
 };
 
 const App: React.FC = () => {
@@ -101,16 +116,6 @@ const App: React.FC = () => {
         Balance your stack with income requirments and risk tolerance.
       </p>
 
-      <label className="flex items-center mb-4">
-        <input
-          type="checkbox"
-          checked={showUSD}
-          onChange={() => setShowUSD(!showUSD)}
-          className="mr-2"
-        />
-        Show USD Equivalents
-      </label>
-
       <PortfolioForm
         formData={formData}
         updateFormData={updateFormData}
@@ -146,7 +151,7 @@ const App: React.FC = () => {
           </a>{" "}
           |{" "}
           <a
-            href="mailto:contact@example.com"
+            href="mailto:chris.r.elam@protonmail.com"
             className="text-blue-600 underline"
           >
             Contact

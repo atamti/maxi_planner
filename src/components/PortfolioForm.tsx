@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { FormData } from "../types";
 import { formatCurrency, formatNumber } from "../utils/formatNumber";
 import { AllocationSliders } from "./AllocationSliders";
+import { BtcPriceSection } from "./BtcPriceSection";
+import { EconomicScenariosSection } from "./EconomicScenariosSection";
 import { InflationSection } from "./InflationSection";
 import { YieldChart } from "./YieldChart";
 
@@ -55,10 +57,15 @@ export const PortfolioForm: React.FC<Props> = ({
     <div className="bg-white p-4 rounded-lg shadow mb-4">
       <h2 className="text-xl font-semibold mb-4">Portfolio Configuration</h2>
 
-      <CollapsibleSection
-        title="🏦 Core Portfolio Setup"
-        defaultExpanded={true}
-      >
+      {/* Add Economic Scenarios section at the top */}
+      <div className="mb-6">
+        <EconomicScenariosSection
+          formData={formData}
+          updateFormData={updateFormData}
+        />
+      </div>
+
+      <CollapsibleSection title="💼 Portfolio Setup" defaultExpanded={true}>
         <div>
           <label className="block font-medium mb-1">BTC Stack Size (₿):</label>
           <input
@@ -125,13 +132,10 @@ export const PortfolioForm: React.FC<Props> = ({
             {formData.btcGrowth}% annually
           </span>
         </div>
-      </CollapsibleSection>
 
-      <CollapsibleSection
-        title="📊 Asset Allocation Strategy"
-        defaultExpanded={true}
-      >
-        <div className="col-span-2">
+        {/* Asset allocation section integrated here */}
+        <div className="col-span-2 mt-4 pt-4 border-t border-gray-200">
+          <h4 className="font-semibold mb-3">Asset Allocation Strategy</h4>
           <AllocationSliders
             savingsPct={formData.savingsPct}
             investmentsPct={formData.investmentsPct}
@@ -459,6 +463,15 @@ export const PortfolioForm: React.FC<Props> = ({
       <CollapsibleSection title="💵 USD Inflation Assumptions">
         <div className="col-span-2">
           <InflationSection
+            formData={formData}
+            updateFormData={updateFormData}
+          />
+        </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection title="₿ BTC Price Appreciation">
+        <div className="col-span-2">
+          <BtcPriceSection
             formData={formData}
             updateFormData={updateFormData}
           />

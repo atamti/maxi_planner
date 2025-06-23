@@ -1,4 +1,5 @@
 import React from "react";
+import economicScenarios, { ScenarioKey } from "../config/economicScenarios";
 import { FormData } from "../types";
 import { DraggableInflationChart } from "./DraggableInflationChart";
 
@@ -11,26 +12,17 @@ export const InflationSection: React.FC<Props> = ({
   formData,
   updateFormData,
 }) => {
-  const presetScenarios = {
-    managed: {
-      name: "Managed Debasement",
-      startRate: 8,
-      endRate: 12,
-      maxAxis: 20,
-    },
-    crisis: {
-      name: "Crisis Acceleration",
-      startRate: 15,
-      endRate: 25,
-      maxAxis: 40,
-    },
-    hyperinflation: {
-      name: "Hyperinflationary Spiral",
-      startRate: 30,
-      endRate: 100,
-      maxAxis: 100,
-    },
+  const getScenarioPresets = () => {
+    const presets: Record<string, any> = {};
+    Object.entries(economicScenarios).forEach(([key, scenario]) => {
+      if (key !== "custom") {
+        presets[key] = scenario.inflation;
+      }
+    });
+    return presets;
   };
+
+  const presetScenarios = getScenarioPresets();
 
   const generateInflationRates = (
     inputType = formData.inflationInputType,
@@ -129,10 +121,83 @@ export const InflationSection: React.FC<Props> = ({
     return 100; // Default
   };
 
+  // Calculate average inflation rate
+  const calculateAverageInflation = (): number => {
+    if (formData.inflationCustomRates.length === 0) return 0;
+
+    const sum = formData.inflationCustomRates
+      .slice(0, formData.timeHorizon)
+      .reduce((acc, val) => acc + val, 0);
+
+    return Math.round(sum / formData.timeHorizon);
+  };
+
+  const handleScenarioToggle = (follow: boolean) => {
+    updateFormData({
+      followEconomicScenarioInflation: follow,
+      // If now following scenario, update inflation preset based on economic scenario
+      ...(follow &&
+        formData.economicScenario !== "custom" && {
+          inflationManualMode: false,
+          inflationInputType: "preset",
+        }),
+    });
+  };
+
   return (
     <div className="space-y-4">
-      {/* Quick Setup Options */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+      {/* Scenario Toggle - With fixed description that includes the message from the removed blue box */}
+      <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+        <div className="flex items-center justify-start space-x-4">
+          <div className="text-sm font-medium text-amber-800 w-32">
+            Follow Scenario
+          </div>
+
+          <div className="relative mx-2">
+            <input
+              type="checkbox"
+              checked={formData.followEconomicScenarioInflation}
+              onChange={(e) => handleScenarioToggle(e.target.checked)}
+              className="sr-only"
+              id="inflation-scenario-toggle"
+            />
+            <label
+              htmlFor="inflation-scenario-toggle"
+              className={`flex items-center cursor-pointer w-12 h-6 rounded-full transition-colors duration-200 ${
+                formData.followEconomicScenarioInflation
+                  ? "bg-amber-500"
+                  : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`inline-block w-4 h-4 bg-white rounded-full shadow transform transition-transform duration-200 ${
+                  formData.followEconomicScenarioInflation
+                    ? "translate-x-7"
+                    : "translate-x-1"
+                }`}
+              />
+            </label>
+          </div>
+
+          <div className="text-sm font-medium text-amber-800 w-32">
+            Custom Control
+          </div>
+        </div>
+
+        {/* Description with corrected text and integrated info box message */}
+        <div className="mt-3 text-xs text-amber-700 min-h-[1.5rem] ml-1">
+          {formData.followEconomicScenarioInflation
+            ? `Following economic scenario with ${calculateAverageInflation()}% average inflation. Settings are controlled by the selected scenario.`
+            : "Manual configuration with custom parameters."}
+        </div>
+      </div>
+
+      {/* Remove the Following Scenario Message blue box since we integrated it into the description */}
+
+      {/* Quick Setup Options - Only fully enabled in manual mode */}
+      <div
+        className={`grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg ${formData.followEconomicScenarioInflation ? "opacity-60" : ""}`}
+      >
         <div>
           <label className="block font-medium mb-2">Quick Setup:</label>
           <div className="space-y-2">
@@ -256,20 +321,17 @@ export const InflationSection: React.FC<Props> = ({
                 value={formData.inflationPreset}
                 onChange={(e) =>
                   updateFormData({
-                    inflationPreset: e.target.value as
-                      | "managed"
-                      | "crisis"
-                      | "hyperinflation",
+                    inflationPreset: e.target.value as ScenarioKey,
                   })
                 }
                 className="w-full p-2 border rounded"
                 disabled={formData.inflationManualMode}
               >
-                <option value="managed">Managed Debasement (8% → 12%)</option>
-                <option value="crisis">Crisis Acceleration (15% → 25%)</option>
-                <option value="hyperinflation">
-                  Hyperinflationary Spiral (30% → 100%)
-                </option>
+                {Object.entries(presetScenarios).map(([key, preset]) => (
+                  <option key={key} value={key}>
+                    {preset.name} ({preset.startRate}% → {preset.endRate}%)
+                  </option>
+                ))}
               </select>
               <p className="text-xs text-gray-600 mt-1">
                 Curved upward progression over {formData.timeHorizon} years
@@ -279,16 +341,24 @@ export const InflationSection: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Interactive Chart Editor */}
+      {/* Interactive Chart Editor - Always visible but may be read-only */}
       <div className="mt-4 w-full">
         <h4 className="font-semibold mb-2">📊 Interactive Chart Editor</h4>
         <div className="w-full">
           <DraggableInflationChart
             data={formData.inflationCustomRates}
             onChange={(newData) =>
-              updateFormData({ inflationCustomRates: newData })
+              updateFormData({
+                inflationCustomRates: newData,
+                ...(formData.followEconomicScenarioInflation
+                  ? { followEconomicScenarioInflation: false }
+                  : {}),
+              })
             }
             onStartDrag={() => {
+              if (formData.followEconomicScenarioInflation) {
+                updateFormData({ followEconomicScenarioInflation: false });
+              }
               if (!formData.inflationManualMode) {
                 updateFormData({ inflationManualMode: true });
               }
@@ -296,48 +366,58 @@ export const InflationSection: React.FC<Props> = ({
             maxYears={formData.timeHorizon}
             maxValue={getChartMaxValue()}
             minValue={0}
+            yAxisLabel="Annual Inflation Rate (%)"
           />
         </div>
       </div>
 
-      {/* Manual Mode Toggle - Below Chart */}
-      <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-200">
-        <div className="flex items-center space-x-3">
-          <span className="text-sm font-medium text-amber-800">
-            {formData.inflationManualMode ? "🔒 Manual Mode" : "🔄 Auto Mode"}
-          </span>
-          <div className="relative">
-            <input
-              type="checkbox"
-              checked={formData.inflationManualMode}
-              onChange={(e) =>
-                updateFormData({ inflationManualMode: e.target.checked })
-              }
-              className="sr-only"
-              id="manual-mode-toggle"
-            />
-            <label
-              htmlFor="manual-mode-toggle"
-              className={`flex items-center cursor-pointer w-12 h-6 rounded-full transition-colors duration-200 ${
-                formData.inflationManualMode ? "bg-amber-500" : "bg-gray-300"
-              }`}
-            >
-              <span
-                className={`inline-block w-4 h-4 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                  formData.inflationManualMode
-                    ? "translate-x-7"
-                    : "translate-x-1"
-                }`}
+      {/* Manual Mode Toggle - Below Chart - Only visible in manual mode */}
+      {!formData.followEconomicScenarioInflation && (
+        <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+          <div className="flex items-center justify-start space-x-4">
+            <div className="text-sm font-medium text-amber-800 w-24">
+              Auto Apply
+            </div>
+
+            <div className="relative mx-2">
+              <input
+                type="checkbox"
+                checked={formData.inflationManualMode}
+                onChange={(e) =>
+                  updateFormData({ inflationManualMode: e.target.checked })
+                }
+                className="sr-only"
+                id="manual-mode-toggle"
               />
-            </label>
+              <label
+                htmlFor="manual-mode-toggle"
+                className={`flex items-center cursor-pointer w-12 h-6 rounded-full transition-colors duration-200 ${
+                  formData.inflationManualMode ? "bg-amber-500" : "bg-gray-300"
+                }`}
+              >
+                <span
+                  className={`inline-block w-4 h-4 bg-white rounded-full shadow transform transition-transform duration-200 ${
+                    formData.inflationManualMode
+                      ? "translate-x-7"
+                      : "translate-x-1"
+                  }`}
+                />
+              </label>
+            </div>
+
+            <div className="text-sm font-medium text-amber-800 w-24">
+              Manual Mode
+            </div>
           </div>
-          <span className="text-sm text-amber-700">
+
+          {/* Left-aligned description */}
+          <div className="mt-3 text-xs text-amber-700 min-h-[1.5rem] ml-1">
             {formData.inflationManualMode
-              ? "Chart locked - quick setup disabled"
-              : "Auto-apply enabled"}
-          </span>
+              ? "Chart editing locked - drag points to adjust values"
+              : "Changes apply immediately when adjusting parameters"}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
