@@ -2,7 +2,6 @@ import React from "react";
 import economicScenarios, { ScenarioKey } from "../config/economicScenarios";
 import { FormData } from "../types";
 import { DraggableRateChart } from "./DraggableRateChart";
-import { RateConfigSection } from "./RateConfigSection";
 import { ToggleSwitch } from "./common/ToggleSwitch";
 
 interface Props {
@@ -67,8 +66,12 @@ export const BtcPriceSection: React.FC<Props> = ({
       }
     } else if (inputType === "preset") {
       // Only access preset scenarios if we're not in custom mode
-      if (!isManualRateSelected && presetScenarios[formData.btcPricePreset]) {
-        const scenario = presetScenarios[formData.btcPricePreset];
+      if (
+        !isManualRateSelected &&
+        presetScenarios[formData.btcPricePreset as ScenarioKey]
+      ) {
+        const scenario =
+          presetScenarios[formData.btcPricePreset as ScenarioKey];
 
         for (let i = 0; i < formData.timeHorizon; i++) {
           const progress = i / Math.max(1, formData.timeHorizon - 1);
@@ -213,21 +216,15 @@ export const BtcPriceSection: React.FC<Props> = ({
   }, [formData.btcPriceManualMode]);
 
   const getChartMaxValue = (): number => {
+    // If we're using a preset scenario that isn't custom, use its maxAxis value
     if (formData.btcPriceInputType === "preset" && !isManualRateSelected) {
-      return presetScenarios[formData.btcPricePreset]?.maxAxis || 100;
+      return (
+        presetScenarios[formData.btcPricePreset as ScenarioKey]?.maxAxis || 200
+      );
     }
-    if (isManualRateSelected) {
-      // When manual mode is selected, use the custom scenario's maxAxis
-      return presetScenarios.custom?.maxAxis || 100;
-    }
-    if (formData.btcPriceInputType === "flat") {
-      return Math.max(100, Math.ceil((formData.btcPriceFlat * 1.2) / 10) * 10);
-    }
-    if (formData.btcPriceInputType === "linear") {
-      const maxValue = Math.max(formData.btcPriceStart, formData.btcPriceEnd);
-      return Math.max(100, Math.ceil((maxValue * 1.2) / 10) * 10);
-    }
-    return 100;
+
+    // Default to 200% for all other cases
+    return 200;
   };
 
   const handleScenarioToggle = (follow: boolean) => {
@@ -251,33 +248,129 @@ export const BtcPriceSection: React.FC<Props> = ({
           checked={formData.followEconomicScenarioBtc}
           onChange={(checked) => handleScenarioToggle(checked)}
           id="btc-scenario-toggle"
-          label="Follow Scenario"
+          label="Follow Global Scenario"
           colorClass={{ on: "bg-green-500", off: "bg-gray-300" }}
           disabled={formData.btcPriceManualMode}
           description={{
-            on: `Following economic scenario with ${calculateAverageBtcAppreciation()}% average appreciation. Settings are controlled by the selected scenario.`,
+            on: `Following ${formData.economicScenario} scenario with ${calculateAverageBtcAppreciation()}% average appreciation. Settings are controlled by the selected scenario.`,
             off: "Manual configuration with custom parameters.",
           }}
         />
       )}
 
-      {/* Use the RateConfigSection for configuration */}
-      <RateConfigSection
-        title="BTC Growth Scenario:"
-        inputType={formData.btcPriceInputType}
-        onInputTypeChange={handleInputTypeChange}
-        flat={formData.btcPriceFlat}
-        onFlatChange={(value) => updateFormData({ btcPriceFlat: value })}
-        start={formData.btcPriceStart}
-        onStartChange={(value) => updateFormData({ btcPriceStart: value })}
-        end={formData.btcPriceEnd}
-        onEndChange={(value) => updateFormData({ btcPriceEnd: value })}
-        preset={formData.btcPricePreset}
-        onPresetChange={(value) => handleScenarioChange(value)}
-        manualMode={formData.btcPriceManualMode}
-        scenarioType="btcPrice"
-        disabled={formData.followEconomicScenarioBtc}
-      />
+      {/* BTC Growth Scenario Dropdown Section */}
+      <div
+        className={`p-4 bg-gray-50 rounded-lg ${formData.followEconomicScenarioBtc ? "opacity-60" : ""}`}
+      >
+        <label className="block font-medium mb-2">BTC Growth Scenario:</label>
+        <select
+          value={
+            formData.btcPriceInputType === "flat"
+              ? "custom-flat"
+              : formData.btcPriceInputType === "linear"
+                ? "custom-linear"
+                : formData.btcPricePreset
+          }
+          onChange={(e) => handleScenarioChange(e.target.value)}
+          className="w-full p-2 border rounded mb-3"
+          disabled={
+            formData.followEconomicScenarioBtc || formData.btcPriceManualMode
+          }
+        >
+          {/* Economic scenario presets */}
+          <optgroup label="Preset Scenarios">
+            {Object.entries(presetScenarios).map(([key, scenario]) => {
+              if (key !== "custom") {
+                return (
+                  <option key={key} value={key}>
+                    {scenario.name} ({scenario.startRate}% → {scenario.endRate}
+                    %)
+                  </option>
+                );
+              }
+              return null;
+            })}
+          </optgroup>
+
+          {/* Custom options */}
+          <optgroup label="Custom Configurations">
+            <option value="custom-flat">Custom - Flat Rate</option>
+            <option value="custom-linear">Custom - Linear Progression</option>
+          </optgroup>
+        </select>
+
+        {/* Show appropriate fields based on selection - MODIFIED to maintain visibility */}
+        {formData.btcPriceInputType === "flat" && (
+          <div
+            className={`mt-3 ${formData.btcPriceManualMode ? "opacity-60" : ""}`}
+          >
+            <label className="block font-medium mb-1">Flat Rate (%):</label>
+            <input
+              type="number"
+              value={formData.btcPriceFlat}
+              onChange={(e) =>
+                updateFormData({ btcPriceFlat: Number(e.target.value) })
+              }
+              className="w-full p-2 border rounded"
+              min="0"
+              max="500"
+              disabled={
+                formData.followEconomicScenarioBtc ||
+                formData.btcPriceManualMode
+              }
+            />
+          </div>
+        )}
+
+        {formData.btcPriceInputType === "linear" && (
+          <div
+            className={`grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 ${formData.btcPriceManualMode ? "opacity-60" : ""}`}
+          >
+            <div>
+              <label className="block font-medium mb-1">Start Rate (%):</label>
+              <input
+                type="number"
+                value={formData.btcPriceStart}
+                onChange={(e) =>
+                  updateFormData({ btcPriceStart: Number(e.target.value) })
+                }
+                className="w-full p-2 border rounded"
+                min="0"
+                max="500"
+                disabled={
+                  formData.followEconomicScenarioBtc ||
+                  formData.btcPriceManualMode
+                }
+              />
+            </div>
+            <div>
+              <label className="block font-medium mb-1">End Rate (%):</label>
+              <input
+                type="number"
+                value={formData.btcPriceEnd}
+                onChange={(e) =>
+                  updateFormData({ btcPriceEnd: Number(e.target.value) })
+                }
+                className="w-full p-2 border rounded"
+                min="0"
+                max="500"
+                disabled={
+                  formData.followEconomicScenarioBtc ||
+                  formData.btcPriceManualMode
+                }
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Add this message when in manual mode to provide context */}
+        {formData.btcPriceManualMode && (
+          <div className="mt-3 text-xs text-gray-500 italic">
+            Reference settings shown above. Adjustments are now made directly on
+            the chart.
+          </div>
+        )}
+      </div>
 
       {/* Interactive Chart Editor */}
       <div className="mt-4 w-full">
