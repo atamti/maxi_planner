@@ -42,7 +42,7 @@ export const InflationSection: React.FC<Props> = ({
         rates.push(Math.round(rate)); // Round to nearest 1%
       }
     } else if (inputType === "preset") {
-      const scenario = presetScenarios[formData.inflationPreset];
+      const scenario = presetScenarios[formData.inflationPreset as ScenarioKey];
 
       for (let i = 0; i < formData.timeHorizon; i++) {
         const progress = i / Math.max(1, formData.timeHorizon - 1);
@@ -108,7 +108,7 @@ export const InflationSection: React.FC<Props> = ({
   // Determine chart max value based on input type
   const getChartMaxValue = (): number => {
     if (formData.inflationInputType === "preset") {
-      return presetScenarios[formData.inflationPreset].maxAxis;
+      return presetScenarios[formData.inflationPreset as ScenarioKey].maxAxis;
     }
     // For flat and linear modes, use a reasonable max based on the values
     if (formData.inflationInputType === "flat") {
