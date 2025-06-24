@@ -43,7 +43,8 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       const savings = btcAmount * (savingsPct / 100) * (1 + savingsYield);
       const investments =
         btcAmount * (investmentsPct / 100) * (1 + investmentsYield);
-      const speculation = btcAmount * (speculationPct / 100) * (1 + speculationYield);
+      const speculation =
+        btcAmount * (speculationPct / 100) * (1 + speculationYield);
 
       return savings + investments + speculation;
     };
@@ -62,12 +63,15 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       const btcStackAtActivation = getBtcStackAtYear(activationYear);
       const btcSavingsAtActivation = btcStackAtActivation * (savingsPct / 100);
       const collateralBtc = btcSavingsAtActivation * (collateralPct / 100);
-      const btcPriceAtActivation = exchangeRate * Math.pow(1 + btcGrowth / 100, activationYear);
+      const btcPriceAtActivation =
+        exchangeRate * Math.pow(1 + btcGrowth / 100, activationYear);
       const loanPrincipal = collateralBtc * 0.4 * btcPriceAtActivation;
 
       const debtService = interestOnly
         ? loanPrincipal * (loanRate / 100)
-        : (loanPrincipal * ((loanRate / 100) * Math.pow(1 + loanRate / 100, loanTermYears))) / (Math.pow(1 + loanRate / 100, loanTermYears) - 1);
+        : (loanPrincipal *
+            ((loanRate / 100) * Math.pow(1 + loanRate / 100, loanTermYears))) /
+          (Math.pow(1 + loanRate / 100, loanTermYears) - 1);
 
       return { loanPrincipal, debtService };
     };
@@ -84,17 +88,22 @@ export const useCalculations = (formData: FormData): CalculationResults => {
     let leveragedUsdPool = 0;
 
     // Calculate loan details once for the actual activation year
-    const loanDetails = collateralPct > 0 ? calculateLoanDetails(activationYear) : { loanPrincipal: 0, debtService: 0 };
+    const loanDetails =
+      collateralPct > 0
+        ? calculateLoanDetails(activationYear)
+        : { loanPrincipal: 0, debtService: 0 };
 
     for (let year = 0; year <= timeHorizon; year++) {
       // Handle income allocation at activation year
       if (year === activationYear) {
         const btcToRemove = btcWithIncome * (incomeAllocationPct / 100);
-        const currentBtcPrice = exchangeRate * Math.pow(1 + btcGrowth / 100, year);
+        const currentBtcPrice =
+          exchangeRate * Math.pow(1 + btcGrowth / 100, year);
         usdIncomePool = btcToRemove * currentBtcPrice;
 
         // Initialize leveraged pool with original pool + loan proceeds
-        leveragedUsdPool = usdIncomePool + (collateralPct > 0 ? loanDetails.loanPrincipal : 0);
+        leveragedUsdPool =
+          usdIncomePool + (collateralPct > 0 ? loanDetails.loanPrincipal : 0);
         // console.log(`Year ${year}: USD Income Pool = ${usdIncomePool}, Leveraged USD Pool = ${leveragedUsdPool}`);
 
         // Scale down btcWithIncome by the allocation percentage
@@ -104,26 +113,31 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       // Calculate income yields
       const effectiveIncomeRate = (incomeYield - incomeReinvestmentPct) / 100;
 
-      const baseUsdIncomeValue = year >= activationYear && usdIncomePool > 0
-        ? usdIncomePool * effectiveIncomeRate
-        : 0;
+      const baseUsdIncomeValue =
+        year >= activationYear && usdIncomePool > 0
+          ? usdIncomePool * effectiveIncomeRate
+          : 0;
       // console.log(`Year ${year}: Base USD Income Value = ${baseUsdIncomeValue}`);
 
-      const leveragedIncomeValue = year >= activationYear && leveragedUsdPool > 0
-        ? leveragedUsdPool * effectiveIncomeRate
-        : 0;
+      const leveragedIncomeValue =
+        year >= activationYear && leveragedUsdPool > 0
+          ? leveragedUsdPool * effectiveIncomeRate
+          : 0;
       // console.log(`Year ${year}: Leveraged USD Income Value = ${leveragedIncomeValue}`);
 
       // Calculate net leveraged income after debt service
-      const netLeveragedIncome = year >= activationYear && collateralPct > 0
-        ? leveragedIncomeValue - loanDetails.debtService
-        : baseUsdIncomeValue;
+      const netLeveragedIncome =
+        year >= activationYear && collateralPct > 0
+          ? leveragedIncomeValue - loanDetails.debtService
+          : baseUsdIncomeValue;
       // console.log(`Year ${year}: Net Leveraged Income = ${netLeveragedIncome}`);
 
       // Apply reinvestment to grow both pools
       if (year >= activationYear) {
-        const baseReinvestmentAmount = usdIncomePool * (incomeReinvestmentPct / 100);
-        const leveragedReinvestmentAmount = leveragedUsdPool * (incomeReinvestmentPct / 100);
+        const baseReinvestmentAmount =
+          usdIncomePool * (incomeReinvestmentPct / 100);
+        const leveragedReinvestmentAmount =
+          leveragedUsdPool * (incomeReinvestmentPct / 100);
 
         usdIncomePool += baseReinvestmentAmount;
         leveragedUsdPool += leveragedReinvestmentAmount;
@@ -137,7 +151,9 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       });
 
       usdIncome.push(year >= activationYear ? baseUsdIncomeValue : 0);
-      usdIncomeWithLeverage.push(year >= activationYear ? netLeveragedIncome : 0);
+      usdIncomeWithLeverage.push(
+        year >= activationYear ? netLeveragedIncome : 0,
+      );
       btcIncome.push(0);
 
       // Apply BTC growth for next year
@@ -158,10 +174,15 @@ export const useCalculations = (formData: FormData): CalculationResults => {
     const incomeAtActivationYears: number[] = [];
     const incomeAtActivationYearsWithLeverage: number[] = [];
 
-    for (let potentialActivationYear = 0; potentialActivationYear <= timeHorizon; potentialActivationYear++) {
+    for (
+      let potentialActivationYear = 0;
+      potentialActivationYear <= timeHorizon;
+      potentialActivationYear++
+    ) {
       const simulatedBtcStack = getBtcStackAtYear(potentialActivationYear);
       const btcToRemove = simulatedBtcStack * (incomeAllocationPct / 100);
-      const btcPriceAtActivation = exchangeRate * Math.pow(1 + btcGrowth / 100, potentialActivationYear);
+      const btcPriceAtActivation =
+        exchangeRate * Math.pow(1 + btcGrowth / 100, potentialActivationYear);
       const usdPoolValue = btcToRemove * btcPriceAtActivation;
       const effectiveRate = (incomeYield - incomeReinvestmentPct) / 100;
       const annualIncome = usdPoolValue * effectiveRate;
@@ -169,10 +190,16 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       // Calculate leveraged income potential
       let netLeveragedAnnualIncome = annualIncome;
       if (collateralPct > 0) {
-        const potentialLoanDetails = calculateLoanDetails(potentialActivationYear);
-        const leveragedPoolValue = usdPoolValue + potentialLoanDetails.loanPrincipal;
+        const potentialLoanDetails = calculateLoanDetails(
+          potentialActivationYear,
+        );
+        const leveragedPoolValue =
+          usdPoolValue + potentialLoanDetails.loanPrincipal;
         const leveragedAnnualIncome = leveragedPoolValue * effectiveRate;
-        netLeveragedAnnualIncome = Math.max(0, leveragedAnnualIncome - potentialLoanDetails.debtService);
+        netLeveragedAnnualIncome = Math.max(
+          0,
+          leveragedAnnualIncome - potentialLoanDetails.debtService,
+        );
       }
 
       incomeAtActivationYears.push(annualIncome);
@@ -180,7 +207,8 @@ export const useCalculations = (formData: FormData): CalculationResults => {
     }
 
     // Calculate loan details for display (using year 0 values for simplicity)
-    const displayCollateralValue = btcStack * (savingsPct / 100) * (collateralPct / 100);
+    const displayCollateralValue =
+      btcStack * (savingsPct / 100) * (collateralPct / 100);
     const displayLoanPrincipal = displayCollateralValue * 0.4 * exchangeRate;
     const displayLoanInterest = displayLoanPrincipal * (loanRate / 100);
 

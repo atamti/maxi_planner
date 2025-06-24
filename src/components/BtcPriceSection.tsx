@@ -1,7 +1,9 @@
 import React from "react";
 import economicScenarios, { ScenarioKey } from "../config/economicScenarios";
 import { FormData } from "../types";
-import { DraggableInflationChart } from "./DraggableInflationChart";
+import { DraggableRateChart } from "./DraggableRateChart";
+import { RateConfigSection } from "./RateConfigSection";
+import { ToggleSwitch } from "./common/ToggleSwitch";
 
 interface Props {
   formData: FormData;
@@ -12,12 +14,20 @@ export const BtcPriceSection: React.FC<Props> = ({
   formData,
   updateFormData,
 }) => {
+  // Calculate average BTC appreciation rate
+  const calculateAverageBtcAppreciation = (): number => {
+    if (formData.btcPriceCustomRates.length === 0) return 0;
+    const sum = formData.btcPriceCustomRates
+      .slice(0, formData.timeHorizon)
+      .reduce((acc, val) => acc + val, 0);
+    return Math.round(sum / formData.timeHorizon);
+  };
+
   const getScenarioPresets = () => {
     const presets: Record<string, any> = {};
     Object.entries(economicScenarios).forEach(([key, scenario]) => {
-      if (key !== "custom") {
-        presets[key] = scenario.btcPrice;
-      }
+      // Include "custom" scenario in presets so we can access its values
+      presets[key] = scenario.btcPrice;
     });
     return presets;
   };
@@ -27,8 +37,19 @@ export const BtcPriceSection: React.FC<Props> = ({
   // Check if manual mode is selected
   const isManualRateSelected = formData.btcPricePreset === "custom";
 
+  // Change the check for year-by-year mode to check for manual mode instead
+  // This now represents "direct edit chart" mode
+  const isDirectEditMode = formData.btcPriceManualMode;
+
+  // Check if the economic scenario is set to custom
+  const isCustomEconomicScenario = formData.economicScenario === "custom";
+
   const generateBtcRates = (
-    inputType = formData.btcPriceInputType,
+    inputType:
+      | "flat"
+      | "linear"
+      | "preset"
+      | "manual" = formData.btcPriceInputType,
   ): number[] => {
     const rates = [];
 
@@ -69,7 +90,13 @@ export const BtcPriceSection: React.FC<Props> = ({
     return rates;
   };
 
-  const applyToChart = (inputType = formData.btcPriceInputType) => {
+  const applyToChart = (
+    inputType:
+      | "flat"
+      | "linear"
+      | "preset"
+      | "manual" = formData.btcPriceInputType,
+  ) => {
     const rates = generateBtcRates(inputType);
     const newRates = [...formData.btcPriceCustomRates];
     rates.forEach((rate, index) => {
@@ -80,20 +107,68 @@ export const BtcPriceSection: React.FC<Props> = ({
     updateFormData({ btcPriceCustomRates: newRates });
   };
 
-  const handleInputTypeChange = (newType: "flat" | "linear" | "preset") => {
+  const handleInputTypeChange = (
+    newType: "flat" | "linear" | "preset" | "manual",
+  ) => {
     updateFormData({ btcPriceInputType: newType });
+
+    // If switching to year-by-year mode, don't apply any preset and enable manual mode
+    if (newType === "manual") {
+      updateFormData({ btcPriceManualMode: true });
+      return;
+    }
+
+    // For other input types, apply the chart
     applyToChart(newType);
   };
 
+  // Update handleScenarioChange to handle the new dropdown options
   const handleScenarioChange = (selectedScenario: string) => {
-    if (selectedScenario === "manual") {
-      // Handle manual selection
+    if (selectedScenario === "custom-flat") {
+      // Handle Custom Flat Rate selection
+      const customScenario = economicScenarios.custom.btcPrice;
+
+      updateFormData({
+        btcPricePreset: "custom",
+        followEconomicScenarioBtc: false,
+        btcPriceInputType: "flat",
+        btcPriceFlat: customScenario.startRate,
+      });
+
+      // Apply flat rate to the chart immediately
+      setTimeout(() => applyToChart("flat"), 0);
+    } else if (selectedScenario === "custom-linear") {
+      // Handle Custom Linear Progression selection
+      const customScenario = economicScenarios.custom.btcPrice;
+
+      updateFormData({
+        btcPricePreset: "custom",
+        followEconomicScenarioBtc: false,
+        btcPriceInputType: "linear",
+        btcPriceStart: customScenario.startRate,
+        btcPriceEnd: customScenario.endRate,
+      });
+
+      // Apply linear progression to the chart immediately
+      setTimeout(() => applyToChart("linear"), 0);
+    } else if (selectedScenario === "manual") {
+      // Get the custom scenario settings
+      const customScenario = economicScenarios.custom.btcPrice;
+
+      // Handle manual selection with custom scenario defaults
       updateFormData({
         btcPricePreset: "custom",
         followEconomicScenarioBtc: false,
         // Default to flat rate when switching to manual
-        btcPriceInputType: "flat",
+        btcPriceInputType: "manual",
+        // Apply defaults from custom scenario
+        btcPriceFlat: customScenario.startRate,
+        btcPriceStart: customScenario.startRate,
+        btcPriceEnd: customScenario.endRate,
       });
+
+      // Enable direct editing
+      updateFormData({ btcPriceManualMode: true });
     } else {
       // Handle preset scenario selection
       updateFormData({
@@ -141,7 +216,11 @@ export const BtcPriceSection: React.FC<Props> = ({
     if (formData.btcPriceInputType === "preset" && !isManualRateSelected) {
       return presetScenarios[formData.btcPricePreset]?.maxAxis || 100;
     }
-    if (formData.btcPriceInputType === "flat" || isManualRateSelected) {
+    if (isManualRateSelected) {
+      // When manual mode is selected, use the custom scenario's maxAxis
+      return presetScenarios.custom?.maxAxis || 100;
+    }
+    if (formData.btcPriceInputType === "flat") {
       return Math.max(100, Math.ceil((formData.btcPriceFlat * 1.2) / 10) * 10);
     }
     if (formData.btcPriceInputType === "linear") {
@@ -149,17 +228,6 @@ export const BtcPriceSection: React.FC<Props> = ({
       return Math.max(100, Math.ceil((maxValue * 1.2) / 10) * 10);
     }
     return 100;
-  };
-
-  // Calculate average BTC appreciation rate
-  const calculateAverageBtcAppreciation = (): number => {
-    if (formData.btcPriceCustomRates.length === 0) return 0;
-
-    const sum = formData.btcPriceCustomRates
-      .slice(0, formData.timeHorizon)
-      .reduce((acc, val) => acc + val, 0);
-
-    return Math.round(sum / formData.timeHorizon);
   };
 
   const handleScenarioToggle = (follow: boolean) => {
@@ -170,272 +238,97 @@ export const BtcPriceSection: React.FC<Props> = ({
         formData.economicScenario !== "custom" && {
           btcPriceManualMode: false,
           btcPriceInputType: "preset",
+          btcPricePreset: formData.economicScenario as ScenarioKey, // Reset to match economic scenario
         }),
     });
   };
 
   return (
     <div className="space-y-4">
-      {/* Scenario Toggle - With corrected description */}
-      <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-        <div className="flex items-center justify-start space-x-4">
-          <div className="text-sm font-medium text-green-800 w-32">
-            Follow Scenario
-          </div>
+      {/* Use ToggleSwitch for "Follow Scenario" */}
+      {formData.economicScenario !== "custom" && (
+        <ToggleSwitch
+          checked={formData.followEconomicScenarioBtc}
+          onChange={(checked) => handleScenarioToggle(checked)}
+          id="btc-scenario-toggle"
+          label="Follow Scenario"
+          colorClass={{ on: "bg-green-500", off: "bg-gray-300" }}
+          disabled={formData.btcPriceManualMode}
+          description={{
+            on: `Following economic scenario with ${calculateAverageBtcAppreciation()}% average appreciation. Settings are controlled by the selected scenario.`,
+            off: "Manual configuration with custom parameters.",
+          }}
+        />
+      )}
 
-          <div className="relative mx-2">
-            <input
-              type="checkbox"
-              checked={!formData.followEconomicScenarioBtc}
-              onChange={(e) => handleScenarioToggle(!e.target.checked)}
-              className="sr-only"
-              id="btc-scenario-toggle"
-            />
-            <label
-              htmlFor="btc-scenario-toggle"
-              className={`flex items-center cursor-pointer w-12 h-6 rounded-full transition-colors duration-200 ${
-                formData.followEconomicScenarioBtc
-                  ? "bg-green-500"
-                  : "bg-gray-300"
-              }`}
-            >
-              <span
-                className={`inline-block w-4 h-4 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                  formData.followEconomicScenarioBtc
-                    ? "translate-x-7"
-                    : "translate-x-1"
-                }`}
-              />
-            </label>
-          </div>
-
-          <div className="text-sm font-medium text-green-800 w-32">
-            Manual Control
-          </div>
-        </div>
-
-        {/* Corrected description */}
-        <div className="mt-3 text-xs text-green-700 min-h-[1.5rem] ml-1">
-          {formData.followEconomicScenarioBtc
-            ? `Following economic scenario with ${calculateAverageBtcAppreciation()}% average appreciation. Settings are controlled by the selected scenario.`
-            : "Manual configuration with custom parameters."}
-        </div>
-      </div>
-
-      {/* Scenario Selection at the top */}
-      <div
-        className={`p-4 bg-gray-50 rounded-lg ${formData.followEconomicScenarioBtc ? "opacity-60" : ""}`}
-      >
-        <div className="mb-4">
-          <label className="block font-medium mb-1">BTC Growth Scenario:</label>
-          <select
-            value={isManualRateSelected ? "manual" : formData.btcPricePreset}
-            onChange={(e) => handleScenarioChange(e.target.value)}
-            className="w-full p-2 border rounded"
-            disabled={formData.followEconomicScenarioBtc}
-          >
-            {Object.entries(presetScenarios).map(([key, preset]) => (
-              <option key={key} value={key}>
-                {preset.name} ({preset.startRate}% → {preset.endRate}%)
-              </option>
-            ))}
-            <option value="manual">Manually set rate</option>
-          </select>
-          <p className="text-xs text-gray-600 mt-1">
-            {!isManualRateSelected && "Curved upward progression over "}
-            {formData.timeHorizon} years
-          </p>
-        </div>
-
-        {/* Show additional options only when manual rate is selected */}
-        {isManualRateSelected && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <div className="space-y-2">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    value="flat"
-                    checked={formData.btcPriceInputType === "flat"}
-                    onChange={(e) =>
-                      handleInputTypeChange(
-                        e.target.value as "flat" | "linear" | "preset",
-                      )
-                    }
-                    className="mr-2"
-                    disabled={formData.btcPriceManualMode}
-                  />
-                  <span
-                    className={
-                      formData.btcPriceManualMode ? "text-gray-400" : ""
-                    }
-                  >
-                    Flat Rate
-                  </span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    value="linear"
-                    checked={formData.btcPriceInputType === "linear"}
-                    onChange={(e) =>
-                      handleInputTypeChange(
-                        e.target.value as "flat" | "linear" | "preset",
-                      )
-                    }
-                    className="mr-2"
-                    disabled={formData.btcPriceManualMode}
-                  />
-                  <span
-                    className={
-                      formData.btcPriceManualMode ? "text-gray-400" : ""
-                    }
-                  >
-                    Linear Progression
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            <div>
-              {formData.btcPriceInputType === "flat" && (
-                <div>
-                  <label className="block font-medium mb-1">
-                    Flat Rate (%):
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.btcPriceFlat}
-                    onChange={(e) =>
-                      updateFormData({ btcPriceFlat: Number(e.target.value) })
-                    }
-                    className="w-full p-2 border rounded"
-                    min="0"
-                    max="500"
-                    disabled={formData.btcPriceManualMode}
-                  />
-                </div>
-              )}
-
-              {formData.btcPriceInputType === "linear" && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="block font-medium mb-1">
-                      Start Rate (%):
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.btcPriceStart}
-                      onChange={(e) =>
-                        updateFormData({
-                          btcPriceStart: Number(e.target.value),
-                        })
-                      }
-                      className="w-full p-2 border rounded"
-                      min="0"
-                      max="500"
-                      disabled={formData.btcPriceManualMode}
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-medium mb-1">
-                      End Rate (%):
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.btcPriceEnd}
-                      onChange={(e) =>
-                        updateFormData({ btcPriceEnd: Number(e.target.value) })
-                      }
-                      className="w-full p-2 border rounded"
-                      min="0"
-                      max="500"
-                      disabled={formData.btcPriceManualMode}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Use the RateConfigSection for configuration */}
+      <RateConfigSection
+        title="BTC Growth Scenario:"
+        inputType={formData.btcPriceInputType}
+        onInputTypeChange={handleInputTypeChange}
+        flat={formData.btcPriceFlat}
+        onFlatChange={(value) => updateFormData({ btcPriceFlat: value })}
+        start={formData.btcPriceStart}
+        onStartChange={(value) => updateFormData({ btcPriceStart: value })}
+        end={formData.btcPriceEnd}
+        onEndChange={(value) => updateFormData({ btcPriceEnd: value })}
+        preset={formData.btcPricePreset}
+        onPresetChange={(value) => handleScenarioChange(value)}
+        manualMode={formData.btcPriceManualMode}
+        scenarioType="btcPrice"
+        disabled={formData.followEconomicScenarioBtc}
+      />
 
       {/* Interactive Chart Editor */}
       <div className="mt-4 w-full">
-        <h4 className="font-semibold mb-2">📈 BTC Price Appreciation Chart</h4>
-        <div className="w-full">
-          <DraggableInflationChart
-            data={formData.btcPriceCustomRates}
-            onChange={(newData) =>
-              updateFormData({
-                btcPriceCustomRates: newData,
-                ...(formData.followEconomicScenarioBtc
-                  ? { followEconomicScenarioBtc: false }
-                  : {}),
-              })
+        <DraggableRateChart
+          title="📈 BTC Price Appreciation Chart"
+          data={formData.btcPriceCustomRates}
+          onChange={(newData) =>
+            updateFormData({
+              btcPriceCustomRates: newData,
+              ...(formData.followEconomicScenarioBtc
+                ? { followEconomicScenarioBtc: false }
+                : {}),
+            })
+          }
+          onStartDrag={() => {
+            if (formData.followEconomicScenarioBtc) {
+              updateFormData({ followEconomicScenarioBtc: false });
             }
-            onStartDrag={() => {
-              if (formData.followEconomicScenarioBtc) {
-                updateFormData({ followEconomicScenarioBtc: false });
-              }
-              if (!formData.btcPriceManualMode) {
-                updateFormData({ btcPriceManualMode: true });
-              }
-            }}
-            maxYears={formData.timeHorizon}
-            maxValue={getChartMaxValue()}
-            minValue={0}
-            yAxisLabel="BTC appreciation (%, nominal)"
-          />
-        </div>
+            if (!formData.btcPriceManualMode) {
+              updateFormData({
+                btcPriceManualMode: true,
+                btcPriceInputType: "manual",
+              });
+            }
+          }}
+          maxYears={formData.timeHorizon}
+          maxValue={getChartMaxValue()}
+          minValue={0}
+          yAxisLabel="BTC appreciation (%, nominal)"
+          readOnly={!formData.btcPriceManualMode}
+        />
       </div>
 
-      {/* Manual Mode Toggle - Below Chart - Only visible in manual mode */}
+      {/* Use ToggleSwitch for Direct Edit mode */}
       {!formData.followEconomicScenarioBtc && (
-        <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-          <div className="flex items-center justify-start space-x-4">
-            <div className="text-sm font-medium text-green-800 w-24">
-              Auto Apply
-            </div>
-
-            <div className="relative mx-2">
-              <input
-                type="checkbox"
-                checked={formData.btcPriceManualMode}
-                onChange={(e) =>
-                  updateFormData({ btcPriceManualMode: e.target.checked })
-                }
-                className="sr-only"
-                id="btc-manual-mode-toggle"
-              />
-              <label
-                htmlFor="btc-manual-mode-toggle"
-                className={`flex items-center cursor-pointer w-12 h-6 rounded-full transition-colors duration-200 ${
-                  formData.btcPriceManualMode ? "bg-gray-300" : "bg-green-500"
-                }`}
-              >
-                <span
-                  className={`inline-block w-4 h-4 bg-white rounded-full shadow transform transition-transform duration-200 ${
-                    formData.btcPriceManualMode
-                      ? "translate-x-7"
-                      : "translate-x-1"
-                  }`}
-                />
-              </label>
-            </div>
-
-            <div className="text-sm font-medium text-green-800 w-24">
-              Manual Mode
-            </div>
-          </div>
-
-          {/* Left-aligned description */}
-          <div className="mt-3 text-xs text-green-700 min-h-[1.5rem] ml-1">
-            {formData.btcPriceManualMode
-              ? "Chart editing locked - drag points to adjust values"
-              : "Changes apply immediately when adjusting parameters"}
-          </div>
-        </div>
+        <ToggleSwitch
+          checked={formData.btcPriceManualMode}
+          onChange={(checked) =>
+            updateFormData({
+              btcPriceManualMode: checked,
+              ...(checked ? { btcPriceInputType: "manual" } : {}),
+            })
+          }
+          id="btc-manual-mode-toggle"
+          label="Direct edit chart"
+          colorClass={{ on: "bg-yellow-400", off: "bg-gray-300" }}
+          description={{
+            on: "🔓 Chart unlocked. Click and drag points to customize your BTC price forecast.",
+            off: "🔒 Chart locked. Enable to directly edit by dragging points on the chart.",
+          }}
+        />
       )}
     </div>
   );

@@ -15,9 +15,10 @@ export const EconomicScenariosSection: React.FC<Props> = ({
     const selectedScenario = economicScenarios[scenario];
 
     if (scenario === "custom") {
-      // Just set the scenario name but don't change other settings
+      // Just set the scenario name but also disable "follow scenario" for BTC
       updateFormData({
         economicScenario: scenario,
+        followEconomicScenarioBtc: false, // Turn off "Follow scenario" toggle
       });
       return;
     }

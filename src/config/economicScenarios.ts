@@ -140,13 +140,13 @@ const economicScenarios: Record<ScenarioKey, ScenarioConfiguration> = {
       name: "Custom BTC Growth",
       startRate: 30,
       endRate: 30,
-      maxAxis: 100,
+      maxAxis: 200,
     },
     incomeYield: {
       name: "Custom Income",
       startRate: 8,
       endRate: 8,
-      maxAxis: 15,
+      maxAxis: 100,
     },
   },
 };

@@ -8,10 +8,11 @@ interface Props {
   maxValue: number;
   minValue?: number;
   yAxisLabel?: string;
-  readOnly?: boolean; // Add this prop if it doesn't exist
+  readOnly?: boolean;
+  title?: string;
 }
 
-export const DraggableInflationChart: React.FC<Props> = ({
+export const DraggableRateChart: React.FC<Props> = ({
   data,
   onChange,
   onStartDrag,
@@ -19,7 +20,8 @@ export const DraggableInflationChart: React.FC<Props> = ({
   maxValue,
   minValue = 0,
   yAxisLabel = "",
-  readOnly = false, // Default to false
+  readOnly = false,
+  title,
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -192,6 +194,7 @@ export const DraggableInflationChart: React.FC<Props> = ({
       ref={containerRef}
       className={`w-full ${readOnly ? "cursor-not-allowed" : "cursor-pointer"}`}
     >
+      {title && <h4 className="font-semibold mb-2">{title}</h4>}
       <svg
         ref={svgRef}
         width="100%"
@@ -305,7 +308,9 @@ export const DraggableInflationChart: React.FC<Props> = ({
       </svg>
 
       <p className="text-xs text-gray-600 mt-2">
-        💡 Click and drag points to adjust rates. Values snap to 2% increments.
+        {readOnly
+          ? "Chart is read-only. Enable editing to modify values."
+          : "💡 Click and drag points to adjust rates. Values snap to 2% increments."}
       </p>
     </div>
   );

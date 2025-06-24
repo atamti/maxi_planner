@@ -52,6 +52,11 @@ const DEFAULT_FORM_DATA: FormData = {
   timeHorizon: 20,
   activationYear: 5,
 
+  // Economic scenario
+  economicScenario: "debasement",
+  followEconomicScenarioInflation: true,
+  followEconomicScenarioBtc: true,
+
   // USD Inflation
   inflationMode: "simple",
   inflationInputType: "flat",
@@ -71,11 +76,6 @@ const DEFAULT_FORM_DATA: FormData = {
   btcPricePreset: "debasement",
   btcPriceCustomRates: Array(30).fill(50), // Default 50% for all years
   btcPriceManualMode: false,
-
-  // Economic Scenario
-  economicScenario: "debasement",
-  followEconomicScenarioInflation: true,
-  followEconomicScenarioBtc: true,
 };
 
 const App: React.FC = () => {
