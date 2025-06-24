@@ -19,6 +19,7 @@ export const EconomicScenariosSection: React.FC<Props> = ({
       updateFormData({
         economicScenario: scenario,
         followEconomicScenarioBtc: false, // Turn off "Follow scenario" toggle
+        followEconomicScenarioInflation: false, // Turn off "Follow scenario" toggle
       });
       return;
     }
