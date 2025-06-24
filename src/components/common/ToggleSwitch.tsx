@@ -22,7 +22,7 @@ export const ToggleSwitch: React.FC<Props> = ({
   return (
     <div className="p-3 rounded-lg border relative group">
       <div className="flex items-center justify-start space-x-4">
-        {label && <div className="text-sm font-medium w-32">{label}</div>}
+        {label && <div className="text-sm font-medium w-38">{label}</div>}
 
         <div className="relative mx-2">
           <input
