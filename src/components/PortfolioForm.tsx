@@ -4,6 +4,7 @@ import { formatCurrency, formatNumber } from "../utils/formatNumber";
 import { AllocationSliders } from "./AllocationSliders";
 import { BtcPriceSection } from "./BtcPriceSection";
 import { EconomicScenariosSection } from "./EconomicScenariosSection";
+import { IncomeExpensesSection } from "./IncomeExpensesSection";
 import { InflationSection } from "./InflationSection";
 import { YieldChart } from "./YieldChart";
 
@@ -78,23 +79,6 @@ export const PortfolioForm: React.FC<Props> = ({
             min="0"
             step="0.1"
           />
-        </div>
-        <div>
-          <label className="block font-medium mb-1">
-            Starting USD Exchange Rate ($/₿):
-          </label>
-          <input
-            type="number"
-            value={formData.exchangeRate}
-            onChange={(e) =>
-              updateFormData({ exchangeRate: Number(e.target.value) })
-            }
-            className="w-full p-2 border rounded"
-            min="0"
-          />
-          <p className="text-xs text-gray-600 mt-1">
-            Current: {formatCurrency(formData.exchangeRate, 0)}
-          </p>
         </div>
         <div>
           <label className="block font-medium mb-1">
@@ -229,73 +213,11 @@ export const PortfolioForm: React.FC<Props> = ({
       </CollapsibleSection>
 
       <CollapsibleSection title="💰 Income & Expenses">
-        <div>
-          <label className="block font-medium mb-1">
-            Income Bucket Yield (USD %):
-          </label>
-          <input
-            type="number"
-            value={formData.incomeYield}
-            onChange={(e) =>
-              updateFormData({ incomeYield: Number(e.target.value) })
-            }
-            className="w-full p-2 border rounded"
-            min="0"
+        <div className="col-span-2">
+          <IncomeExpensesSection
+            formData={formData}
+            updateFormData={updateFormData}
           />
-        </div>
-        <div>
-          <label className="block font-medium mb-1">
-            Income Bucket Allocation (%):
-          </label>
-          <input
-            type="number"
-            value={formData.incomeAllocationPct}
-            onChange={(e) =>
-              updateFormData({ incomeAllocationPct: Number(e.target.value) })
-            }
-            className="w-full p-2 border rounded"
-            min="0"
-            max="50"
-          />
-          <p className="text-xs text-gray-600 mt-1">
-            Percentage of BTC stack to convert to USD income pool at activation
-            year
-          </p>
-        </div>
-        <div>
-          <label className="block font-medium mb-1">
-            Reinvestment Rate (%):
-          </label>
-          <input
-            type="range"
-            value={formData.incomeReinvestmentPct}
-            onChange={(e) =>
-              updateFormData({ incomeReinvestmentPct: Number(e.target.value) })
-            }
-            className="w-full"
-            min="0"
-            max={formData.incomeYield}
-          />
-          <span className="text-sm text-gray-600">
-            {formData.incomeReinvestmentPct}% reinvested,{" "}
-            {formData.incomeYield - formData.incomeReinvestmentPct}% income
-          </span>
-        </div>
-        <div>
-          <label className="block font-medium mb-1">Activation Year:</label>
-          <input
-            type="range"
-            value={formData.activationYear}
-            onChange={(e) =>
-              updateFormData({ activationYear: Number(e.target.value) })
-            }
-            className="w-full"
-            min="0"
-            max={formData.timeHorizon}
-          />
-          <span className="text-sm text-gray-600">
-            Year {formData.activationYear} - When income starts
-          </span>
         </div>
       </CollapsibleSection>
 

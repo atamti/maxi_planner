@@ -46,4 +46,16 @@ export const DEFAULT_FORM_DATA: FormData = {
   btcPricePreset: "debasement",
   btcPriceCustomRates: Array(30).fill(50), // Default 50% for all years
   btcPriceManualMode: false,
+
+  // Add missing income-related properties
+  startingExpenses: 50000,
+  followEconomicScenarioIncome: true,
+  incomeMode: "simple",
+  incomeInputType: "preset",
+  incomeFlat: 8,
+  incomeStart: 8,
+  incomeEnd: 8,
+  incomePreset: "debasement",
+  incomeCustomRates: Array(30).fill(8), // Default 8% for all years
+  incomeManualMode: false,
 };

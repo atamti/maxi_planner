@@ -67,11 +67,13 @@ export interface FormData {
 
   // Income configuration
   incomeAllocationPct: number;
+  startingExpenses: number;
 
   // Economic scenario configuration
   economicScenario: ScenarioKey;
   followEconomicScenarioInflation: boolean;
   followEconomicScenarioBtc: boolean;
+  followEconomicScenarioIncome: boolean;
 
   // Loan configuration
   loanRate: number;
@@ -97,6 +99,16 @@ export interface FormData {
   btcPricePreset: ScenarioKey;
   btcPriceCustomRates: number[];
   btcPriceManualMode: boolean;
+
+  // Income settings - flat structure for backward compatibility
+  incomeMode: Mode;
+  incomeInputType: "flat" | "linear" | "preset" | "manual";
+  incomeFlat: number;
+  incomeStart: number;
+  incomeEnd: number;
+  incomePreset: ScenarioKey;
+  incomeCustomRates: number[];
+  incomeManualMode: boolean;
 }
 
 export interface Result {

@@ -1,8 +1,8 @@
 import React from "react";
 import economicScenarios, { ScenarioKey } from "../config/economicScenarios";
 import { FormData } from "../types";
-import { DraggableRateChart } from "./DraggableRateChart";
-import { ToggleSwitch } from "./common/ToggleSwitch";
+import { BtcExchangeChart } from "./BtcExchangeChart";
+import { RateAssumptionsSection } from "./common/RateAssumptionsSection";
 
 interface Props {
   formData: FormData;
@@ -240,189 +240,93 @@ export const BtcPriceSection: React.FC<Props> = ({
     });
   };
 
+  // Format number with commas for display
+  const formatNumberForDisplay = (value: number): string => {
+    return Math.round(value).toLocaleString();
+  };
+
+  // Parse number from formatted string
+  const parseFormattedNumber = (value: string): number => {
+    return Number(value.replace(/,/g, ""));
+  };
+
+  // Handle exchange rate input change
+  const handleExchangeRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const numericValue = parseFormattedNumber(inputValue);
+    if (!isNaN(numericValue)) {
+      updateFormData({ exchangeRate: numericValue });
+    }
+  };
+
+  const [showLockedMessage, setShowLockedMessage] = React.useState(false);
+
+  // Show locked message temporarily when user tries to interact with locked controls
+  const handleLockedInteraction = () => {
+    if (formData.followEconomicScenarioBtc || formData.btcPriceManualMode) {
+      setShowLockedMessage(true);
+      setTimeout(() => setShowLockedMessage(false), 3000);
+    }
+  };
+
   return (
-    <div className="space-y-4">
-      {/* Use ToggleSwitch for "Follow Scenario" */}
-      {formData.economicScenario !== "custom" && (
-        <ToggleSwitch
-          checked={formData.followEconomicScenarioBtc}
-          onChange={(checked) => handleScenarioToggle(checked)}
-          id="btc-scenario-toggle"
-          label="Follow Global Scenario"
-          colorClass={{ on: "bg-green-500", off: "bg-gray-300" }}
-          disabled={formData.btcPriceManualMode}
-          description={{
-            on: `Following ${formData.economicScenario} scenario with ${calculateAverageBtcAppreciation()}% average appreciation. Settings are controlled by the selected scenario.`,
-            off: "Manual configuration with custom parameters.",
-          }}
-        />
-      )}
-
-      {/* BTC Growth Scenario Dropdown Section */}
-      <div
-        className={`p-4 bg-gray-50 rounded-lg ${formData.followEconomicScenarioBtc ? "opacity-60" : ""}`}
-      >
-        <label className="block font-medium mb-2">BTC Growth Scenario:</label>
-        <select
-          value={
-            formData.btcPriceInputType === "flat"
-              ? "custom-flat"
-              : formData.btcPriceInputType === "linear"
-                ? "custom-linear"
-                : formData.btcPricePreset
-          }
-          onChange={(e) => handleScenarioChange(e.target.value)}
-          className="w-full p-2 border rounded mb-3"
-          disabled={
-            formData.followEconomicScenarioBtc || formData.btcPriceManualMode
-          }
-        >
-          {/* Economic scenario presets */}
-          <optgroup label="Preset Scenarios">
-            {Object.entries(presetScenarios).map(([key, scenario]) => {
-              if (key !== "custom") {
-                return (
-                  <option key={key} value={key}>
-                    {scenario.name} ({scenario.startRate}% → {scenario.endRate}
-                    %)
-                  </option>
-                );
-              }
-              return null;
-            })}
-          </optgroup>
-
-          {/* Custom options */}
-          <optgroup label="Custom Configurations">
-            <option value="custom-flat">Custom - Flat Rate</option>
-            <option value="custom-linear">Custom - Linear Progression</option>
-          </optgroup>
-        </select>
-
-        {/* Show appropriate fields based on selection - MODIFIED to maintain visibility */}
-        {formData.btcPriceInputType === "flat" && (
-          <div
-            className={`mt-3 ${formData.btcPriceManualMode ? "opacity-60" : ""}`}
-          >
-            <label className="block font-medium mb-1">Flat Rate (%):</label>
-            <input
-              type="number"
-              value={formData.btcPriceFlat}
-              onChange={(e) =>
-                updateFormData({ btcPriceFlat: Number(e.target.value) })
-              }
-              className="w-full p-2 border rounded"
-              min="0"
-              max="500"
-              disabled={
-                formData.followEconomicScenarioBtc ||
-                formData.btcPriceManualMode
-              }
-            />
-          </div>
-        )}
-
-        {formData.btcPriceInputType === "linear" && (
-          <div
-            className={`grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 ${formData.btcPriceManualMode ? "opacity-60" : ""}`}
-          >
-            <div>
-              <label className="block font-medium mb-1">Start Rate (%):</label>
-              <input
-                type="number"
-                value={formData.btcPriceStart}
-                onChange={(e) =>
-                  updateFormData({ btcPriceStart: Number(e.target.value) })
-                }
-                className="w-full p-2 border rounded"
-                min="0"
-                max="500"
-                disabled={
-                  formData.followEconomicScenarioBtc ||
-                  formData.btcPriceManualMode
-                }
-              />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">End Rate (%):</label>
-              <input
-                type="number"
-                value={formData.btcPriceEnd}
-                onChange={(e) =>
-                  updateFormData({ btcPriceEnd: Number(e.target.value) })
-                }
-                className="w-full p-2 border rounded"
-                min="0"
-                max="500"
-                disabled={
-                  formData.followEconomicScenarioBtc ||
-                  formData.btcPriceManualMode
-                }
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Add this message when in manual mode to provide context */}
-        {formData.btcPriceManualMode && (
-          <div className="mt-3 text-xs text-gray-500 italic">
-            Reference settings shown above. Adjustments are now made directly on
-            the chart.
-          </div>
-        )}
+    <div className="space-y-6">
+      {/* Section 1: Starting Exchange Rate */}
+      <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+        <h4 className="font-semibold text-blue-800 mb-3">
+          💰 Current BTC Price
+        </h4>
+        <div>
+          <label className="block font-medium mb-1">
+            Starting USD Exchange Rate ($/₿):
+          </label>
+          <input
+            type="text"
+            value={formatNumberForDisplay(formData.exchangeRate)}
+            onChange={handleExchangeRateChange}
+            className="w-full p-2 border rounded font-mono"
+            placeholder="100,000"
+          />
+        </div>
       </div>
 
-      {/* Interactive Chart Editor */}
-      <div className="mt-4 w-full">
-        <DraggableRateChart
-          title="📈 BTC Price Appreciation Chart"
-          data={formData.btcPriceCustomRates}
-          onChange={(newData) =>
-            updateFormData({
-              btcPriceCustomRates: newData,
-              ...(formData.followEconomicScenarioBtc
-                ? { followEconomicScenarioBtc: false }
-                : {}),
-            })
-          }
-          onStartDrag={() => {
-            if (formData.followEconomicScenarioBtc) {
-              updateFormData({ followEconomicScenarioBtc: false });
-            }
-            if (!formData.btcPriceManualMode) {
-              updateFormData({
-                btcPriceManualMode: true,
-                btcPriceInputType: "manual",
-              });
-            }
-          }}
-          maxYears={formData.timeHorizon}
-          maxValue={getChartMaxValue()}
-          minValue={0}
-          yAxisLabel="BTC appreciation (%, nominal)"
-          readOnly={!formData.btcPriceManualMode}
-        />
-      </div>
+      {/* Section 2: Rate Assumptions - Using Reusable Component */}
+      <RateAssumptionsSection
+        formData={formData}
+        updateFormData={updateFormData}
+        config={{
+          title: "Appreciation Rate Assumptions",
+          emoji: "📊",
+          colorClass: {
+            background: "bg-gray-50",
+            border: "border-gray-400",
+            text: "text-gray-800",
+          },
+          dataKey: "btcPriceCustomRates",
+          flatRateKey: "btcPriceFlat",
+          startRateKey: "btcPriceStart",
+          endRateKey: "btcPriceEnd",
+          inputTypeKey: "btcPriceInputType",
+          manualModeKey: "btcPriceManualMode",
+          followScenarioKey: "followEconomicScenarioBtc",
+          presetKey: "btcPricePreset",
+          maxValue: getChartMaxValue(),
+          yAxisLabel: "BTC appreciation (%, nominal)",
+          unit: "%",
+        }}
+        economicScenarios={economicScenarios}
+        presetScenarios={presetScenarios}
+      />
 
-      {/* Use ToggleSwitch for Direct Edit mode */}
-      {!formData.followEconomicScenarioBtc && (
-        <ToggleSwitch
-          checked={formData.btcPriceManualMode}
-          onChange={(checked) =>
-            updateFormData({
-              btcPriceManualMode: checked,
-              ...(checked ? { btcPriceInputType: "manual" } : {}),
-            })
-          }
-          id="btc-manual-mode-toggle"
-          label="Direct edit chart"
-          colorClass={{ on: "bg-yellow-400", off: "bg-gray-300" }}
-          description={{
-            on: "🔓 Chart unlocked. Click and drag points to customize your BTC price forecast.",
-            off: "🔒 Chart locked. Enable to directly edit by dragging points on the chart.",
-          }}
-        />
-      )}
+      {/* Section 3: Price Projection Chart */}
+      <div className="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-400">
+        <h4 className="font-semibold text-orange-800 mb-3">
+          💹 Projected USD exchange rate
+        </h4>
+        <div style={{ height: "400px" }}>
+          <BtcExchangeChart formData={formData} />
+        </div>
+      </div>
     </div>
   );
 };
