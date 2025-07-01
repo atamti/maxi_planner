@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import economicScenarios, { ScenarioKey } from "../config/economicScenarios";
 import { CalculationResults, FormData, Result } from "../types";
 
 export const useCalculations = (formData: FormData): CalculationResults => {
@@ -11,7 +12,6 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       collateralPct,
       loanRate,
       loanTermYears,
-      incomeYield,
       incomeAllocationPct,
       incomeReinvestmentPct,
       interestOnly,
@@ -19,17 +19,68 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       investmentsEndYield,
       speculationStartYield,
       speculationEndYield,
-      btcGrowth,
       priceCrash,
       exchangeRate,
       timeHorizon,
       activationYear,
+      startingExpenses,
+      incomeCustomRates,
+      inflationCustomRates,
+      btcPriceCustomRates,
     } = formData;
 
     // Helper function to calculate yields that decline over time
     const getYield = (year: number, start: number, end: number): number => {
       if (start === 0 && end === 0) return 0;
       return start - (start - end) * (year / timeHorizon);
+    };
+
+    // Helper function to get income yield for a specific year
+    const getIncomeYield = (year: number): number => {
+      // If following economic scenario, use the scenario's income yield progression
+      if (
+        formData.followEconomicScenarioIncome &&
+        formData.economicScenario !== "custom"
+      ) {
+        const scenario =
+          economicScenarios[formData.economicScenario as ScenarioKey];
+        if (scenario && scenario.incomeYield) {
+          const progress = year / Math.max(1, timeHorizon - 1);
+          const curvedProgress = Math.pow(progress, 1.5);
+          const yieldRate =
+            scenario.incomeYield.startRate +
+            (scenario.incomeYield.endRate - scenario.incomeYield.startRate) *
+              curvedProgress;
+
+          return yieldRate;
+        }
+      }
+
+      // Otherwise use custom rates
+      const customRate =
+        incomeCustomRates[year] ||
+        incomeCustomRates[incomeCustomRates.length - 1] ||
+        8;
+
+      return customRate;
+    };
+
+    // Helper function to get inflation rate for a specific year
+    const getInflationRate = (year: number): number => {
+      return (
+        inflationCustomRates[year] ||
+        inflationCustomRates[inflationCustomRates.length - 1] ||
+        8
+      );
+    };
+
+    // Helper function to get BTC appreciation rate for a specific year
+    const getBtcAppreciationRate = (year: number): number => {
+      return (
+        btcPriceCustomRates[year] ||
+        btcPriceCustomRates[btcPriceCustomRates.length - 1] ||
+        50
+      );
     };
 
     // Calculate BTC stack growth for a given year
@@ -58,13 +109,32 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       return stack;
     };
 
+    // Calculate BTC price at a specific year using custom rates
+    const getBtcPriceAtYear = (year: number): number => {
+      let price = exchangeRate;
+      for (let i = 0; i < year; i++) {
+        const appreciationRate = getBtcAppreciationRate(i) / 100;
+        price = price * (1 + appreciationRate);
+      }
+      return price;
+    };
+
+    // Calculate expenses at a specific year with inflation
+    const getExpensesAtYear = (year: number): number => {
+      let expenses = startingExpenses;
+      for (let i = 0; i < year; i++) {
+        const inflationRate = getInflationRate(i) / 100;
+        expenses = expenses * (1 + inflationRate);
+      }
+      return expenses;
+    };
+
     // Calculate loan details at activation year
     const calculateLoanDetails = (activationYear: number) => {
       const btcStackAtActivation = getBtcStackAtYear(activationYear);
       const btcSavingsAtActivation = btcStackAtActivation * (savingsPct / 100);
       const collateralBtc = btcSavingsAtActivation * (collateralPct / 100);
-      const btcPriceAtActivation =
-        exchangeRate * Math.pow(1 + btcGrowth / 100, activationYear);
+      const btcPriceAtActivation = getBtcPriceAtYear(activationYear);
       const loanPrincipal = collateralBtc * 0.4 * btcPriceAtActivation;
 
       const debtService = interestOnly
@@ -81,6 +151,7 @@ export const useCalculations = (formData: FormData): CalculationResults => {
     const usdIncome: number[] = [];
     const usdIncomeWithLeverage: number[] = [];
     const btcIncome: number[] = [];
+    const annualExpenses: number[] = [];
 
     let btcWithIncome = btcStack;
     let btcWithoutIncome = btcStack;
@@ -93,52 +164,60 @@ export const useCalculations = (formData: FormData): CalculationResults => {
         ? calculateLoanDetails(activationYear)
         : { loanPrincipal: 0, debtService: 0 };
 
+    // Also fix the main calculation loop for consistency
     for (let year = 0; year <= timeHorizon; year++) {
+      // Calculate current year expenses
+      const currentExpenses = getExpensesAtYear(year);
+      annualExpenses.push(currentExpenses);
+
       // Handle income allocation at activation year
       if (year === activationYear) {
         const btcToRemove = btcWithIncome * (incomeAllocationPct / 100);
-        const currentBtcPrice =
-          exchangeRate * Math.pow(1 + btcGrowth / 100, year);
+        const currentBtcPrice = getBtcPriceAtYear(year);
         usdIncomePool = btcToRemove * currentBtcPrice;
 
         // Initialize leveraged pool with original pool + loan proceeds
         leveragedUsdPool =
           usdIncomePool + (collateralPct > 0 ? loanDetails.loanPrincipal : 0);
-        // console.log(`Year ${year}: USD Income Pool = ${usdIncomePool}, Leveraged USD Pool = ${leveragedUsdPool}`);
 
         // Scale down btcWithIncome by the allocation percentage
         btcWithIncome *= (100 - incomeAllocationPct) / 100;
       }
 
-      // Calculate income yields
-      const effectiveIncomeRate = (incomeYield - incomeReinvestmentPct) / 100;
+      // Calculate income yields using dynamic rates
+      const currentIncomeYield = getIncomeYield(year);
+      const totalYieldRate = currentIncomeYield / 100;
 
-      const baseUsdIncomeValue =
+      // Calculate total yield generated
+      const totalBaseYield =
         year >= activationYear && usdIncomePool > 0
-          ? usdIncomePool * effectiveIncomeRate
+          ? usdIncomePool * totalYieldRate
           : 0;
-      // console.log(`Year ${year}: Base USD Income Value = ${baseUsdIncomeValue}`);
 
-      const leveragedIncomeValue =
+      const totalLeveragedYield =
         year >= activationYear && leveragedUsdPool > 0
-          ? leveragedUsdPool * effectiveIncomeRate
+          ? leveragedUsdPool * totalYieldRate
           : 0;
-      // console.log(`Year ${year}: Leveraged USD Income Value = ${leveragedIncomeValue}`);
+
+      // Calculate reinvestment amounts (percentage of yield generated)
+      const baseReinvestmentAmount =
+        totalBaseYield * (incomeReinvestmentPct / 100);
+      const leveragedReinvestmentAmount =
+        totalLeveragedYield * (incomeReinvestmentPct / 100);
+
+      // Net income is the remaining yield after reinvestment
+      const baseUsdIncomeValue = totalBaseYield - baseReinvestmentAmount;
+      const leveragedIncomeValue =
+        totalLeveragedYield - leveragedReinvestmentAmount;
 
       // Calculate net leveraged income after debt service
       const netLeveragedIncome =
         year >= activationYear && collateralPct > 0
           ? leveragedIncomeValue - loanDetails.debtService
           : baseUsdIncomeValue;
-      // console.log(`Year ${year}: Net Leveraged Income = ${netLeveragedIncome}`);
 
       // Apply reinvestment to grow both pools
       if (year >= activationYear) {
-        const baseReinvestmentAmount =
-          usdIncomePool * (incomeReinvestmentPct / 100);
-        const leveragedReinvestmentAmount =
-          leveragedUsdPool * (incomeReinvestmentPct / 100);
-
         usdIncomePool += baseReinvestmentAmount;
         leveragedUsdPool += leveragedReinvestmentAmount;
       }
@@ -173,6 +252,7 @@ export const useCalculations = (formData: FormData): CalculationResults => {
     // Calculate income potential for each possible activation year
     const incomeAtActivationYears: number[] = [];
     const incomeAtActivationYearsWithLeverage: number[] = [];
+    const expensesAtActivationYears: number[] = [];
 
     for (
       let potentialActivationYear = 0;
@@ -181,11 +261,19 @@ export const useCalculations = (formData: FormData): CalculationResults => {
     ) {
       const simulatedBtcStack = getBtcStackAtYear(potentialActivationYear);
       const btcToRemove = simulatedBtcStack * (incomeAllocationPct / 100);
-      const btcPriceAtActivation =
-        exchangeRate * Math.pow(1 + btcGrowth / 100, potentialActivationYear);
+      const btcPriceAtActivation = getBtcPriceAtYear(potentialActivationYear);
       const usdPoolValue = btcToRemove * btcPriceAtActivation;
-      const effectiveRate = (incomeYield - incomeReinvestmentPct) / 100;
-      const annualIncome = usdPoolValue * effectiveRate;
+      const currentIncomeYield = getIncomeYield(potentialActivationYear);
+
+      // Fix: Calculate yield properly - reinvestment is a percentage of yield generated
+      const totalYieldRate = currentIncomeYield / 100;
+      const totalYieldGenerated = usdPoolValue * totalYieldRate;
+      const reinvestmentAmount =
+        totalYieldGenerated * (incomeReinvestmentPct / 100);
+      const annualIncome = totalYieldGenerated - reinvestmentAmount;
+
+      // Calculate expenses at this activation year
+      const expensesAtActivation = getExpensesAtYear(potentialActivationYear);
 
       // Calculate leveraged income potential
       let netLeveragedAnnualIncome = annualIncome;
@@ -195,7 +283,11 @@ export const useCalculations = (formData: FormData): CalculationResults => {
         );
         const leveragedPoolValue =
           usdPoolValue + potentialLoanDetails.loanPrincipal;
-        const leveragedAnnualIncome = leveragedPoolValue * effectiveRate;
+        const leveragedTotalYield = leveragedPoolValue * totalYieldRate;
+        const leveragedReinvestment =
+          leveragedTotalYield * (incomeReinvestmentPct / 100);
+        const leveragedAnnualIncome =
+          leveragedTotalYield - leveragedReinvestment;
         netLeveragedAnnualIncome = Math.max(
           0,
           leveragedAnnualIncome - potentialLoanDetails.debtService,
@@ -204,6 +296,7 @@ export const useCalculations = (formData: FormData): CalculationResults => {
 
       incomeAtActivationYears.push(annualIncome);
       incomeAtActivationYearsWithLeverage.push(netLeveragedAnnualIncome);
+      expensesAtActivationYears.push(expensesAtActivation);
     }
 
     // Calculate loan details for display (using year 0 values for simplicity)
@@ -217,8 +310,10 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       usdIncome,
       usdIncomeWithLeverage,
       btcIncome,
+      annualExpenses,
       incomeAtActivationYears,
       incomeAtActivationYearsWithLeverage,
+      expensesAtActivationYears,
       loanPrincipal: displayLoanPrincipal,
       loanInterest: displayLoanInterest,
     };

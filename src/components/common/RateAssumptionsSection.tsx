@@ -210,6 +210,39 @@ export const RateAssumptionsSection: React.FC<Props> = ({
     }
   }, [manualMode]);
 
+  // Add effect to handle economic scenario changes for income
+  React.useEffect(() => {
+    if (
+      followScenario &&
+      formData.economicScenario !== "custom" &&
+      economicScenarios
+    ) {
+      const scenario = economicScenarios[formData.economicScenario];
+      if (scenario && dataKey === "incomeCustomRates" && scenario.incomeYield) {
+        // Generate rates based on the selected economic scenario
+        const newRates = [];
+        for (let i = 0; i < formData.timeHorizon; i++) {
+          const progress = i / Math.max(1, formData.timeHorizon - 1);
+          const curvedProgress = Math.pow(progress, 1.5);
+          const rate =
+            scenario.incomeYield.startRate +
+            (scenario.incomeYield.endRate - scenario.incomeYield.startRate) *
+              curvedProgress;
+          newRates.push(Math.round(rate));
+        }
+
+        // Update the custom rates to match the economic scenario
+        const updatedRates = [...(formData[dataKey] as number[])];
+        newRates.forEach((rate, index) => {
+          if (index < updatedRates.length) {
+            updatedRates[index] = rate;
+          }
+        });
+        updateFormData({ [dataKey]: updatedRates });
+      }
+    }
+  }, [followScenario, formData.economicScenario, formData.timeHorizon]);
+
   const [showLockedMessage, setShowLockedMessage] = React.useState(false);
 
   // Show locked message temporarily when user tries to interact with locked controls

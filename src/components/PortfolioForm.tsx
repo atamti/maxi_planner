@@ -98,24 +98,6 @@ export const PortfolioForm: React.FC<Props> = ({
             {formData.timeHorizon} years
           </span>
         </div>
-        <div>
-          <label className="block font-medium mb-1">
-            BTC Annual Growth Rate (%):
-          </label>
-          <input
-            type="range"
-            value={formData.btcGrowth}
-            onChange={(e) =>
-              updateFormData({ btcGrowth: Number(e.target.value) })
-            }
-            className="w-full"
-            min="0"
-            max="100"
-          />
-          <span className="text-sm text-gray-600">
-            {formData.btcGrowth}% annually
-          </span>
-        </div>
 
         {/* Asset allocation section integrated here */}
         <div className="col-span-2 mt-4 pt-4 border-t border-gray-200">
@@ -329,10 +311,15 @@ export const PortfolioForm: React.FC<Props> = ({
               const collateralBtc =
                 btcSavingsAtActivation * (formData.collateralPct / 100);
 
-              // Use BTC price at activation year
-              const btcPriceAtActivation =
-                formData.exchangeRate *
-                Math.pow(1 + formData.btcGrowth / 100, formData.activationYear);
+              // Use BTC price at activation year from custom rates
+              let btcPriceAtActivation = formData.exchangeRate;
+              for (let i = 0; i < formData.activationYear; i++) {
+                const appreciationRate =
+                  (formData.btcPriceCustomRates?.[i] || 50) / 100;
+                btcPriceAtActivation =
+                  btcPriceAtActivation * (1 + appreciationRate);
+              }
+
               const loanPrincipal = collateralBtc * 0.4 * btcPriceAtActivation;
 
               const annualInterest = loanPrincipal * (formData.loanRate / 100);

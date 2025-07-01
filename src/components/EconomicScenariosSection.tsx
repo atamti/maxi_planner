@@ -12,7 +12,87 @@ export const EconomicScenariosSection: React.FC<Props> = ({
   updateFormData,
 }) => {
   const handleScenarioChange = (scenario: ScenarioKey) => {
-    const selectedScenario = economicScenarios[scenario];
+    updateFormData({ economicScenario: scenario });
+
+    // If following scenarios, update the respective sections
+    if (formData.followEconomicScenarioInflation && scenario !== "custom") {
+      // Update inflation rates
+      const inflationScenario = economicScenarios[scenario].inflation;
+      const newInflationRates = [];
+      for (let i = 0; i < formData.timeHorizon; i++) {
+        const progress = i / Math.max(1, formData.timeHorizon - 1);
+        const curvedProgress = Math.pow(progress, 2);
+        const rate =
+          inflationScenario.startRate +
+          (inflationScenario.endRate - inflationScenario.startRate) *
+            curvedProgress;
+        newInflationRates.push(Math.round(rate / 2) * 2);
+      }
+
+      const updatedInflationRates = [...formData.inflationCustomRates];
+      newInflationRates.forEach((rate, index) => {
+        if (index < updatedInflationRates.length) {
+          updatedInflationRates[index] = rate;
+        }
+      });
+
+      updateFormData({
+        inflationPreset: scenario,
+        inflationCustomRates: updatedInflationRates,
+      });
+    }
+
+    if (formData.followEconomicScenarioBtc && scenario !== "custom") {
+      // Update BTC price rates
+      const btcScenario = economicScenarios[scenario].btcPrice;
+      const newBtcRates = [];
+      for (let i = 0; i < formData.timeHorizon; i++) {
+        const progress = i / Math.max(1, formData.timeHorizon - 1);
+        const curvedProgress = Math.pow(progress, 1.5);
+        const rate =
+          btcScenario.startRate +
+          (btcScenario.endRate - btcScenario.startRate) * curvedProgress;
+        newBtcRates.push(Math.round(rate / 2) * 2);
+      }
+
+      const updatedBtcRates = [...formData.btcPriceCustomRates];
+      newBtcRates.forEach((rate, index) => {
+        if (index < updatedBtcRates.length) {
+          updatedBtcRates[index] = rate;
+        }
+      });
+
+      updateFormData({
+        btcPricePreset: scenario,
+        btcPriceCustomRates: updatedBtcRates,
+      });
+    }
+
+    // Add income yield updates
+    if (formData.followEconomicScenarioIncome && scenario !== "custom") {
+      const incomeScenario = economicScenarios[scenario].incomeYield;
+      const newIncomeRates = [];
+      for (let i = 0; i < formData.timeHorizon; i++) {
+        const progress = i / Math.max(1, formData.timeHorizon - 1);
+        const curvedProgress = Math.pow(progress, 1.5);
+        const rate =
+          incomeScenario.startRate +
+          (incomeScenario.endRate - incomeScenario.startRate) * curvedProgress;
+        newIncomeRates.push(Math.round(rate));
+      }
+
+      const updatedIncomeRates = [...formData.incomeCustomRates];
+      newIncomeRates.forEach((rate, index) => {
+        if (index < updatedIncomeRates.length) {
+          updatedIncomeRates[index] = rate;
+        }
+      });
+
+      updateFormData({
+        incomePreset: scenario,
+        incomeCustomRates: updatedIncomeRates,
+      });
+    }
 
     if (scenario === "custom") {
       // Just set the scenario name but also disable "follow scenario" for BTC
@@ -23,23 +103,6 @@ export const EconomicScenariosSection: React.FC<Props> = ({
       });
       return;
     }
-
-    // Apply scenario settings
-    updateFormData({
-      economicScenario: scenario,
-      // Apply inflation settings if following scenario
-      ...(formData.followEconomicScenarioInflation && {
-        inflationInputType: "preset",
-        inflationPreset: scenario,
-        inflationManualMode: false,
-      }),
-      // Apply BTC settings if following scenario
-      ...(formData.followEconomicScenarioBtc && {
-        btcPriceInputType: "preset",
-        btcPricePreset: scenario,
-        btcPriceManualMode: false,
-      }),
-    });
   };
 
   const currentScenario =

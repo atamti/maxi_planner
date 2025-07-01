@@ -48,7 +48,6 @@ export interface FormData {
   exchangeRate: number;
   timeHorizon: number;
   activationYear: number;
-  btcGrowth: number;
   priceCrash: number;
 
   // Portfolio allocations
@@ -122,24 +121,10 @@ export interface CalculationResults {
   usdIncome: number[];
   usdIncomeWithLeverage: number[];
   btcIncome: number[];
+  annualExpenses: number[];
   incomeAtActivationYears: number[];
   incomeAtActivationYearsWithLeverage: number[];
-  loanPrincipal: number;
-  loanInterest: number;
-}
-export interface Result {
-  year: number;
-  btcWithIncome: number;
-  btcWithoutIncome: number;
-}
-
-export interface CalculationResults {
-  results: Result[];
-  usdIncome: number[];
-  usdIncomeWithLeverage: number[];
-  btcIncome: number[];
-  incomeAtActivationYears: number[];
-  incomeAtActivationYearsWithLeverage: number[];
+  expensesAtActivationYears: number[];
   loanPrincipal: number;
   loanInterest: number;
 }

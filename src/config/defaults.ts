@@ -9,14 +9,10 @@ export const DEFAULT_FORM_DATA: FormData = {
   loanRate: 7,
   loanTermYears: 10,
   interestOnly: true,
-  incomeYield: 20,
-  incomeAllocationPct: 10,
-  incomeReinvestmentPct: 5,
   investmentsStartYield: 30,
   investmentsEndYield: 10,
   speculationStartYield: 40,
   speculationEndYield: 10,
-  btcGrowth: 50,
   priceCrash: 0,
   exchangeRate: 100000,
   timeHorizon: 20,
@@ -27,35 +23,40 @@ export const DEFAULT_FORM_DATA: FormData = {
   followEconomicScenarioInflation: true,
   followEconomicScenarioBtc: true,
 
-  // USD Inflation
+  // USD Inflation - Fix to match economic scenario
   inflationMode: "simple",
-  inflationInputType: "flat",
+  inflationInputType: "preset", // Should be preset, not flat
   inflationFlat: 8,
   inflationStart: 5,
   inflationEnd: 15,
-  inflationPreset: "debasement",
-  inflationCustomRates: Array(30).fill(8), // Default 8% for all years
+  inflationPreset: "debasement", // This should match economicScenario
+  inflationCustomRates: Array(30).fill(8), // Will be updated by scenario
   inflationManualMode: false,
 
-  // BTC Price Appreciation
+  // BTC Price Appreciation - Also fix this to match
   btcPriceMode: "simple",
-  btcPriceInputType: "preset",
+  btcPriceInputType: "preset", // Should be preset, not flat
   btcPriceFlat: 50,
   btcPriceStart: 30,
   btcPriceEnd: 70,
-  btcPricePreset: "debasement",
-  btcPriceCustomRates: Array(30).fill(50), // Default 50% for all years
+  btcPricePreset: "debasement", // This should match economicScenario
+  btcPriceCustomRates: Array(30).fill(50), // Will be updated by scenario
   btcPriceManualMode: false,
 
-  // Add missing income-related properties
+  // Income section - Fix to match economic scenario
+  incomeYield: 8, // This old field might be causing confusion
+  incomeAllocationPct: 10,
+  incomeReinvestmentPct: 5,
+
+  // New income system - Fix to match economic scenario
   startingExpenses: 50000,
   followEconomicScenarioIncome: true,
   incomeMode: "simple",
-  incomeInputType: "preset",
+  incomeInputType: "preset", // Should be preset, not flat
   incomeFlat: 8,
   incomeStart: 8,
   incomeEnd: 8,
-  incomePreset: "debasement",
-  incomeCustomRates: Array(30).fill(8), // Default 8% for all years
+  incomePreset: "debasement", // This should match economicScenario
+  incomeCustomRates: Array(30).fill(8), // Will be updated by scenario
   incomeManualMode: false,
 };

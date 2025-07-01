@@ -8,7 +8,6 @@ interface Props {
   formData: {
     timeHorizon: number;
     exchangeRate: number;
-    btcGrowth: number;
     priceCrash: number;
     speculationPct: number;
     collateralPct: number;
@@ -17,6 +16,10 @@ interface Props {
     speculationStartYield: number;
     speculationEndYield: number;
     activationYear: number;
+    btcPriceCustomRates: number[];
+    inflationCustomRates: number[];
+    incomeCustomRates: number[];
+    startingExpenses: number;
   };
   showUSD: boolean;
   onUpdateFormData?: (updates: { activationYear: number }) => void;
@@ -33,15 +36,16 @@ export const ResultsSection: React.FC<Props> = ({
     usdIncome,
     usdIncomeWithLeverage,
     btcIncome,
+    annualExpenses,
     incomeAtActivationYears,
     incomeAtActivationYearsWithLeverage,
+    expensesAtActivationYears,
     loanPrincipal,
     loanInterest,
   } = results;
   const {
     timeHorizon,
     exchangeRate,
-    btcGrowth,
     priceCrash,
     speculationPct,
     collateralPct,
@@ -74,6 +78,16 @@ export const ResultsSection: React.FC<Props> = ({
     ],
   };
 
+  // Helper function to get BTC price at a specific year using custom rates
+  const getBtcPriceAtYear = (year: number): number => {
+    let price = formData.exchangeRate;
+    for (let i = 0; i < year; i++) {
+      const appreciationRate = (formData.btcPriceCustomRates?.[i] || 50) / 100;
+      price = price * (1 + appreciationRate);
+    }
+    return price;
+  };
+
   const incomeChartData = {
     labels: calculationResults.map((r) => r.year),
     datasets: [
@@ -82,7 +96,15 @@ export const ResultsSection: React.FC<Props> = ({
         data: usdIncome.map((v) => v / 1000),
         borderColor: "#1A73E8",
         backgroundColor: "rgba(26, 115, 232, 0.2)",
-        fill: true,
+        fill: false,
+        tension: 0.1,
+      },
+      {
+        label: "Annual Expenses ($k/year)",
+        data: annualExpenses.map((v) => v / 1000),
+        borderColor: "#DC2626",
+        backgroundColor: "rgba(220, 38, 38, 0.2)",
+        fill: false,
         tension: 0.1,
       },
       ...(formData.collateralPct > 0
@@ -108,7 +130,15 @@ export const ResultsSection: React.FC<Props> = ({
         data: incomeAtActivationYears.map((v) => v / 1000),
         borderColor: "#10B981",
         backgroundColor: "rgba(16, 185, 129, 0.2)",
-        fill: true,
+        fill: false,
+        tension: 0.1,
+      },
+      {
+        label: "Annual Expenses at Activation ($k/year)",
+        data: expensesAtActivationYears.map((v) => v / 1000),
+        borderColor: "#DC2626",
+        backgroundColor: "rgba(220, 38, 38, 0.2)",
+        fill: false,
         tension: 0.1,
       },
       ...(formData.collateralPct > 0
@@ -133,13 +163,23 @@ export const ResultsSection: React.FC<Props> = ({
         label: "USD Income (BTC equivalent)",
         data: usdIncome.map((income, index) => {
           if (income === 0) return 0;
-          const btcPriceAtYear =
-            exchangeRate * Math.pow(1 + formData.btcGrowth / 100, index);
+          const btcPriceAtYear = getBtcPriceAtYear(index);
           return income / btcPriceAtYear;
         }),
         borderColor: "#EF4444",
         backgroundColor: "rgba(239, 68, 68, 0.2)",
-        fill: true,
+        fill: false,
+        tension: 0.1,
+      },
+      {
+        label: "Annual Expenses (BTC equivalent)",
+        data: annualExpenses.map((expenses, index) => {
+          const btcPriceAtYear = getBtcPriceAtYear(index);
+          return expenses / btcPriceAtYear;
+        }),
+        borderColor: "#DC2626",
+        backgroundColor: "rgba(220, 38, 38, 0.2)",
+        fill: false,
         tension: 0.1,
       },
       ...(formData.collateralPct > 0
@@ -148,8 +188,7 @@ export const ResultsSection: React.FC<Props> = ({
               label: "USD Income with Leverage (BTC equivalent)",
               data: usdIncomeWithLeverage.map((income, index) => {
                 if (income === 0) return 0;
-                const btcPriceAtYear =
-                  exchangeRate * Math.pow(1 + formData.btcGrowth / 100, index);
+                const btcPriceAtYear = getBtcPriceAtYear(index);
                 return income / btcPriceAtYear;
               }),
               borderColor: "#8B5CF6",
@@ -180,9 +219,7 @@ export const ResultsSection: React.FC<Props> = ({
               (
               {formatCurrency(
                 calculationResults[calculationResults.length - 1]
-                  .btcWithIncome *
-                  exchangeRate *
-                  Math.pow(1 + btcGrowth / 100, timeHorizon),
+                  .btcWithIncome * getBtcPriceAtYear(timeHorizon),
                 0,
               )}
               )
@@ -201,9 +238,7 @@ export const ResultsSection: React.FC<Props> = ({
               (
               {formatCurrency(
                 calculationResults[calculationResults.length - 1]
-                  .btcWithoutIncome *
-                  exchangeRate *
-                  Math.pow(1 + btcGrowth / 100, timeHorizon),
+                  .btcWithoutIncome * getBtcPriceAtYear(timeHorizon),
                 0,
               )}
               )
@@ -229,8 +264,8 @@ export const ResultsSection: React.FC<Props> = ({
           <p className="text-red-600">Risk Insights:</p>
           <ul className="list-disc pl-5 text-red-600">
             <li>
-              High BTC growth ({btcGrowth}%) assumes volatility; a {priceCrash}%
-              crash reduces stack.
+              High BTC growth assumes volatility; a {priceCrash}% crash reduces
+              stack.
             </li>
             {speculationPct > 0 && (
               <li>
@@ -245,10 +280,7 @@ export const ResultsSection: React.FC<Props> = ({
                 if BTC drops below {formatCurrency(exchangeRate * 0.4, 0)}.
               </li>
             )}
-            <li>
-              USD income decays in BTC terms as Bitcoin appreciates at{" "}
-              {btcGrowth}% annually.
-            </li>
+            <li>USD income decays in BTC terms as Bitcoin appreciates.</li>
           </ul>
         </div>
       </div>
@@ -324,14 +356,17 @@ export const ResultsSection: React.FC<Props> = ({
               scales: {
                 y: {
                   beginAtZero: true,
-                  title: { display: true, text: "USD Income (thousands)" },
+                  title: {
+                    display: true,
+                    text: "USD Income/Expenses (thousands)",
+                  },
                 },
                 x: { title: { display: true, text: "Years" } },
               },
               plugins: {
                 title: {
                   display: true,
-                  text: "Annual USD income generation",
+                  text: "Annual USD income vs expenses",
                 },
                 legend: {
                   position: "bottom",
@@ -366,7 +401,7 @@ export const ResultsSection: React.FC<Props> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <div>
           <h3 className="text-lg font-semibold mb-2">
-            USD Income in BTC Terms (Purchasing Power Decay)
+            USD Income in BTC Terms (Purchasing Power)
           </h3>
           <Line
             data={incomeBtcChartData}
@@ -384,7 +419,7 @@ export const ResultsSection: React.FC<Props> = ({
               plugins: {
                 title: {
                   display: true,
-                  text: "Your income in BTC terms over time",
+                  text: "Income and expenses in BTC terms over time",
                 },
                 legend: {
                   position: "bottom",
@@ -393,12 +428,13 @@ export const ResultsSection: React.FC<Props> = ({
             }}
           />
           <p className="text-xs text-gray-600 mt-2">
-            📉 Shows how USD income loses purchasing power as BTC appreciates
+            📉 Shows how USD income and expenses lose purchasing power as BTC
+            appreciates
           </p>
         </div>
         <div>
           <h3 className="text-lg font-semibold mb-2">
-            Income Potential by Activation Year
+            Income vs Expenses by Activation Year
           </h3>
           <Line
             data={incomePotentialChartData}
@@ -408,7 +444,7 @@ export const ResultsSection: React.FC<Props> = ({
                   type: "logarithmic",
                   title: {
                     display: true,
-                    text: "USD Income (thousands, log scale)",
+                    text: "USD Income/Expenses (thousands, log scale)",
                   },
                 },
                 x: { title: { display: true, text: "Activation Year" } },
@@ -416,7 +452,7 @@ export const ResultsSection: React.FC<Props> = ({
               plugins: {
                 title: {
                   display: true,
-                  text: "Annual income potential if activated in each year",
+                  text: "Annual income potential vs expenses if activated in each year",
                 },
                 legend: {
                   position: "bottom",
