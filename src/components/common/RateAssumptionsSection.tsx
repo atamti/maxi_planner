@@ -85,12 +85,12 @@ export const RateAssumptionsSection: React.FC<Props> = ({
     const rates = [];
 
     if (type === "flat") {
-      // Ensure we generate rates for the full time horizon
-      for (let i = 0; i < formData.timeHorizon; i++) {
+      // Generate rates for the full time horizon + 1 (to include the final year)
+      for (let i = 0; i <= formData.timeHorizon; i++) {
         rates.push(flatRate);
       }
     } else if (type === "linear") {
-      for (let i = 0; i < formData.timeHorizon; i++) {
+      for (let i = 0; i <= formData.timeHorizon; i++) {
         const progress = i / Math.max(1, formData.timeHorizon - 1);
         const rate = startRate + (endRate - startRate) * progress;
         rates.push(Math.round(rate));
@@ -98,7 +98,7 @@ export const RateAssumptionsSection: React.FC<Props> = ({
     } else if (type === "preset" && presetScenarios && preset !== "custom") {
       const scenario = presetScenarios[preset];
       if (scenario) {
-        for (let i = 0; i < formData.timeHorizon; i++) {
+        for (let i = 0; i <= formData.timeHorizon; i++) {
           const progress = i / Math.max(1, formData.timeHorizon - 1);
           const curvedProgress = Math.pow(progress, 1.5);
           const rate =
@@ -117,23 +117,26 @@ export const RateAssumptionsSection: React.FC<Props> = ({
   ) => {
     const rates = generateRates(type);
 
-    // Make sure we have a properly sized array
+    // Make sure we have a properly sized array that includes the final year
     const newRates = [...customRates];
 
-    // Ensure the array is at least as long as the time horizon
-    while (newRates.length < formData.timeHorizon) {
-      newRates.push(flatRate || 8); // Use flat rate or default
+    // Ensure the array is at least as long as timeHorizon + 1
+    while (newRates.length <= formData.timeHorizon) {
+      newRates.push(flatRate || 8);
     }
 
     // Apply the generated rates
     rates.forEach((rate, index) => {
-      if (index < formData.timeHorizon) {
+      if (index <= formData.timeHorizon) {
         newRates[index] = rate;
       }
     });
 
-    // Update only up to timeHorizon to avoid extra values
-    const trimmedRates = newRates.slice(0, Math.max(formData.timeHorizon, 30));
+    // Keep a reasonable buffer but ensure we have enough for timeHorizon + 1
+    const trimmedRates = newRates.slice(
+      0,
+      Math.max(formData.timeHorizon + 1, 30),
+    );
 
     updateFormData({ [dataKey]: trimmedRates });
   };

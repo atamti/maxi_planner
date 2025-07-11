@@ -37,7 +37,7 @@ export const useCalculations = (formData: FormData): CalculationResults => {
 
     // Helper function to get income yield for a specific year
     const getIncomeYield = (year: number): number => {
-      // If following economic scenario, use the scenario's income yield progression
+      // If following economic scenario AND it's not custom, use the scenario's income yield progression
       if (
         formData.followEconomicScenarioIncome &&
         formData.economicScenario !== "custom"
@@ -56,18 +56,7 @@ export const useCalculations = (formData: FormData): CalculationResults => {
         }
       }
 
-      // Debug logging for array access issues
-      if ((year === 19 || year === 20) && year >= activationYear) {
-        console.log(`Income Yield Debug Year ${year}:
-          incomeCustomRates length: ${incomeCustomRates.length}
-          incomeCustomRates[${year}]: ${incomeCustomRates[year]}
-          incomeCustomRates[last]: ${incomeCustomRates[incomeCustomRates.length - 1]}
-          followEconomicScenarioIncome: ${formData.followEconomicScenarioIncome}
-          incomeInputType: ${formData.incomeInputType}
-        `);
-      }
-
-      // Otherwise use custom rates
+      // For all other cases (custom scenario, or when not following scenarios), use custom rates
       const customRate =
         incomeCustomRates[year] ||
         incomeCustomRates[incomeCustomRates.length - 1] ||

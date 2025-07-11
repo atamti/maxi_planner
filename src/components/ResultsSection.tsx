@@ -128,8 +128,8 @@ export const ResultsSection: React.FC<Props> = ({
       {
         label: "Annual Income Potential ($k/year)",
         data: incomeAtActivationYears.map((v) => v / 1000),
-        borderColor: "#10B981",
-        backgroundColor: "rgba(16, 185, 129, 0.2)",
+        borderColor: "#1A73E8",
+        backgroundColor: "rgba(26, 115, 232, 0.2)",
         fill: false,
         tension: 0.1,
       },
@@ -166,8 +166,8 @@ export const ResultsSection: React.FC<Props> = ({
           const btcPriceAtYear = getBtcPriceAtYear(index);
           return income / btcPriceAtYear;
         }),
-        borderColor: "#EF4444",
-        backgroundColor: "rgba(239, 68, 68, 0.2)",
+        borderColor: "#1A73E8",
+        backgroundColor: "rgba(26, 115, 232, 0.2)",
         fill: false,
         tension: 0.1,
       },

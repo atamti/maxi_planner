@@ -132,20 +132,20 @@ const economicScenarios: Record<ScenarioKey, ScenarioConfiguration> = {
     realIncomeGrowth: 0,
     inflation: {
       name: "Custom Inflation",
-      startRate: 5,
-      endRate: 5,
+      startRate: 3,
+      endRate: 3,
       maxAxis: 100,
     },
     btcPrice: {
       name: "Custom BTC Growth",
-      startRate: 30,
-      endRate: 30,
+      startRate: 20,
+      endRate: 20,
       maxAxis: 200,
     },
     incomeYield: {
       name: "Custom Income",
-      startRate: 8,
-      endRate: 8,
+      startRate: 5, // Changed from 8 to 5 to be less intrusive
+      endRate: 5, // Changed from 8 to 5 to be less intrusive
       maxAxis: 100,
     },
   },
