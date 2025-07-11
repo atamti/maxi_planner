@@ -58,15 +58,8 @@ export const PortfolioForm: React.FC<Props> = ({
     <div className="bg-white p-4 rounded-lg shadow mb-4">
       <h2 className="text-xl font-semibold mb-4">Portfolio Configuration</h2>
 
-      {/* Add Economic Scenarios section at the top */}
-      <div className="mb-6">
-        <EconomicScenariosSection
-          formData={formData}
-          updateFormData={updateFormData}
-        />
-      </div>
-
-      <CollapsibleSection title="💼 Portfolio Setup" defaultExpanded={true}>
+      {/* Section 1: Portfolio Setup */}
+      <CollapsibleSection title="1. 💼 Portfolio Setup" defaultExpanded={true}>
         <div>
           <label className="block font-medium mb-1">BTC Stack Size (₿):</label>
           <input
@@ -111,90 +104,143 @@ export const PortfolioForm: React.FC<Props> = ({
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="📈 BTC yield assumptions">
-        <div>
-          <label className="block font-medium mb-1">
-            Investments Start Yield (BTC %):
-          </label>
-          <input
-            type="range"
-            value={formData.investmentsStartYield}
-            onChange={(e) =>
-              updateFormData({ investmentsStartYield: Number(e.target.value) })
-            }
-            className="w-full"
-            min="0"
-            max="100"
-          />
-          <span className="text-sm text-gray-600">
-            {formData.investmentsStartYield}% initial yield
-          </span>
-        </div>
-        <div>
-          <label className="block font-medium mb-1">
-            Speculation Start Yield (BTC %):
-          </label>
-          <input
-            type="range"
-            value={formData.speculationStartYield}
-            onChange={(e) =>
-              updateFormData({ speculationStartYield: Number(e.target.value) })
-            }
-            className="w-full"
-            min="0"
-            max="100"
-          />
-          <span className="text-sm text-gray-600">
-            {formData.speculationStartYield}% initial yield
-          </span>
-        </div>
-        <div>
-          <label className="block font-medium mb-1">
-            Investments End Yield (BTC %):
-          </label>
-          <input
-            type="range"
-            value={formData.investmentsEndYield}
-            onChange={(e) =>
-              updateFormData({ investmentsEndYield: Number(e.target.value) })
-            }
-            className="w-full"
-            min="0"
-            max="50"
-          />
-          <span className="text-sm text-gray-600">
-            {formData.investmentsEndYield}% final yield
-          </span>
-        </div>
-        <div>
-          <label className="block font-medium mb-1">
-            Speculation End Yield (BTC %):
-          </label>
-          <input
-            type="range"
-            value={formData.speculationEndYield}
-            onChange={(e) =>
-              updateFormData({ speculationEndYield: Number(e.target.value) })
-            }
-            className="w-full"
-            min="0"
-            max="50"
-          />
-          <span className="text-sm text-gray-600">
-            {formData.speculationEndYield}% final yield
-          </span>
-        </div>
+      {/* Section 2: Economic Scenario */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold mb-3 text-gray-800">
+          2. 🌍 Economic Scenario
+        </h3>
+        <EconomicScenariosSection
+          formData={formData}
+          updateFormData={updateFormData}
+        />
+      </div>
 
-        {/* Yield Projection Chart */}
-        <div className="col-span-2 mt-4 p-3 bg-gray-50 rounded-lg">
-          <h4 className="font-semibold mb-2">📈 Yield Projection Chart</h4>
-          <div style={{ height: "300px" }}>
-            <YieldChart formData={formData} />
+      {/* Section 3: Market Assumptions */}
+      <CollapsibleSection title="3. 📊 Market Assumptions">
+        <div className="col-span-2 space-y-6">
+          {/* Subsection 3a: USD Inflation */}
+          <div>
+            <h4 className="text-lg font-semibold mb-3 text-gray-700">
+              3a. 💵 USD Inflation
+            </h4>
+            <InflationSection
+              formData={formData}
+              updateFormData={updateFormData}
+            />
+          </div>
+
+          {/* Subsection 3b: BTC Price Appreciation */}
+          <div>
+            <h4 className="text-lg font-semibold mb-3 text-gray-700">
+              3b. ₿ BTC Price Appreciation
+            </h4>
+            <BtcPriceSection
+              formData={formData}
+              updateFormData={updateFormData}
+            />
+          </div>
+
+          {/* Subsection 3c: BTC Yield Assumptions */}
+          <div>
+            <h4 className="text-lg font-semibold mb-3 text-gray-700">
+              3c. 📈 BTC Yield Assumptions
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-medium mb-1">
+                  Investments Start Yield (BTC %):
+                </label>
+                <input
+                  type="range"
+                  value={formData.investmentsStartYield}
+                  onChange={(e) =>
+                    updateFormData({
+                      investmentsStartYield: Number(e.target.value),
+                    })
+                  }
+                  className="w-full"
+                  min="0"
+                  max="100"
+                />
+                <span className="text-sm text-gray-600">
+                  {formData.investmentsStartYield}% initial yield
+                </span>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">
+                  Speculation Start Yield (BTC %):
+                </label>
+                <input
+                  type="range"
+                  value={formData.speculationStartYield}
+                  onChange={(e) =>
+                    updateFormData({
+                      speculationStartYield: Number(e.target.value),
+                    })
+                  }
+                  className="w-full"
+                  min="0"
+                  max="100"
+                />
+                <span className="text-sm text-gray-600">
+                  {formData.speculationStartYield}% initial yield
+                </span>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">
+                  Investments End Yield (BTC %):
+                </label>
+                <input
+                  type="range"
+                  value={formData.investmentsEndYield}
+                  onChange={(e) =>
+                    updateFormData({
+                      investmentsEndYield: Number(e.target.value),
+                    })
+                  }
+                  className="w-full"
+                  min="0"
+                  max="50"
+                />
+                <span className="text-sm text-gray-600">
+                  {formData.investmentsEndYield}% final yield
+                </span>
+              </div>
+              <div>
+                <label className="block font-medium mb-1">
+                  Speculation End Yield (BTC %):
+                </label>
+                <input
+                  type="range"
+                  value={formData.speculationEndYield}
+                  onChange={(e) =>
+                    updateFormData({
+                      speculationEndYield: Number(e.target.value),
+                    })
+                  }
+                  className="w-full"
+                  min="0"
+                  max="50"
+                />
+                <span className="text-sm text-gray-600">
+                  {formData.speculationEndYield}% final yield
+                </span>
+              </div>
+            </div>
+
+            {/* Yield Projection Chart */}
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+              <h4 className="font-semibold mb-2">📈 Yield Projection Chart</h4>
+              <div style={{ height: "300px" }}>
+                <YieldChart formData={formData} />
+              </div>
+            </div>
           </div>
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="💰 Income & Expenses">
+      {/* Section 4: Income & Cashflow */}
+      <CollapsibleSection title="4. 💰 Income & Cashflow">
         <div className="col-span-2">
           <IncomeExpensesSection
             formData={formData}
@@ -203,7 +249,8 @@ export const PortfolioForm: React.FC<Props> = ({
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection title="🏦 Borrowing & Collateral">
+      {/* Section 5: Leverage & Borrowing */}
+      <CollapsibleSection title="5. 🏦 Leverage & Borrowing">
         <div>
           <label className="block font-medium mb-1">
             Collateralized BTC (% of Savings):
@@ -369,24 +416,7 @@ export const PortfolioForm: React.FC<Props> = ({
         )}
       </CollapsibleSection>
 
-      <CollapsibleSection title="💵 USD Inflation Assumptions">
-        <div className="col-span-2">
-          <InflationSection
-            formData={formData}
-            updateFormData={updateFormData}
-          />
-        </div>
-      </CollapsibleSection>
-
-      <CollapsibleSection title="₿ BTC Price Appreciation">
-        <div className="col-span-2">
-          <BtcPriceSection
-            formData={formData}
-            updateFormData={updateFormData}
-          />
-        </div>
-      </CollapsibleSection>
-
+      {/* Risk Scenarios section (unchanged) */}
       <CollapsibleSection title="⚠️ Risk Scenarios (TBC)">
         <div className="flex items-center p-3 bg-yellow-50 rounded border-l-4 border-yellow-400">
           <span className="text-yellow-800 text-sm">

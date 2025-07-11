@@ -285,6 +285,30 @@ export const ResultsSection: React.FC<Props> = ({
         </div>
       </div>
 
+      {/* Activation Year Control - Moved to top and full width */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+        <label className="block font-medium mb-2 text-lg">
+          Activation Year: {activationYear}
+        </label>
+        <input
+          type="range"
+          value={activationYear}
+          onChange={(e) =>
+            onUpdateFormData?.({ activationYear: Number(e.target.value) })
+          }
+          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          min="0"
+          max={timeHorizon}
+        />
+        <div className="flex justify-between text-sm text-gray-600 mt-2">
+          <span>Year 0</span>
+          <span className="font-medium">
+            Year {activationYear} - When income starts
+          </span>
+          <span>Year {timeHorizon}</span>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
         <div>
           <h3 className="text-lg font-semibold mb-2">BTC Stack Growth</h3>
@@ -374,26 +398,6 @@ export const ResultsSection: React.FC<Props> = ({
               },
             }}
           />
-
-          {/* Activation Year Control */}
-          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-            <label className="block font-medium mb-2 text-sm">
-              Activation Year: {activationYear}
-            </label>
-            <input
-              type="range"
-              value={activationYear}
-              onChange={(e) =>
-                onUpdateFormData?.({ activationYear: Number(e.target.value) })
-              }
-              className="w-full"
-              min="0"
-              max={timeHorizon}
-            />
-            <span className="text-xs text-gray-600">
-              Year {activationYear} - When income starts
-            </span>
-          </div>
         </div>
       </div>
 

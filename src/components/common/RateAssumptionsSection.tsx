@@ -85,6 +85,7 @@ export const RateAssumptionsSection: React.FC<Props> = ({
     const rates = [];
 
     if (type === "flat") {
+      // Ensure we generate rates for the full time horizon
       for (let i = 0; i < formData.timeHorizon; i++) {
         rates.push(flatRate);
       }
@@ -115,13 +116,26 @@ export const RateAssumptionsSection: React.FC<Props> = ({
     type: "flat" | "linear" | "preset" | "manual" = inputType as any,
   ) => {
     const rates = generateRates(type);
+
+    // Make sure we have a properly sized array
     const newRates = [...customRates];
+
+    // Ensure the array is at least as long as the time horizon
+    while (newRates.length < formData.timeHorizon) {
+      newRates.push(flatRate || 8); // Use flat rate or default
+    }
+
+    // Apply the generated rates
     rates.forEach((rate, index) => {
-      if (index < newRates.length) {
+      if (index < formData.timeHorizon) {
         newRates[index] = rate;
       }
     });
-    updateFormData({ [dataKey]: newRates });
+
+    // Update only up to timeHorizon to avoid extra values
+    const trimmedRates = newRates.slice(0, Math.max(formData.timeHorizon, 30));
+
+    updateFormData({ [dataKey]: trimmedRates });
   };
 
   const handleScenarioChange = (selectedScenario: string) => {
