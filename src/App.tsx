@@ -14,6 +14,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { PortfolioForm } from "./components/PortfolioForm";
 import { ResultsSection } from "./components/ResultsSection";
+import { SaveLoadSection } from "./components/SaveLoadSection";
 import { DEFAULT_FORM_DATA } from "./config/defaults";
 import { useCalculations } from "./hooks/useCalculations";
 import { useFormReset } from "./hooks/useFormReset";
@@ -54,9 +55,13 @@ const App: React.FC = () => {
 
   const calculationResults = useCalculations(formData);
 
+  const handleLoadConfig = (data: FormData) => {
+    setFormData(data);
+  };
+
   return (
     <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
-      <div className="bg-red-600 text-white p-2 text-center mb-4">
+      <div className="bg-gray-300 p-2 text-center mb-4">
         This is for educational purposes only. Not financial advice. Consult a
         professional.
       </div>
@@ -67,6 +72,8 @@ const App: React.FC = () => {
       <p className="text-gray-600 mb-4">
         Balance your stack with income requirments and risk tolerance.
       </p>
+
+      <SaveLoadSection formData={formData} onLoad={handleLoadConfig} />
 
       <PortfolioForm
         formData={formData}
@@ -83,10 +90,10 @@ const App: React.FC = () => {
       />
 
       <div className="bg-gray-100 p-4 text-center mt-4">
-        <p className="text-red-600">
-          Educational only. Not financial advice. BTC volatile, borrowing risky,
-          USD income decays.
-        </p>
+        <div className="bg-gray-300 p-2 text-center mb-4">
+          This is for educational purposes only. Not financial advice. Consult a
+          professional.
+        </div>
         <p>
           <a
             href="https://github.com/atamti/maxi_planner"
