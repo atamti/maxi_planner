@@ -153,10 +153,10 @@ export const EconomicScenariosSection: React.FC<Props> = ({
         <div className="p-3 bg-white rounded-md shadow-sm">
           <div className="text-sm text-gray-500">Income portfolio yield</div>
           <div
-            className={`text-xl font-bold ${currentScenario.realIncomeGrowth >= 0 ? "text-blue-600" : "text-red-600"}`}
+            className={`text-xl font-bold ${currentScenario.incomeGrowth >= 0 ? "text-blue-600" : "text-red-600"}`}
           >
-            {currentScenario.realIncomeGrowth >= 0 ? "+" : ""}
-            {currentScenario.realIncomeGrowth}% avg
+            {currentScenario.incomeGrowth >= 0 ? "+" : ""}
+            {currentScenario.incomeGrowth}% avg
           </div>
         </div>
       </div>

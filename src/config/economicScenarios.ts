@@ -17,7 +17,7 @@ export interface ScenarioConfiguration {
   description: string;
   inflationAvg: number;
   btcAppreciationAvg: number;
-  realIncomeGrowth: number;
+  incomeGrowth: number;
   inflation: ScenarioPreset;
   btcPrice: ScenarioPreset;
   incomeYield: ScenarioPreset;
@@ -29,7 +29,7 @@ const economicScenarios: Record<ScenarioKey, ScenarioConfiguration> = {
     description: "Low inflation, steady BTC growth",
     inflationAvg: 2,
     btcAppreciationAvg: 15,
-    realIncomeGrowth: 2,
+    incomeGrowth: 7.5,
     inflation: {
       name: "Tight monetary policy",
       startRate: 2,
@@ -54,7 +54,7 @@ const economicScenarios: Record<ScenarioKey, ScenarioConfiguration> = {
     description: "Moderate inflation, solid BTC growth",
     inflationAvg: 5,
     btcAppreciationAvg: 30,
-    realIncomeGrowth: 4,
+    incomeGrowth: 12.5,
     inflation: {
       name: "Managed debasement",
       startRate: 8,
@@ -79,7 +79,7 @@ const economicScenarios: Record<ScenarioKey, ScenarioConfiguration> = {
     description: "Higher inflation, accelerated BTC adoption",
     inflationAvg: 12,
     btcAppreciationAvg: 60,
-    realIncomeGrowth: -3,
+    incomeGrowth: 45,
     inflation: {
       name: "Accelerated crisis",
       startRate: 8,
@@ -104,7 +104,7 @@ const economicScenarios: Record<ScenarioKey, ScenarioConfiguration> = {
     description: "High inflation, rapid BTC adoption",
     inflationAvg: 35,
     btcAppreciationAvg: 120,
-    realIncomeGrowth: -8,
+    incomeGrowth: 11,
     inflation: {
       name: "Hyperinflationary spiral",
       startRate: 10,
@@ -129,7 +129,7 @@ const economicScenarios: Record<ScenarioKey, ScenarioConfiguration> = {
     description: "Manually configured settings",
     inflationAvg: 0,
     btcAppreciationAvg: 0,
-    realIncomeGrowth: 0,
+    incomeGrowth: 0,
     inflation: {
       name: "Custom Inflation",
       startRate: 3,
