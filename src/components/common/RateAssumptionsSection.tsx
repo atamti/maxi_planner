@@ -80,7 +80,7 @@ export const RateAssumptionsSection: React.FC<Props> = ({
   };
 
   const generateRates = (
-    type: "flat" | "linear" | "preset" | "manual" = inputType as any,
+    type: "flat" | "linear" | "preset" | "saylor" | "manual" = inputType as any,
   ): number[] => {
     const rates = [];
 
@@ -93,6 +93,14 @@ export const RateAssumptionsSection: React.FC<Props> = ({
       for (let i = 0; i <= formData.timeHorizon; i++) {
         const progress = i / Math.max(1, formData.timeHorizon - 1);
         const rate = startRate + (endRate - startRate) * progress;
+        rates.push(Math.round(rate));
+      }
+    } else if (type === "saylor") {
+      // Saylor projection: 37% -> 21% over timeHorizon, following the 21-year curve
+      for (let i = 0; i <= formData.timeHorizon; i++) {
+        const progress = i / Math.max(1, formData.timeHorizon - 1);
+        // 37% declining to 21% linearly
+        const rate = 37 - (37 - 21) * progress;
         rates.push(Math.round(rate));
       }
     } else if (type === "preset" && presetScenarios && preset !== "custom") {
@@ -113,7 +121,7 @@ export const RateAssumptionsSection: React.FC<Props> = ({
   };
 
   const applyToChart = (
-    type: "flat" | "linear" | "preset" | "manual" = inputType as any,
+    type: "flat" | "linear" | "preset" | "manual" | "saylor" = inputType as any,
   ) => {
     const rates = generateRates(type);
 
@@ -173,6 +181,19 @@ export const RateAssumptionsSection: React.FC<Props> = ({
           : {}),
       });
       setTimeout(() => applyToChart("linear"), 0);
+    } else if (
+      selectedScenario === "custom-saylor" &&
+      dataKey === "btcPriceCustomRates"
+    ) {
+      // Handle Saylor projection selection
+      updateFormData({
+        ...(presetKey ? { [presetKey]: "custom" } : {}),
+        ...(followScenarioKey ? { [followScenarioKey]: false } : {}),
+        ...(inputTypeKey ? { [inputTypeKey]: "saylor" } : {}),
+        ...(startRateKey ? { [startRateKey]: 37 } : {}),
+        ...(endRateKey ? { [endRateKey]: 21 } : {}),
+      });
+      setTimeout(() => applyToChart("saylor"), 0);
     } else {
       // Handle preset scenario selection
       updateFormData({
@@ -320,7 +341,9 @@ export const RateAssumptionsSection: React.FC<Props> = ({
               ? "custom-flat"
               : inputType === "linear"
                 ? "custom-linear"
-                : preset
+                : inputType === "saylor"
+                  ? "custom-saylor"
+                  : preset
           }
           onChange={(e) => {
             if (followScenario || manualMode) {
@@ -363,6 +386,11 @@ export const RateAssumptionsSection: React.FC<Props> = ({
           <optgroup label="Custom Configurations">
             <option value="custom-flat">Custom - Flat Rate</option>
             <option value="custom-linear">Custom - Linear Progression</option>
+            {dataKey === "btcPriceCustomRates" && (
+              <option value="custom-saylor">
+                Custom - Strategy/Saylor projection (37% → 21%)
+              </option>
+            )}
           </optgroup>
         </select>
 
@@ -459,6 +487,20 @@ export const RateAssumptionsSection: React.FC<Props> = ({
                 }
               />
             </div>
+          </div>
+        )}
+
+        {inputType === "saylor" && (
+          <div className="mt-3 p-3 bg-blue-50 rounded border">
+            <p className="text-sm text-blue-800 font-medium mb-2">
+              📈 Strategy/Saylor Projection
+            </p>
+            <p className="text-xs text-blue-600">
+              Based on MicroStrategy's long-term Bitcoin adoption model:
+              <br />• Starts at 37% annual appreciation in year 0
+              <br />• Declines linearly to 21% by the final year
+              <br />• Curve adjusts automatically for your selected time horizon
+            </p>
           </div>
         )}
 

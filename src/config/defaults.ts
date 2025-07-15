@@ -9,6 +9,7 @@ export const DEFAULT_FORM_DATA: FormData = {
   loanRate: 7,
   loanTermYears: 10,
   interestOnly: true,
+  ltvRatio: 40, 
   investmentsStartYield: 30,
   investmentsEndYield: 10,
   speculationStartYield: 40,
@@ -35,7 +36,12 @@ export const DEFAULT_FORM_DATA: FormData = {
 
   // BTC Price Appreciation - Also fix this to match
   btcPriceMode: "simple",
-  btcPriceInputType: "preset", // Should be preset, not flat
+  btcPriceInputType: "preset" as
+    | "flat"
+    | "linear"
+    | "preset"
+    | "saylor"
+    | "manual",
   btcPriceFlat: 50,
   btcPriceStart: 30,
   btcPriceEnd: 70,
@@ -46,7 +52,7 @@ export const DEFAULT_FORM_DATA: FormData = {
   // Income section - Fix to match economic scenario
   incomeYield: 8, // This old field might be causing confusion
   incomeAllocationPct: 10,
-  incomeReinvestmentPct: 5,
+  incomeReinvestmentPct: 30,
 
   // New income system - Fix to match economic scenario
   startingExpenses: 50000,

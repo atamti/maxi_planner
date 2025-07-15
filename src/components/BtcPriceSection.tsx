@@ -48,6 +48,7 @@ export const BtcPriceSection: React.FC<Props> = ({
       | "flat"
       | "linear"
       | "preset"
+      | "saylor"
       | "manual" = formData.btcPriceInputType,
   ): number[] => {
     const rates = [];
@@ -62,6 +63,15 @@ export const BtcPriceSection: React.FC<Props> = ({
         const rate =
           formData.btcPriceStart +
           (formData.btcPriceEnd - formData.btcPriceStart) * progress;
+        rates.push(Math.round(rate));
+      }
+    } else if (inputType === "saylor") {
+      // Saylor projection: 37% -> 21% over 21-year curve, mapped to current timeHorizon
+      for (let i = 0; i < formData.timeHorizon; i++) {
+        // Map current year to the 21-year Saylor curve
+        const saylorProgress = i / Math.max(1, formData.timeHorizon - 1);
+        // Apply the 21-year curve: 37% declining to 21%
+        const rate = 37 - (37 - 21) * saylorProgress;
         rates.push(Math.round(rate));
       }
     } else if (inputType === "preset") {
@@ -98,6 +108,7 @@ export const BtcPriceSection: React.FC<Props> = ({
       | "flat"
       | "linear"
       | "preset"
+      | "saylor"
       | "manual" = formData.btcPriceInputType,
   ) => {
     const rates = generateBtcRates(inputType);
@@ -111,7 +122,7 @@ export const BtcPriceSection: React.FC<Props> = ({
   };
 
   const handleInputTypeChange = (
-    newType: "flat" | "linear" | "preset" | "manual",
+    newType: "flat" | "linear" | "preset" | "saylor" | "manual",
   ) => {
     updateFormData({ btcPriceInputType: newType });
 
@@ -154,6 +165,18 @@ export const BtcPriceSection: React.FC<Props> = ({
 
       // Apply linear progression to the chart immediately
       setTimeout(() => applyToChart("linear"), 0);
+    } else if (selectedScenario === "custom-saylor") {
+      // Handle Saylor projection selection (37% -> 21% over 21 years)
+      updateFormData({
+        btcPricePreset: "custom",
+        followEconomicScenarioBtc: false,
+        btcPriceInputType: "saylor",
+        btcPriceStart: 37,
+        btcPriceEnd: 21,
+      });
+
+      // Apply Saylor projection to the chart immediately
+      setTimeout(() => applyToChart("saylor"), 0);
     } else if (selectedScenario === "manual") {
       // Get the custom scenario settings
       const customScenario = economicScenarios.custom.btcPrice;
@@ -197,6 +220,15 @@ export const BtcPriceSection: React.FC<Props> = ({
       applyToChart();
     }
   }, [formData.btcPriceStart, formData.btcPriceEnd, formData.timeHorizon]);
+
+  React.useEffect(() => {
+    if (
+      formData.btcPriceInputType === "saylor" &&
+      !formData.btcPriceManualMode
+    ) {
+      applyToChart();
+    }
+  }, [formData.timeHorizon]);
 
   React.useEffect(() => {
     if (
