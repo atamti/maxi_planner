@@ -263,10 +263,29 @@ export const PortfolioForm: React.FC<Props> = ({
             }
             className="w-full"
             min="0"
-            max="50"
+            max="100"
           />
           <span className="text-sm text-gray-600">
             {formData.collateralPct}% used as collateral
+          </span>
+        </div>
+        <div>
+          <label className="block font-medium mb-1">
+            Loan-to-Value Ratio (LTV %):
+          </label>
+          <input
+            type="range"
+            value={formData.ltvRatio}
+            onChange={(e) =>
+              updateFormData({ ltvRatio: Number(e.target.value) })
+            }
+            className="w-full"
+            min="0"
+            max="50"
+          />
+          <span className="text-sm text-gray-600">
+            {formData.ltvRatio}% LTV (borrow {formData.ltvRatio}% of collateral
+            value)
           </span>
         </div>
         <div>
@@ -367,7 +386,10 @@ export const PortfolioForm: React.FC<Props> = ({
                   btcPriceAtActivation * (1 + appreciationRate);
               }
 
-              const loanPrincipal = collateralBtc * 0.4 * btcPriceAtActivation;
+              const loanPrincipal =
+                collateralBtc *
+                (formData.ltvRatio / 100) *
+                btcPriceAtActivation;
 
               const annualInterest = loanPrincipal * (formData.loanRate / 100);
               const monthlyPayment = formData.interestOnly
@@ -396,6 +418,13 @@ export const PortfolioForm: React.FC<Props> = ({
                     {formatCurrency(btcPriceAtActivation, 0)}
                   </div>
                   <div>
+                    <strong>Collateral Value:</strong>{" "}
+                    {formatCurrency(collateralBtc * btcPriceAtActivation, 0)}
+                  </div>
+                  <div>
+                    <strong>LTV Ratio:</strong> {formData.ltvRatio}%
+                  </div>
+                  <div>
                     <strong>Loan Principal:</strong>{" "}
                     {formatCurrency(loanPrincipal, 0)}
                   </div>
@@ -409,6 +438,14 @@ export const PortfolioForm: React.FC<Props> = ({
                       {formatCurrency(loanPrincipal, 0)} remains due
                     </div>
                   )}
+                  <div className="col-span-2 text-blue-600 text-xs">
+                    💡 Liquidation risk if BTC drops below{" "}
+                    {formatCurrency(
+                      btcPriceAtActivation * (formData.ltvRatio / 80),
+                      0,
+                    )}
+                    (assuming 80% liquidation threshold)
+                  </div>
                 </div>
               );
             })()}

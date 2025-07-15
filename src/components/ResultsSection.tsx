@@ -1,26 +1,11 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
-import { CalculationResults } from "../types";
+import { CalculationResults, FormDataSubset } from "../types";
 import { formatCurrency, formatNumber } from "../utils/formatNumber";
 
 interface Props {
   results: CalculationResults;
-  formData: {
-    timeHorizon: number;
-    exchangeRate: number;
-    priceCrash: number;
-    speculationPct: number;
-    collateralPct: number;
-    investmentsStartYield: number;
-    investmentsEndYield: number;
-    speculationStartYield: number;
-    speculationEndYield: number;
-    activationYear: number;
-    btcPriceCustomRates: number[];
-    inflationCustomRates: number[];
-    incomeCustomRates: number[];
-    startingExpenses: number;
-  };
+  formData: FormDataSubset;
   showUSD: boolean;
   onUpdateFormData?: (updates: { activationYear: number }) => void;
 }
@@ -49,8 +34,6 @@ export const ResultsSection: React.FC<Props> = ({
     priceCrash,
     speculationPct,
     collateralPct,
-    investmentsStartYield,
-    investmentsEndYield,
     speculationStartYield,
     speculationEndYield,
     activationYear,
@@ -201,94 +184,475 @@ export const ResultsSection: React.FC<Props> = ({
     ],
   };
 
+  // Helper function to calculate dynamic loan values
+  const calculateDynamicLoanValues = () => {
+    // Calculate BTC stack at activation year with growth
+    let btcStackAtActivation = formData.btcStack;
+    for (let year = 0; year < formData.activationYear; year++) {
+      const investmentsYield =
+        formData.investmentsStartYield -
+        (formData.investmentsStartYield - formData.investmentsEndYield) *
+          (year / formData.timeHorizon);
+      const speculationYield =
+        formData.speculationStartYield -
+        (formData.speculationStartYield - formData.speculationEndYield) *
+          (year / formData.timeHorizon);
+
+      const savings = btcStackAtActivation * (formData.savingsPct / 100);
+      const investments =
+        btcStackAtActivation *
+        (formData.investmentsPct / 100) *
+        (1 + investmentsYield / 100);
+      const speculation =
+        btcStackAtActivation *
+        (formData.speculationPct / 100) *
+        (1 + speculationYield / 100);
+
+      btcStackAtActivation = savings + investments + speculation;
+    }
+
+    const btcSavingsAtActivation =
+      btcStackAtActivation * (formData.savingsPct / 100);
+    const collateralBtc =
+      btcSavingsAtActivation * (formData.collateralPct / 100);
+
+    // Use BTC price at activation year from custom rates
+    let btcPriceAtActivation = formData.exchangeRate;
+    for (let i = 0; i < formData.activationYear; i++) {
+      const appreciationRate = (formData.btcPriceCustomRates?.[i] || 50) / 100;
+      btcPriceAtActivation = btcPriceAtActivation * (1 + appreciationRate);
+    }
+
+    const loanPrincipal =
+      collateralBtc * (formData.ltvRatio / 100) * btcPriceAtActivation;
+    const liquidationPrice = btcPriceAtActivation * (formData.ltvRatio / 80); // 80% liquidation threshold
+
+    // Calculate annual payments
+    const annualInterest = loanPrincipal * (formData.loanRate / 100);
+    const annualPayments = formData.interestOnly
+      ? annualInterest
+      : (loanPrincipal *
+          ((formData.loanRate / 100) *
+            Math.pow(1 + formData.loanRate / 100, formData.loanTermYears))) /
+        (Math.pow(1 + formData.loanRate / 100, formData.loanTermYears) - 1);
+
+    return { loanPrincipal, liquidationPrice, annualPayments };
+  };
+
+  // Calculate escape velocity - when income exceeds expenses
+  const calculateEscapeVelocity = () => {
+    let escapeYearBase = null;
+    let escapeYearLeveraged = null;
+
+    for (let year = 0; year <= formData.timeHorizon; year++) {
+      const income = results.incomeAtActivationYears[year] || 0;
+      const incomeWithLeverage =
+        results.incomeAtActivationYearsWithLeverage[year] || 0;
+      const expenses = results.expensesAtActivationYears[year] || 0;
+
+      // Check base scenario
+      if (escapeYearBase === null && income > expenses) {
+        escapeYearBase = year;
+      }
+
+      // Check leveraged scenario
+      if (
+        escapeYearLeveraged === null &&
+        incomeWithLeverage > expenses &&
+        formData.collateralPct > 0
+      ) {
+        escapeYearLeveraged = year;
+      }
+
+      // Break if we found both (or don't need leveraged)
+      if (
+        escapeYearBase !== null &&
+        (escapeYearLeveraged !== null || formData.collateralPct === 0)
+      ) {
+        break;
+      }
+    }
+
+    return { escapeYearBase, escapeYearLeveraged };
+  };
+
+  const dynamicLoanValues =
+    formData.collateralPct > 0 ? calculateDynamicLoanValues() : null;
+  const escapeVelocity = calculateEscapeVelocity();
+
+  // Calculate USD cashflows (income minus expenses)
+  const calculateCashflows = () => {
+    const activationYearExpenses =
+      results.annualExpenses[formData.activationYear] || 0;
+    const finalYearExpenses =
+      results.annualExpenses[results.annualExpenses.length - 1] || 0;
+
+    const activationYearIncome =
+      results.usdIncome[formData.activationYear] || 0;
+    const activationYearIncomeWithLeverage =
+      results.usdIncomeWithLeverage[formData.activationYear] || 0;
+
+    const finalYearIncome =
+      results.usdIncome[results.usdIncome.length - 1] || 0;
+    const finalYearIncomeWithLeverage =
+      results.usdIncomeWithLeverage[results.usdIncomeWithLeverage.length - 1] ||
+      0;
+
+    return {
+      activationYear: {
+        withoutLeverage: activationYearIncome - activationYearExpenses,
+        withLeverage: activationYearIncomeWithLeverage - activationYearExpenses,
+      },
+      finalYear: {
+        withoutLeverage: finalYearIncome - finalYearExpenses,
+        withLeverage: finalYearIncomeWithLeverage - finalYearExpenses,
+      },
+    };
+  };
+
+  const cashflows = calculateCashflows();
+
+  // Helper function to format cashflow values
+  const formatCashflow = (value: number): React.ReactElement => {
+    if (value < 0) {
+      return (
+        <span className="text-red-600">
+          ({formatCurrency(Math.abs(value), 0)})
+        </span>
+      );
+    }
+    return <span>{formatCurrency(value, 0)}</span>;
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-2">Results</h2>
+      <h2 className="text-xl font-semibold mb-4">Results</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <p>
-            <strong>Ending BTC Stack (Year {timeHorizon}):</strong>{" "}
-            {formatNumber(
-              calculationResults[calculationResults.length - 1].btcWithIncome,
-            )}{" "}
-            BTC
-          </p>
-          {showUSD && (
+      {/* Results Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Section 1: Final BTC Stack */}
+        <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+          <h3 className="text-lg font-semibold text-orange-800 mb-3">
+            ₿ Final BTC Stack (Year {timeHorizon})
+          </h3>
+          <div className="space-y-2">
             <p>
-              (
-              {formatCurrency(
-                calculationResults[calculationResults.length - 1]
-                  .btcWithIncome * getBtcPriceAtYear(timeHorizon),
-                0,
-              )}
-              )
+              <strong>With Income Strategy:</strong>
+              <br />
+              {formatNumber(
+                calculationResults[calculationResults.length - 1].btcWithIncome,
+              )}{" "}
+              BTC
             </p>
-          )}
-          <p>
-            <strong>Without Income Allocation:</strong>{" "}
-            {formatNumber(
-              calculationResults[calculationResults.length - 1]
-                .btcWithoutIncome,
-            )}{" "}
-            BTC
-          </p>
-          {showUSD && (
+            {showUSD && (
+              <p className="text-sm text-gray-600">
+                (
+                {formatCurrency(
+                  calculationResults[calculationResults.length - 1]
+                    .btcWithIncome * getBtcPriceAtYear(timeHorizon),
+                  0,
+                )}
+                )
+              </p>
+            )}
             <p>
-              (
-              {formatCurrency(
+              <strong>Pure Growth (No Income):</strong>
+              <br />
+              {formatNumber(
                 calculationResults[calculationResults.length - 1]
-                  .btcWithoutIncome * getBtcPriceAtYear(timeHorizon),
-                0,
-              )}
-              )
+                  .btcWithoutIncome,
+              )}{" "}
+              BTC
             </p>
-          )}
-          <p>
-            <strong>USD Income (Year {timeHorizon}):</strong>{" "}
-            {formatCurrency(usdIncome[usdIncome.length - 1], 0)}
-          </p>
-          <p>
-            <strong>BTC Income (Year {timeHorizon}):</strong>{" "}
-            {formatNumber(btcIncome[btcIncome.length - 1], 3)} BTC
-          </p>
-          <p>
-            <strong>Loan Principal:</strong> {formatCurrency(loanPrincipal, 0)}
-          </p>
-          <p>
-            <strong>Loan Interest (Annual):</strong>{" "}
-            {formatCurrency(loanInterest, 0)}
-          </p>
+            {showUSD && (
+              <p className="text-sm text-gray-600">
+                (
+                {formatCurrency(
+                  calculationResults[calculationResults.length - 1]
+                    .btcWithoutIncome * getBtcPriceAtYear(timeHorizon),
+                  0,
+                )}
+                )
+              </p>
+            )}
+          </div>
         </div>
-        <div>
-          <p className="text-red-600">Risk Insights:</p>
-          <ul className="list-disc pl-5 text-red-600">
-            <li>
-              High BTC growth assumes volatility; a {priceCrash}% crash reduces
-              stack.
-            </li>
-            {speculationPct > 0 && (
-              <li>
-                Speculation ({speculationPct}%) has high potential yields (
-                {speculationStartYield}%→{speculationEndYield}%) but greater
-                loss risk.
-              </li>
-            )}
-            {collateralPct > 0 && (
-              <li>
-                Borrowing {formatCurrency(loanPrincipal, 0)} risks liquidation
-                if BTC drops below {formatCurrency(exchangeRate * 0.4, 0)}.
-              </li>
-            )}
-            <li>USD income decays in BTC terms as Bitcoin appreciates.</li>
-          </ul>
+
+        {/* Section 2: Income Activation Year Analysis */}
+        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+          <h3 className="text-lg font-semibold text-green-800 mb-3">
+            🚀 Income Activation Year Analysis (Year {formData.activationYear})
+          </h3>
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm font-medium text-green-700 mb-1">
+                💰 Income:
+              </p>
+              <p className="text-sm">
+                <strong>Base:</strong>{" "}
+                {formatCurrency(
+                  results.usdIncome[formData.activationYear] || 0,
+                  0,
+                )}
+              </p>
+              {formData.collateralPct > 0 && (
+                <p className="text-sm">
+                  <strong>Leveraged:</strong>{" "}
+                  {formatCurrency(
+                    results.usdIncomeWithLeverage[formData.activationYear] || 0,
+                    0,
+                  )}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <p className="text-sm font-medium text-green-700 mb-1">
+                💸 Expenses:
+              </p>
+              <p className="text-sm">
+                {formatCurrency(
+                  results.annualExpenses[formData.activationYear] || 0,
+                  0,
+                )}
+              </p>
+            </div>
+
+            <div className="pt-2 border-t border-green-300">
+              <p className="text-sm font-medium text-green-700 mb-1">
+                📊 Net Cashflow:
+              </p>
+              <p className="text-sm">
+                <strong>Base:</strong>{" "}
+                {formatCashflow(cashflows.activationYear.withoutLeverage)}
+              </p>
+              {formData.collateralPct > 0 && (
+                <p className="text-sm">
+                  <strong>Leveraged:</strong>{" "}
+                  {formatCashflow(cashflows.activationYear.withLeverage)}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Section 3: Final Year Analysis */}
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <h3 className="text-lg font-semibold text-blue-800 mb-3">
+            🎯 Year {timeHorizon} Analysis
+          </h3>
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm font-medium text-blue-700 mb-1">
+                💰 Income:
+              </p>
+              <p className="text-sm">
+                <strong>USD:</strong>{" "}
+                {formatCurrency(usdIncome[usdIncome.length - 1], 0)}
+              </p>
+              <p className="text-sm">
+                <strong>BTC:</strong>{" "}
+                {formatNumber(btcIncome[btcIncome.length - 1], 3)} BTC
+              </p>
+              {formData.collateralPct > 0 && (
+                <p className="text-sm">
+                  <strong>USD (Leveraged):</strong>{" "}
+                  {formatCurrency(
+                    usdIncomeWithLeverage[usdIncomeWithLeverage.length - 1],
+                    0,
+                  )}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <p className="text-sm font-medium text-blue-700 mb-1">
+                💸 Expenses:
+              </p>
+              <p className="text-sm">
+                {formatCurrency(annualExpenses[annualExpenses.length - 1], 0)}
+              </p>
+            </div>
+
+            <div className="pt-2 border-t border-blue-300">
+              <p className="text-sm font-medium text-blue-700 mb-1">
+                📊 Net Cashflow:
+              </p>
+              <p className="text-sm">
+                <strong>Base:</strong>{" "}
+                {formatCashflow(cashflows.finalYear.withoutLeverage)}
+              </p>
+              {formData.collateralPct > 0 && (
+                <p className="text-sm">
+                  <strong>Leveraged:</strong>{" "}
+                  {formatCashflow(cashflows.finalYear.withLeverage)}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Activation Year Control - Moved to top and full width */}
+      {/* Loan Details Section - Only show when leverage is used */}
+      {collateralPct > 0 && dynamicLoanValues && (
+        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200 mb-6">
+          <h3 className="text-lg font-semibold text-purple-800 mb-3">
+            🏦 Loan Details
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+            <div>
+              <p className="font-medium text-purple-700">Principal:</p>
+              <p>{formatCurrency(dynamicLoanValues.loanPrincipal, 0)}</p>
+            </div>
+            <div>
+              <p className="font-medium text-purple-700">Annual Interest:</p>
+              <p>
+                {formatCurrency(
+                  dynamicLoanValues.loanPrincipal * (formData.loanRate / 100),
+                  0,
+                )}
+              </p>
+            </div>
+            <div>
+              <p className="font-medium text-purple-700">Annual Payments:</p>
+              <p>{formatCurrency(dynamicLoanValues.annualPayments, 0)}</p>
+              {formData.interestOnly && (
+                <p className="text-xs text-purple-600">(Interest only)</p>
+              )}
+            </div>
+            <div>
+              <p className="font-medium text-purple-700">LTV Ratio:</p>
+              <p>{formData.ltvRatio}%</p>
+            </div>
+            <div>
+              <p className="font-medium text-purple-700">Liquidation Risk:</p>
+              <p>{formatCurrency(dynamicLoanValues.liquidationPrice, 0)}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Escape Velocity Section */}
+      <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-6">
+        <h3 className="text-lg font-semibold text-yellow-800 mb-3">
+          🚀 Escape Velocity Analysis
+        </h3>
+        <p className="text-sm text-yellow-700 mb-3">
+          When income exceeds expenses by activation year:
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white p-3 rounded border">
+            <p className="font-medium text-yellow-800 mb-1">Base Scenario:</p>
+            {escapeVelocity.escapeYearBase !== null ? (
+              <p className="text-lg font-bold text-green-600">
+                Year {escapeVelocity.escapeYearBase}
+              </p>
+            ) : (
+              <p className="text-lg font-bold text-red-600">Never reached</p>
+            )}
+            <p className="text-xs text-gray-600">
+              When unleveraged income first exceeds expenses
+            </p>
+          </div>
+
+          {formData.collateralPct > 0 && (
+            <div className="bg-white p-3 rounded border">
+              <p className="font-medium text-yellow-800 mb-1">
+                Leveraged Scenario:
+              </p>
+              {escapeVelocity.escapeYearLeveraged !== null ? (
+                <p className="text-lg font-bold text-green-600">
+                  Year {escapeVelocity.escapeYearLeveraged}
+                </p>
+              ) : (
+                <p className="text-lg font-bold text-red-600">Never reached</p>
+              )}
+              <p className="text-xs text-gray-600">
+                When leveraged income (after debt service) exceeds expenses
+              </p>
+            </div>
+          )}
+        </div>
+
+        {escapeVelocity.escapeYearBase !== null &&
+          escapeVelocity.escapeYearLeveraged !== null &&
+          formData.collateralPct > 0 && (
+            <div className="mt-3 p-2 bg-blue-100 rounded border">
+              <p className="text-sm text-blue-800">
+                💡 <strong>Leverage advantage:</strong>{" "}
+                {escapeVelocity.escapeYearBase -
+                  escapeVelocity.escapeYearLeveraged >
+                0
+                  ? `Leverage achieves escape velocity ${escapeVelocity.escapeYearBase - escapeVelocity.escapeYearLeveraged} year(s) earlier`
+                  : escapeVelocity.escapeYearLeveraged -
+                        escapeVelocity.escapeYearBase >
+                      0
+                    ? `Base scenario achieves escape velocity ${escapeVelocity.escapeYearLeveraged - escapeVelocity.escapeYearBase} year(s) earlier`
+                    : "Both scenarios achieve escape velocity in the same year"}
+              </p>
+            </div>
+          )}
+      </div>
+
+      {/* Risk Insights Section */}
+      <div className="bg-red-50 p-4 rounded-lg border border-red-200 mb-6">
+        <h3 className="text-lg font-semibold text-red-800 mb-3">
+          ⚠️ Risk Insights
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Check if we have any risks to show */}
+          {formData.savingsPct < 100 ||
+          speculationPct > 0 ||
+          formData.incomeAllocationPct > 0 ||
+          (collateralPct > 0 && dynamicLoanValues) ? (
+            <>
+              <ul className="list-disc pl-5 text-red-700 space-y-1">
+                {formData.savingsPct < 100 && (
+                  <li>
+                    All investment & speculation carries counterparty risk
+                  </li>
+                )}
+                {speculationPct > 0 && (
+                  <li>
+                    Speculation ({speculationPct}%) has high potential yields (
+                    {speculationStartYield}%→{speculationEndYield}%) but greater
+                    loss risk
+                  </li>
+                )}
+                {formData.incomeAllocationPct > 0 && (
+                  <li>USD income decays in BTC terms as Bitcoin appreciates</li>
+                )}
+              </ul>
+              {collateralPct > 0 && dynamicLoanValues && (
+                <ul className="list-disc pl-5 text-red-700 space-y-1">
+                  <li>
+                    Borrowing{" "}
+                    {formatCurrency(dynamicLoanValues.loanPrincipal, 0)} risks
+                    liquidation if BTC drops below{" "}
+                    {formatCurrency(dynamicLoanValues.liquidationPrice, 0)} (80%
+                    liquidation threshold)
+                  </li>
+                </ul>
+              )}
+            </>
+          ) : (
+            <div className="col-span-2 text-center py-4">
+              <p className="text-green-700 font-medium">
+                ✅ Conservative Configuration
+              </p>
+              <p className="text-sm text-gray-600 mt-2">
+                Your current settings represent a low-risk approach with 100%
+                savings allocation and no income generation or leverage.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Activation Year Control */}
       <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
         <label className="block font-medium mb-2 text-lg">
-          Activation Year: {activationYear}
+          📅 Activation Year: {activationYear}
         </label>
         <input
           type="range"
@@ -309,9 +673,10 @@ export const ResultsSection: React.FC<Props> = ({
         </div>
       </div>
 
+      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
         <div>
-          <h3 className="text-lg font-semibold mb-2">BTC Stack Growth</h3>
+          <h3 className="text-lg font-semibold mb-2">📈 BTC Stack Growth</h3>
           <Line
             data={resultChartData}
             options={{
@@ -373,7 +738,7 @@ export const ResultsSection: React.FC<Props> = ({
           />
         </div>
         <div>
-          <h3 className="text-lg font-semibold mb-2">USD Income Stream</h3>
+          <h3 className="text-lg font-semibold mb-2">💵 USD Income Stream</h3>
           <Line
             data={incomeChartData}
             options={{
@@ -405,7 +770,7 @@ export const ResultsSection: React.FC<Props> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <div>
           <h3 className="text-lg font-semibold mb-2">
-            USD Income in BTC Terms (Purchasing Power)
+            ₿ USD Income in BTC Terms (Purchasing Power)
           </h3>
           <Line
             data={incomeBtcChartData}
@@ -438,7 +803,7 @@ export const ResultsSection: React.FC<Props> = ({
         </div>
         <div>
           <h3 className="text-lg font-semibold mb-2">
-            Income vs Expenses by Activation Year
+            📊 Income vs Expenses by Activation Year
           </h3>
           <Line
             data={incomePotentialChartData}
@@ -475,11 +840,6 @@ export const ResultsSection: React.FC<Props> = ({
           </p>
         </div>
       </div>
-
-      <p className="text-red-600 mt-4">
-        USD income and borrowing carry liquidation risk. BTC income decays as
-        Bitcoin appreciates.
-      </p>
     </div>
   );
 };

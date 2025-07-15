@@ -64,7 +64,7 @@ export const IncomeExpensesSection: React.FC<Props> = ({
       const maxValue = Math.max(formData.incomeStart, formData.incomeEnd);
       return Math.max(50, Math.ceil((maxValue * 1.2) / 10) * 10);
     }
-    return 50; // Default
+    return 100; // Default
   };
 
   return (

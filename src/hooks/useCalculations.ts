@@ -135,7 +135,8 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       const btcSavingsAtActivation = btcStackAtActivation * (savingsPct / 100);
       const collateralBtc = btcSavingsAtActivation * (collateralPct / 100);
       const btcPriceAtActivation = getBtcPriceAtYear(activationYear);
-      const loanPrincipal = collateralBtc * 0.4 * btcPriceAtActivation;
+      const loanPrincipal =
+        collateralBtc * (formData.ltvRatio / 100) * btcPriceAtActivation;
 
       const debtService = interestOnly
         ? loanPrincipal * (loanRate / 100)
@@ -367,7 +368,8 @@ export const useCalculations = (formData: FormData): CalculationResults => {
     // Calculate loan details for display (using year 0 values for simplicity)
     const displayCollateralValue =
       btcStack * (savingsPct / 100) * (collateralPct / 100);
-    const displayLoanPrincipal = displayCollateralValue * 0.4 * exchangeRate;
+    const displayLoanPrincipal =
+      displayCollateralValue * (formData.ltvRatio / 100) * exchangeRate;
     const displayLoanInterest = displayLoanPrincipal * (loanRate / 100);
 
     return {

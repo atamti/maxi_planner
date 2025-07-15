@@ -1,7 +1,7 @@
 import { ScenarioKey } from "./config/economicScenarios";
 
 // Common type for rate configuration (used by both inflation and BTC price)
-export type InputType = "flat" | "linear" | "preset" | "manual";
+export type InputType = "flat" | "linear" | "preset" | "manual" | "saylor";
 export type Mode = "simple" | "advanced";
 
 // Rate configuration interface for both inflation and BTC price
@@ -56,6 +56,14 @@ export interface FormData {
   speculationPct: number;
   collateralPct: number;
 
+  // Loan configuration
+  loanRate: number;
+  loanTermYears: number;
+  interestOnly: boolean;
+
+  // LTV ratio - new field for controlling the starting LTV ratio from 0% to 50%
+  ltvRatio: number;
+
   // Yield settings
   investmentsStartYield: number;
   investmentsEndYield: number;
@@ -74,11 +82,6 @@ export interface FormData {
   followEconomicScenarioBtc: boolean;
   followEconomicScenarioIncome: boolean;
 
-  // Loan configuration
-  loanRate: number;
-  loanTermYears: number;
-  interestOnly: boolean;
-
   // Inflation settings - flat structure for backward compatibility
   inflationMode: Mode;
   inflationInputType: "flat" | "linear" | "preset";
@@ -91,7 +94,7 @@ export interface FormData {
 
   // BTC Price settings - flat structure for backward compatibility
   btcPriceMode: Mode;
-  btcPriceInputType: InputType;
+  btcPriceInputType: "flat" | "linear" | "preset" | "saylor" | "manual";
   btcPriceFlat: number;
   btcPriceStart: number;
   btcPriceEnd: number;
@@ -108,6 +111,32 @@ export interface FormData {
   incomePreset: ScenarioKey;
   incomeCustomRates: number[];
   incomeManualMode: boolean;
+}
+
+// Centralized subset type for components that need specific FormData properties
+export interface FormDataSubset {
+  timeHorizon: number;
+  exchangeRate: number;
+  priceCrash: number;
+  speculationPct: number;
+  collateralPct: number;
+  ltvRatio: number;
+  loanRate: number;
+  loanTermYears: number;
+  interestOnly: boolean;
+  investmentsStartYield: number;
+  investmentsEndYield: number;
+  speculationStartYield: number;
+  speculationEndYield: number;
+  activationYear: number;
+  btcPriceCustomRates: number[];
+  inflationCustomRates: number[];
+  incomeCustomRates: number[];
+  startingExpenses: number;
+  savingsPct: number;
+  investmentsPct: number;
+  btcStack: number;
+  incomeAllocationPct: number; // Add missing income allocation
 }
 
 export interface Result {
