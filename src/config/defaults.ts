@@ -11,13 +11,13 @@ export const DEFAULT_FORM_DATA: FormData = {
   interestOnly: true,
   ltvRatio: 40, 
   investmentsStartYield: 30,
-  investmentsEndYield: 10,
+  investmentsEndYield: 0,
   speculationStartYield: 40,
-  speculationEndYield: 10,
+  speculationEndYield: 0,
   priceCrash: 0,
   exchangeRate: 100000,
   timeHorizon: 20,
-  activationYear: 5,
+  activationYear: 10,
 
   // Economic scenario
   economicScenario: "debasement",
