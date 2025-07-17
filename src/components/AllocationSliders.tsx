@@ -1,24 +1,19 @@
 import React, { useState } from "react";
+import { useAllocation } from "../hooks/useAllocation";
 
 interface Props {
-  savingsPct: number;
-  investmentsPct: number;
-  speculationPct: number;
-  onUpdate: (updates: {
-    savingsPct: number;
-    investmentsPct: number;
-    speculationPct: number;
-  }) => void;
   minThreshold?: number;
 }
 
-export const AllocationSliders: React.FC<Props> = ({
-  savingsPct,
-  investmentsPct,
-  speculationPct,
-  onUpdate,
-  minThreshold = 0,
-}) => {
+export const AllocationSliders: React.FC<Props> = ({ minThreshold = 0 }) => {
+  const {
+    savingsPct,
+    investmentsPct,
+    speculationPct,
+    updateAllocation,
+    allocationError,
+  } = useAllocation();
+
   const [highlightField, setHighlightField] = useState<string | null>(null);
 
   const handleAllocationChange = (
@@ -37,13 +32,9 @@ export const AllocationSliders: React.FC<Props> = ({
       if (remaining - investmentsPct < minThreshold) {
         newInvestments = Math.max(minThreshold, remaining - minThreshold);
         newSpeculation = remaining - newInvestments;
-
-        if (newInvestments !== investmentsPct) {
-          setHighlightField("investments");
-          setTimeout(() => setHighlightField(null), 500);
-        }
       } else {
-        newSpeculation = remaining - investmentsPct;
+        newSpeculation = Math.max(minThreshold, remaining - investmentsPct);
+        newInvestments = remaining - newSpeculation;
       }
     } else if (field === "investments") {
       newInvestments = Math.max(minThreshold, Math.min(100, newValue));
@@ -53,42 +44,49 @@ export const AllocationSliders: React.FC<Props> = ({
       if (remaining - savingsPct < minThreshold) {
         newSavings = Math.max(minThreshold, remaining - minThreshold);
         newSpeculation = remaining - newSavings;
-
-        if (newSavings !== savingsPct) {
-          setHighlightField("savings");
-          setTimeout(() => setHighlightField(null), 500);
-        }
       } else {
-        newSpeculation = remaining - savingsPct;
+        newSpeculation = Math.max(minThreshold, remaining - savingsPct);
+        newSavings = remaining - newSpeculation;
       }
     }
 
-    onUpdate({
-      savingsPct: Math.round(newSavings),
-      investmentsPct: Math.round(newInvestments),
-      speculationPct: Math.round(newSpeculation),
+    updateAllocation({
+      savingsPct: newSavings,
+      investmentsPct: newInvestments,
+      speculationPct: newSpeculation,
     });
   };
 
-  const getBarColor = (type: string, isHighlighted: boolean) => {
-    if (isHighlighted) return "bg-yellow-400 transition-colors duration-500";
+  const getBarColor = (
+    category: "savings" | "investments" | "speculation",
+    isHighlighted: boolean,
+  ): string => {
+    const baseColors = {
+      savings: "bg-green-500",
+      investments: "bg-blue-500",
+      speculation: "bg-red-500",
+    };
 
-    switch (type) {
-      case "savings":
-        return "bg-green-500";
-      case "investments":
-        return "bg-blue-500";
-      case "speculation":
-        return "bg-red-500";
-      default:
-        return "bg-gray-400";
-    }
+    const highlightColors = {
+      savings: "bg-green-600",
+      investments: "bg-blue-600",
+      speculation: "bg-red-600",
+    };
+
+    return isHighlighted ? highlightColors[category] : baseColors[category];
   };
 
   return (
     <div className="space-y-4">
-      {/* Visual Progress Bar */}
-      <div className="w-full h-8 bg-gray-200 rounded-lg overflow-hidden flex">
+      {/* Allocation Error Display */}
+      {allocationError && (
+        <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {allocationError}
+        </div>
+      )}
+
+      {/* Visual allocation bar */}
+      <div className="flex h-8 rounded-lg overflow-hidden border-2 border-gray-300">
         <div
           className={`${getBarColor(
             "savings",
@@ -191,36 +189,37 @@ export const AllocationSliders: React.FC<Props> = ({
             max={100}
           />
           <span className="text-xs text-gray-600 block mt-1 text-center">
-            Medium risk/reward
+            Medium risk/yield
           </span>
         </div>
 
-        {/* Speculation (Calculated) */}
-        <div className="bg-gray-50 p-3 rounded-lg">
+        {/* Speculation */}
+        <div>
           <div className="flex items-center mb-2">
             <div className="w-3 h-3 bg-red-500 rounded mr-2"></div>
             <label className="block font-medium text-sm">
-              Speculation (Remaining)
+              Speculation ({speculationPct}%)
             </label>
           </div>
-          <div className="text-xl font-bold text-center py-2">
-            {speculationPct}%
+          <div className="text-sm text-gray-600 p-2 bg-gray-100 rounded">
+            Auto-adjusted to {speculationPct}%
           </div>
-          <span className="text-xs text-gray-600 block text-center">
-            High risk/reward - Auto calculated
+          <span className="text-xs text-gray-600 block mt-1 text-center">
+            High risk/yield
           </span>
-          {speculationPct <= minThreshold && speculationPct > 0 && (
-            <div className="text-xs text-orange-600 text-center mt-1">
-              ⚠️ At minimum threshold
-            </div>
-          )}
         </div>
       </div>
 
-      {/* Constraint Information */}
-      <div className="text-xs text-gray-500 bg-blue-50 p-2 rounded">
-        💡 Tip: Adjust Savings and Investments - Speculation adjusts
-        automatically. Any allocation can be 0%.
+      {/* Allocation Summary */}
+      <div className="bg-gray-50 p-3 rounded-lg">
+        <div className="text-sm text-gray-700">
+          <div className="flex justify-between">
+            <span>Total Allocation:</span>
+            <span className="font-medium">
+              {savingsPct + investmentsPct + speculationPct}%
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,21 +1,14 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_FORM_DATA } from "../config/defaults";
+import { PortfolioProvider } from "../context/PortfolioContext";
 import { PortfolioForm } from "./PortfolioForm";
 
 // Mock child components to focus on PortfolioForm logic
 vi.mock("./AllocationSliders", () => ({
-  AllocationSliders: ({ onUpdate }: { onUpdate: (updates: any) => void }) => (
-    <div data-testid="allocation-sliders">
-      <button
-        onClick={() =>
-          onUpdate({ savingsPct: 70, investmentsPct: 20, speculationPct: 10 })
-        }
-      >
-        Mock Update Allocation
-      </button>
-    </div>
+  AllocationSliders: () => (
+    <div data-testid="allocation-sliders-v2">Allocation Sliders V2</div>
   ),
 }));
 
@@ -47,12 +40,10 @@ vi.mock("./YieldChart", () => ({
   YieldChart: () => <div data-testid="yield-chart">Yield Chart</div>,
 }));
 
-const defaultProps = {
-  formData: DEFAULT_FORM_DATA,
-  updateFormData: vi.fn(),
-  allocationError: "",
-  onReset: vi.fn(),
-};
+// Wrapper component for tests
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <PortfolioProvider>{children}</PortfolioProvider>
+);
 
 describe("PortfolioForm", () => {
   beforeEach(() => {
@@ -60,12 +51,20 @@ describe("PortfolioForm", () => {
   });
 
   it("should render main form title", () => {
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
     expect(screen.getByText("Portfolio Configuration")).toBeInTheDocument();
   });
 
   it("should render all main sections", () => {
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
     // Check section titles
     expect(screen.getByText("1. 💼 Portfolio Setup")).toBeInTheDocument();
@@ -74,7 +73,11 @@ describe("PortfolioForm", () => {
   });
 
   it("should have Portfolio Setup section expanded by default", () => {
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
     // Should show BTC Stack input since section is expanded
     expect(screen.getByDisplayValue("5")).toBeInTheDocument(); // BTC input
@@ -83,7 +86,11 @@ describe("PortfolioForm", () => {
   });
 
   it("should render BTC stack input with correct value", () => {
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
     const btcInput = screen.getByDisplayValue("5") as HTMLInputElement;
     expect(btcInput.value).toBe("5");
@@ -91,56 +98,67 @@ describe("PortfolioForm", () => {
   });
 
   it("should update BTC stack when input changes", async () => {
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
     const btcInput = screen.getByDisplayValue("5");
     fireEvent.change(btcInput, { target: { value: "10" } });
 
-    expect(defaultProps.updateFormData).toHaveBeenCalledWith({ btcStack: 10 });
+    // After the change, the input should reflect the new value
+    // We can't easily test the context update directly, but we can verify
+    // the input value changes (which happens when context updates)
+    expect(btcInput).toHaveValue(10);
   });
 
   it("should render time horizon slider with correct value", () => {
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
-    const timeSlider = screen.getByDisplayValue("20") as HTMLInputElement;
-    expect(timeSlider.value).toBe("20");
-    expect(screen.getByText("20 years")).toBeInTheDocument();
+    const slider = screen.getByDisplayValue("20") as HTMLInputElement;
+    expect(slider.type).toBe("range");
+    expect(slider.value).toBe("20");
+    expect(slider.min).toBe("1");
+    expect(slider.max).toBe("50");
   });
 
   it("should update time horizon when slider changes", async () => {
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
-    const timeSlider = screen.getByDisplayValue("20");
-    fireEvent.change(timeSlider, { target: { value: "25" } });
+    const slider = screen.getByDisplayValue("20");
+    fireEvent.change(slider, { target: { value: "30" } });
 
-    expect(defaultProps.updateFormData).toHaveBeenCalledWith({
-      timeHorizon: 25,
-    });
+    // Check that the display text updates
+    expect(screen.getByText("30 years")).toBeInTheDocument();
   });
 
   it("should render allocation sliders in portfolio setup", () => {
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
-    expect(screen.getByTestId("allocation-sliders")).toBeInTheDocument();
+    expect(screen.getByTestId("allocation-sliders-v2")).toBeInTheDocument();
     expect(screen.getByText("Asset Allocation Strategy")).toBeInTheDocument();
   });
 
-  it("should pass allocation updates to updateFormData", async () => {
-    const user = userEvent.setup();
-    render(<PortfolioForm {...defaultProps} />);
-
-    const mockUpdateButton = screen.getByText("Mock Update Allocation");
-    await user.click(mockUpdateButton);
-
-    expect(defaultProps.updateFormData).toHaveBeenCalledWith({
-      savingsPct: 70,
-      investmentsPct: 20,
-      speculationPct: 10,
-    });
-  });
-
   it("should render economic scenarios section", () => {
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
+
     expect(
       screen.getByTestId("economic-scenarios-section"),
     ).toBeInTheDocument();
@@ -148,99 +166,123 @@ describe("PortfolioForm", () => {
 
   it("should toggle collapsible sections", async () => {
     const user = userEvent.setup();
-    render(<PortfolioForm {...defaultProps} />);
-
-    // Market Assumptions should be collapsed by default
-    const marketAssumptionsButton = screen.getByText(
-      "3. 📊 Market Assumptions",
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
     );
 
-    // Click to expand
-    await user.click(marketAssumptionsButton);
+    // Market Assumptions should be collapsed by default
+    const marketButton = screen.getByText("3. 📊 Market Assumptions");
+    expect(marketButton.parentElement).toHaveTextContent("+");
 
-    // Should now show the sub-sections
-    await screen.findByText("3a. 💵 USD Inflation");
-    expect(
-      screen.getByText("3b. ₿ BTC Price Appreciation"),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("3c. 📈 BTC Yield Assumptions"),
-    ).toBeInTheDocument();
+    // Click to expand
+    await user.click(marketButton);
+    expect(marketButton.parentElement).toHaveTextContent("−");
+
+    // Click to collapse
+    await user.click(marketButton);
+    expect(marketButton.parentElement).toHaveTextContent("+");
   });
 
   it("should show inflation section when market assumptions expanded", async () => {
     const user = userEvent.setup();
-    render(<PortfolioForm {...defaultProps} />);
-
-    // Expand Market Assumptions
-    const marketAssumptionsButton = screen.getByText(
-      "3. 📊 Market Assumptions",
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
     );
-    await user.click(marketAssumptionsButton);
 
+    // Expand market assumptions
+    const marketButton = screen.getByText("3. 📊 Market Assumptions");
+    await user.click(marketButton);
+
+    // Should show inflation section
+    expect(screen.getByText("3a. 💵 USD Inflation")).toBeInTheDocument();
     expect(screen.getByTestId("inflation-section")).toBeInTheDocument();
   });
 
   it("should show btc price section when market assumptions expanded", async () => {
     const user = userEvent.setup();
-    render(<PortfolioForm {...defaultProps} />);
-
-    // Expand Market Assumptions
-    const marketAssumptionsButton = screen.getByText(
-      "3. 📊 Market Assumptions",
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
     );
-    await user.click(marketAssumptionsButton);
 
+    // Expand market assumptions
+    const marketButton = screen.getByText("3. 📊 Market Assumptions");
+    await user.click(marketButton);
+
+    // Should show BTC price section
+    expect(
+      screen.getByText("3b. ₿ BTC Price Appreciation"),
+    ).toBeInTheDocument();
     expect(screen.getByTestId("btc-price-section")).toBeInTheDocument();
   });
 
   it("should handle BTC stack input edge cases", async () => {
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
     const btcInput = screen.getByDisplayValue("5");
 
     // Test negative value
     fireEvent.change(btcInput, { target: { value: "-5" } });
-    expect(defaultProps.updateFormData).toHaveBeenCalledWith({ btcStack: -5 });
+    expect(btcInput).toHaveValue(-5);
 
     // Test decimal value
     fireEvent.change(btcInput, { target: { value: "2.5" } });
-    expect(defaultProps.updateFormData).toHaveBeenCalledWith({ btcStack: 2.5 });
+    expect(btcInput).toHaveValue(2.5);
   });
 
   it("should handle time horizon slider edge cases", async () => {
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
-    const timeSlider = screen.getByDisplayValue("20");
+    const slider = screen.getByDisplayValue("20");
 
     // Test minimum value
-    fireEvent.change(timeSlider, { target: { value: "1" } });
-    expect(defaultProps.updateFormData).toHaveBeenCalledWith({
-      timeHorizon: 1,
-    });
+    fireEvent.change(slider, { target: { value: "1" } });
+    expect(screen.getByText("1 years")).toBeInTheDocument();
 
     // Test maximum value
-    fireEvent.change(timeSlider, { target: { value: "50" } });
-    expect(defaultProps.updateFormData).toHaveBeenCalledWith({
-      timeHorizon: 50,
-    });
+    fireEvent.change(slider, { target: { value: "50" } });
+    expect(screen.getByText("50 years")).toBeInTheDocument();
   });
 
   it("should have correct input constraints", () => {
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
     const btcInput = screen.getByDisplayValue("5") as HTMLInputElement;
+    const timeSlider = screen.getByDisplayValue("20") as HTMLInputElement;
+
+    // BTC input constraints
     expect(btcInput.min).toBe("0");
     expect(btcInput.step).toBe("0.1");
 
-    const timeSlider = screen.getByDisplayValue("20") as HTMLInputElement;
+    // Time horizon constraints
     expect(timeSlider.min).toBe("1");
     expect(timeSlider.max).toBe("50");
   });
 
   it("should show section indicators properly", async () => {
     const user = userEvent.setup();
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
     // Portfolio Setup should show "−" (expanded)
     const portfolioButton = screen.getByText("1. 💼 Portfolio Setup");
@@ -255,49 +297,62 @@ describe("PortfolioForm", () => {
     expect(marketButton.parentElement).toHaveTextContent("−");
   });
 
-  it("should pass formData to child components", () => {
-    const customFormData = {
-      ...DEFAULT_FORM_DATA,
-      btcStack: 10,
-      timeHorizon: 25,
-    };
+  it("should use context for form data", () => {
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
-    render(<PortfolioForm {...defaultProps} formData={customFormData} />);
-
-    const btcInput = screen.getByDisplayValue("10") as HTMLInputElement;
-    expect(btcInput.value).toBe("10");
-
-    const timeSlider = screen.getByDisplayValue("25") as HTMLInputElement;
-    expect(timeSlider.value).toBe("25");
-    expect(screen.getByText("25 years")).toBeInTheDocument();
+    // Verify default values from context are displayed
+    expect(screen.getByDisplayValue("5")).toBeInTheDocument(); // btcStack
+    expect(screen.getByText("20 years")).toBeInTheDocument(); // timeHorizon
   });
 
-  it("should handle updateFormData prop correctly", () => {
-    const mockUpdate = vi.fn();
-    render(<PortfolioForm {...defaultProps} updateFormData={mockUpdate} />);
+  it("should render reset button", () => {
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
-    const btcInput = screen.getByDisplayValue("5");
-    fireEvent.change(btcInput, { target: { value: "7.5" } });
+    expect(screen.getByText("🔄 Reset to Defaults")).toBeInTheDocument();
+  });
 
-    expect(mockUpdate).toHaveBeenCalledWith({ btcStack: 7.5 });
+  it("should render income & cashflow section", () => {
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
+
+    expect(screen.getByText("4. 💰 Income & Cashflow")).toBeInTheDocument();
   });
 });
 
+// Test CollapsibleSection component separately
 describe("PortfolioForm - CollapsibleSection", () => {
   it("should expand and collapse sections correctly", async () => {
     const user = userEvent.setup();
-    render(<PortfolioForm {...defaultProps} />);
+    render(
+      <TestWrapper>
+        <PortfolioForm />
+      </TestWrapper>,
+    );
 
-    // Test Portfolio Setup (initially expanded)
-    const portfolioButton = screen.getByText("1. 💼 Portfolio Setup");
-    expect(screen.getByDisplayValue("5")).toBeInTheDocument(); // BTC input should be visible
+    const marketButton = screen.getByText("3. 📊 Market Assumptions");
 
-    // Click to collapse
-    await user.click(portfolioButton);
-    expect(screen.queryByDisplayValue("5")).not.toBeInTheDocument(); // BTC input should be hidden
+    // Should be collapsed initially (showing "+")
+    expect(marketButton.parentElement).toHaveTextContent("+");
 
-    // Click to expand again
-    await user.click(portfolioButton);
-    expect(screen.getByDisplayValue("5")).toBeInTheDocument(); // BTC input should be visible again
+    // Should not show inflation section when collapsed
+    expect(screen.queryByText("3a. 💵 USD Inflation")).not.toBeInTheDocument();
+
+    // Click to expand
+    await user.click(marketButton);
+    expect(marketButton.parentElement).toHaveTextContent("−");
+
+    // Should show inflation section when expanded
+    expect(screen.getByText("3a. 💵 USD Inflation")).toBeInTheDocument();
   });
 });

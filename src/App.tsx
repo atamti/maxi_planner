@@ -11,13 +11,11 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { PortfolioForm } from "./components/PortfolioForm";
 import { ResultsSection } from "./components/ResultsSection";
 import { SaveLoadSection } from "./components/SaveLoadSection";
-import { DEFAULT_FORM_DATA } from "./config/defaults";
-import { useCalculations } from "./hooks/useCalculations";
-import { useFormReset } from "./hooks/useFormReset";
+import { PortfolioProvider, usePortfolio } from "./context/PortfolioContext";
 import { FormData } from "./types";
 
 ChartJS.register(
@@ -34,29 +32,24 @@ ChartJS.register(
 );
 
 const App: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>(DEFAULT_FORM_DATA);
-  const [showUSD, setShowUSD] = useState<boolean>(false);
-  const [allocationError, setAllocationError] = useState<string>("");
+  return (
+    <PortfolioProvider>
+      <AppContent />
+    </PortfolioProvider>
+  );
+};
 
-  const updateFormData = (updates: Partial<FormData>) => {
-    setFormData((prev) => ({ ...prev, ...updates }));
-  };
-
-  // Use our new custom hook
-  const { resetForm } = useFormReset(setFormData);
-
-  useEffect(() => {
-    const total =
-      formData.savingsPct + formData.investmentsPct + formData.speculationPct;
-    setAllocationError(
-      total !== 100 ? `Allocations must sum to 100% (current: ${total}%)` : "",
-    );
-  }, [formData.savingsPct, formData.investmentsPct, formData.speculationPct]);
-
-  const calculationResults = useCalculations(formData);
+const AppContent: React.FC = () => {
+  const {
+    formData,
+    updateFormData,
+    resetForm,
+    calculationResults,
+    allocationError,
+  } = usePortfolio();
 
   const handleLoadConfig = (data: FormData) => {
-    setFormData(data);
+    updateFormData(data);
   };
 
   return (
@@ -75,17 +68,12 @@ const App: React.FC = () => {
 
       <SaveLoadSection formData={formData} onLoad={handleLoadConfig} />
 
-      <PortfolioForm
-        formData={formData}
-        updateFormData={updateFormData}
-        allocationError={allocationError}
-        onReset={resetForm}
-      />
+      <PortfolioForm />
 
       <ResultsSection
         results={calculationResults}
         formData={formData}
-        showUSD={showUSD}
+        showUSD={false}
         onUpdateFormData={updateFormData}
       />
 
