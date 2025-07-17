@@ -183,15 +183,6 @@ export const useCalculations = (formData: FormData): CalculationResults => {
 
         // Scale down btcWithIncome by the allocation percentage
         btcWithIncome *= (100 - incomeAllocationPct) / 100;
-
-        // Debug logging for activation year
-        console.log(`ACTIVATION YEAR ${year} Debug:
-          BTC Stack at activation: ${btcWithIncome.toFixed(2)} BTC (after removal)
-          BTC to Remove: ${btcToRemove.toFixed(2)} BTC
-          BTC Price: $${currentBtcPrice.toLocaleString()}
-          Initial USD Pool: $${usdIncomePool.toLocaleString()}
-          Leveraged USD Pool: $${leveragedUsdPool.toLocaleString()}
-        `);
       }
 
       // Calculate income yields using dynamic rates
@@ -226,35 +217,10 @@ export const useCalculations = (formData: FormData): CalculationResults => {
           ? leveragedIncomeValue - loanDetails.debtService
           : baseUsdIncomeValue;
 
-      // Debug logging for years 19 and 20 in main timeline
-      if ((year === 19 || year === 20) && year >= activationYear) {
-        console.log(`MAIN TIMELINE Year ${year} Debug:
-          USD Income Pool (start of year): $${usdIncomePool.toLocaleString()}
-          Leveraged USD Pool (start of year): $${leveragedUsdPool.toLocaleString()}
-          Income Yield Rate: ${currentIncomeYield}%
-          Total Base Yield Generated: $${totalBaseYield.toLocaleString()}
-          Total Leveraged Yield Generated: $${totalLeveragedYield.toLocaleString()}
-          Base Reinvestment Amount: $${baseReinvestmentAmount.toLocaleString()}
-          Leveraged Reinvestment Amount: $${leveragedReinvestmentAmount.toLocaleString()}
-          Base USD Income Value: $${baseUsdIncomeValue.toLocaleString()}
-          Leveraged Income Value: $${leveragedIncomeValue.toLocaleString()}
-          Debt Service: $${loanDetails.debtService.toLocaleString()}
-          Net Leveraged Income: $${netLeveragedIncome.toLocaleString()}
-        `);
-      }
-
       // Apply reinvestment to grow both pools
       if (year >= activationYear) {
         usdIncomePool += baseReinvestmentAmount;
         leveragedUsdPool += leveragedReinvestmentAmount;
-
-        // Debug logging for pool growth
-        if (year === 19 || year === 20) {
-          console.log(`  Pool Growth Year ${year}:
-            USD Pool after reinvestment: $${usdIncomePool.toLocaleString()}
-            Leveraged Pool after reinvestment: $${leveragedUsdPool.toLocaleString()}
-          `);
-        }
       }
 
       // Record current year values
@@ -300,32 +266,12 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       const usdPoolValue = btcToRemove * btcPriceAtActivation;
       const currentIncomeYield = getIncomeYield(potentialActivationYear);
 
-      // Add debug logging for years 19 and 20
-      if (potentialActivationYear === 19 || potentialActivationYear === 20) {
-        console.log(`Year ${potentialActivationYear} Debug:
-          BTC Stack: ${simulatedBtcStack.toFixed(2)} BTC
-          BTC to Remove (${incomeAllocationPct}%): ${btcToRemove.toFixed(2)} BTC
-          BTC Price: $${btcPriceAtActivation.toLocaleString()}
-          USD Pool Value: $${usdPoolValue.toLocaleString()}
-          Income Yield: ${currentIncomeYield}%
-          Reinvestment: ${incomeReinvestmentPct}%
-        `);
-      }
-
       // Fix: Calculate yield properly - reinvestment is a percentage of yield generated
       const totalYieldRate = currentIncomeYield / 100;
       const totalYieldGenerated = usdPoolValue * totalYieldRate;
       const reinvestmentAmount =
         totalYieldGenerated * (incomeReinvestmentPct / 100);
       const annualIncome = totalYieldGenerated - reinvestmentAmount;
-
-      // More debug logging for years 19 and 20
-      if (potentialActivationYear === 19 || potentialActivationYear === 20) {
-        console.log(`  Total Yield Generated: $${totalYieldGenerated.toLocaleString()}
-          Reinvestment Amount: $${reinvestmentAmount.toLocaleString()}
-          Annual Income: $${annualIncome.toLocaleString()}
-        `);
-      }
 
       // Calculate expenses at this activation year
       const expensesAtActivation = getExpensesAtYear(potentialActivationYear);
@@ -347,17 +293,6 @@ export const useCalculations = (formData: FormData): CalculationResults => {
           0,
           leveragedAnnualIncome - potentialLoanDetails.debtService,
         );
-
-        // Additional debug for leveraged calculations
-        if (potentialActivationYear === 19 || potentialActivationYear === 20) {
-          console.log(`  Leveraged Pool Value: $${leveragedPoolValue.toLocaleString()}
-            Leveraged Total Yield: $${leveragedTotalYield.toLocaleString()}
-            Leveraged Reinvestment: $${leveragedReinvestment.toLocaleString()}
-            Leveraged Annual Income: $${leveragedAnnualIncome.toLocaleString()}
-            Debt Service: $${potentialLoanDetails.debtService.toLocaleString()}
-            Net Leveraged Income: $${netLeveragedAnnualIncome.toLocaleString()}
-          `);
-        }
       }
 
       incomeAtActivationYears.push(annualIncome);
