@@ -1,8 +1,8 @@
 import React from "react";
-import economicScenarios, { ScenarioKey } from "../config/economicScenarios";
-import { FormData } from "../types";
-import { BtcExchangeChart } from "./BtcExchangeChart";
-import { RateAssumptionsSection } from "./common/RateAssumptionsSection";
+import economicScenarios, { ScenarioKey } from "../../config/economicScenarios";
+import { FormData } from "../../types";
+import { BtcExchangeChart } from "../charts/BtcExchangeChart";
+import { RateAssumptionsSection } from "../common/RateAssumptionsSection";
 
 interface Props {
   formData: FormData;

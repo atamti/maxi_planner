@@ -1,8 +1,8 @@
 import React from "react";
-import economicScenarios, { ScenarioKey } from "../config/economicScenarios";
-import { FormData } from "../types";
-import { ExpensesInflationChart } from "./ExpensesInflationChart";
-import { RateAssumptionsSection } from "./common/RateAssumptionsSection";
+import economicScenarios, { ScenarioKey } from "../../config/economicScenarios";
+import { FormData } from "../../types";
+import { ExpensesInflationChart } from "../charts/ExpensesInflationChart";
+import { RateAssumptionsSection } from "../common/RateAssumptionsSection";
 
 interface Props {
   formData: FormData;

@@ -1,13 +1,13 @@
 import React from "react";
-import { CalculationResults, FormDataSubset } from "../types";
-import { ChartsSection } from "./results/ChartsSection";
-import { EscapeVelocitySection } from "./results/EscapeVelocitySection";
-import { FinalBtcStackCard } from "./results/FinalBtcStackCard";
-import { FinalYearCard } from "./results/FinalYearCard";
-import { IncomeActivationCard } from "./results/IncomeActivationCard";
-import { LoanDetailsCard } from "./results/LoanDetailsCard";
-import { PortfolioInsightsSection } from "./results/PortfolioInsightsSection";
-import { RiskInsightsSection } from "./results/RiskInsightsSection";
+import { CalculationResults, FormDataSubset } from "../../types";
+import { ChartsSection } from "../results/ChartsSection";
+import { EscapeVelocitySection } from "../results/EscapeVelocitySection";
+import { FinalBtcStackCard } from "../results/FinalBtcStackCard";
+import { FinalYearCard } from "../results/FinalYearCard";
+import { IncomeActivationCard } from "../results/IncomeActivationCard";
+import { LoanDetailsCard } from "../results/LoanDetailsCard";
+import { PortfolioInsightsSection } from "../results/PortfolioInsightsSection";
+import { RiskInsightsSection } from "../results/RiskInsightsSection";
 
 interface Props {
   results: CalculationResults;

@@ -1,4 +1,5 @@
 import React from "react";
+import { useLoanCalculations } from "../../hooks/useLoanCalculations";
 import { CalculationResults, FormDataSubset } from "../../types";
 import { formatCurrency, formatNumber } from "../../utils/formatNumber";
 
@@ -13,57 +14,12 @@ export const RiskInsightsSection: React.FC<Props> = ({
   formData,
   getBtcPriceAtYear,
 }) => {
-  // Helper function to calculate dynamic loan values
-  const calculateDynamicLoanValues = () => {
-    if (formData.collateralPct === 0) return null;
+  const { calculateLoanDetails } = useLoanCalculations(
+    formData,
+    getBtcPriceAtYear,
+  );
 
-    // Calculate BTC stack at activation year with growth
-    let btcStackAtActivation = formData.btcStack;
-    for (let year = 0; year < formData.activationYear; year++) {
-      const investmentsYield =
-        formData.investmentsStartYield -
-        (formData.investmentsStartYield - formData.investmentsEndYield) *
-          (year / formData.timeHorizon);
-      const speculationYield =
-        formData.speculationStartYield -
-        (formData.speculationStartYield - formData.speculationEndYield) *
-          (year / formData.timeHorizon);
-
-      const savings = btcStackAtActivation * (formData.savingsPct / 100);
-      const investments =
-        btcStackAtActivation *
-        (formData.investmentsPct / 100) *
-        (1 + investmentsYield / 100);
-      const speculation =
-        btcStackAtActivation *
-        (formData.speculationPct / 100) *
-        (1 + speculationYield / 100);
-
-      btcStackAtActivation = savings + investments + speculation;
-    }
-
-    const btcSavingsAtActivation =
-      btcStackAtActivation * (formData.savingsPct / 100);
-    const collateralBtc =
-      btcSavingsAtActivation * (formData.collateralPct / 100);
-
-    const btcPriceAtActivation = getBtcPriceAtYear(formData.activationYear);
-
-    const loanPrincipal =
-      collateralBtc * (formData.ltvRatio / 100) * btcPriceAtActivation;
-    const liquidationPrice = btcPriceAtActivation * (formData.ltvRatio / 80);
-
-    const annualPayments = formData.interestOnly
-      ? loanPrincipal * (formData.loanRate / 100)
-      : (loanPrincipal *
-          ((formData.loanRate / 100) *
-            Math.pow(1 + formData.loanRate / 100, formData.loanTermYears))) /
-        (Math.pow(1 + formData.loanRate / 100, formData.loanTermYears) - 1);
-
-    return { loanPrincipal, liquidationPrice, annualPayments };
-  };
-
-  const dynamicLoanValues = calculateDynamicLoanValues();
+  const dynamicLoanValues = calculateLoanDetails(formData.activationYear);
 
   const hasRisks =
     formData.savingsPct < 100 ||

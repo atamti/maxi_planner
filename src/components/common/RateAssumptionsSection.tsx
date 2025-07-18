@@ -1,6 +1,6 @@
 import React from "react";
 import { FormData } from "../../types";
-import { DraggableRateChart } from "../DraggableRateChart";
+import { DraggableRateChart } from "../charts/DraggableRateChart";
 import { ToggleSwitch } from "./ToggleSwitch";
 
 interface RateAssumptionConfig {

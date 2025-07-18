@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_FORM_DATA } from "../config/defaults";
+import { DEFAULT_FORM_DATA } from "../../config/defaults";
 import { InflationSection } from "./InflationSection";
 
 // Mock child components
-vi.mock("./UsdPurchasingPowerChart", () => ({
+vi.mock("../charts/UsdPurchasingPowerChart", () => ({
   UsdPurchasingPowerChart: () => (
     <div data-testid="usd-purchasing-power-chart">
       USD Purchasing Power Chart
@@ -13,7 +13,7 @@ vi.mock("./UsdPurchasingPowerChart", () => ({
   ),
 }));
 
-vi.mock("./common/RateAssumptionsSection", () => ({
+vi.mock("../common/RateAssumptionsSection", () => ({
   RateAssumptionsSection: ({ formData, updateFormData, config }: any) => (
     <div data-testid="rate-assumptions-section">
       <div data-testid="rate-assumptions-title">{config.title}</div>

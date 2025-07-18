@@ -1,17 +1,17 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_FORM_DATA } from "../config/defaults";
+import { DEFAULT_FORM_DATA } from "../../config/defaults";
 import { BtcPriceSection } from "./BtcPriceSection";
 
 // Mock child components
-vi.mock("./BtcExchangeChart", () => ({
+vi.mock("../charts/BtcExchangeChart", () => ({
   BtcExchangeChart: () => (
     <div data-testid="btc-exchange-chart">BTC Exchange Chart</div>
   ),
 }));
 
-vi.mock("./common/RateAssumptionsSection", () => ({
+vi.mock("../common/RateAssumptionsSection", () => ({
   RateAssumptionsSection: ({ formData, updateFormData, config }: any) => (
     <div data-testid="rate-assumptions-section">
       <div data-testid="rate-assumptions-title">{config.title}</div>

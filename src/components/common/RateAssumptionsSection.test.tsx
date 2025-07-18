@@ -5,7 +5,7 @@ import type { FormData } from "../../types";
 import { RateAssumptionsSection } from "./RateAssumptionsSection";
 
 // Mock the DraggableRateChart component
-vi.mock("../DraggableRateChart", () => ({
+vi.mock("../charts/DraggableRateChart", () => ({
   DraggableRateChart: ({
     title,
     data,

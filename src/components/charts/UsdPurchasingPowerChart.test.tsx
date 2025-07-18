@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { DEFAULT_FORM_DATA } from "../config/defaults";
-import { FormData } from "../types";
+import { DEFAULT_FORM_DATA } from "../../config/defaults";
+import { FormData } from "../../types";
 import { UsdPurchasingPowerChart } from "./UsdPurchasingPowerChart";
 
 // Mock react-chartjs-2

@@ -12,9 +12,9 @@ import {
   Tooltip,
 } from "chart.js";
 import React from "react";
-import { PortfolioForm } from "./components/PortfolioForm";
-import { ResultsSection } from "./components/ResultsSection";
-import { SaveLoadSection } from "./components/SaveLoadSection";
+import { PortfolioForm } from "./components/forms/PortfolioForm";
+import { SaveLoadSection } from "./components/forms/SaveLoadSection";
+import { ResultsSection } from "./components/sections/ResultsSection";
 import { PortfolioProvider, usePortfolio } from "./context/PortfolioContext";
 import { FormData } from "./types";
 

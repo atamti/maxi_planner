@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
-import { vi } from "vitest";
-import { DEFAULT_FORM_DATA } from "../config/defaults";
-import { FormData } from "../types";
+import { describe, expect, it, vi } from "vitest";
+import { DEFAULT_FORM_DATA } from "../../config/defaults";
+import { FormData } from "../../types";
 import { YieldChart } from "./YieldChart";
 
 // Mock react-chartjs-2

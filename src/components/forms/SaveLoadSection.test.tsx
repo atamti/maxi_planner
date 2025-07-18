@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_FORM_DATA } from "../config/defaults";
+import { DEFAULT_FORM_DATA } from "../../config/defaults";
 import { SaveLoadSection } from "./SaveLoadSection";
 
 // Mock the useLocalStorage hook
@@ -10,7 +10,7 @@ const mockLoadConfig = vi.fn();
 const mockDeleteConfig = vi.fn();
 const mockRenameConfig = vi.fn();
 
-vi.mock("../hooks/useLocalStorage", () => ({
+vi.mock("../../hooks/useLocalStorage", () => ({
   useLocalStorage: () => ({
     savedConfigs: [
       {

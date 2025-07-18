@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import { FormData } from "../types";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { FormData } from "../../types";
 
 interface Props {
   formData: FormData;

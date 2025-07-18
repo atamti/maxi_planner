@@ -1,12 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_FORM_DATA } from "../config/defaults";
-import economicScenarios from "../config/economicScenarios";
+import { DEFAULT_FORM_DATA } from "../../config/defaults";
+import economicScenarios from "../../config/economicScenarios";
 import { IncomeExpensesSection } from "./IncomeExpensesSection";
 
 // Mock child components
-vi.mock("./ExpensesInflationChart", () => ({
+vi.mock("../charts/ExpensesInflationChart", () => ({
   ExpensesInflationChart: ({ formData }: { formData: any }) => (
     <div data-testid="expenses-inflation-chart">
       Expenses Chart - Starting: ${formData.startingExpenses}
@@ -14,7 +14,7 @@ vi.mock("./ExpensesInflationChart", () => ({
   ),
 }));
 
-vi.mock("./common/RateAssumptionsSection", () => ({
+vi.mock("../common/RateAssumptionsSection", () => ({
   RateAssumptionsSection: ({
     config,
     formData,

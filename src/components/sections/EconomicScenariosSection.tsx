@@ -1,6 +1,6 @@
 import React from "react";
-import economicScenarios, { ScenarioKey } from "../config/economicScenarios";
-import { FormData } from "../types";
+import economicScenarios, { ScenarioKey } from "../../config/economicScenarios";
+import { FormData } from "../../types";
 
 interface Props {
   formData: FormData;

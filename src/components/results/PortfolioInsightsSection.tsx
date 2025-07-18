@@ -1,4 +1,6 @@
 import React from "react";
+import { useLoanCalculations } from "../../hooks/useLoanCalculations";
+import { usePortfolioAnalysis } from "../../hooks/usePortfolioAnalysis";
 import { CalculationResults, FormDataSubset } from "../../types";
 import { formatCurrency, formatNumber } from "../../utils/formatNumber";
 
@@ -14,102 +16,32 @@ export const PortfolioInsightsSection: React.FC<Props> = ({
   getBtcPriceAtYear,
 }) => {
   const { results: calculationResults } = results;
+  const { calculateLoanDetails } = useLoanCalculations(
+    formData,
+    getBtcPriceAtYear,
+  );
+  const { calculateCashflows, calculatePortfolioGrowth } = usePortfolioAnalysis(
+    results,
+    formData,
+  );
 
-  // Helper function to calculate dynamic loan values
-  const calculateDynamicLoanValues = () => {
-    if (formData.collateralPct === 0) return null;
+  const dynamicLoanValues = calculateLoanDetails(formData.activationYear);
 
-    // Calculate BTC stack at activation year with growth
-    let btcStackAtActivation = formData.btcStack;
-    for (let year = 0; year < formData.activationYear; year++) {
-      const investmentsYield =
-        formData.investmentsStartYield -
-        (formData.investmentsStartYield - formData.investmentsEndYield) *
-          (year / formData.timeHorizon);
-      const speculationYield =
-        formData.speculationStartYield -
-        (formData.speculationStartYield - formData.speculationEndYield) *
-          (year / formData.timeHorizon);
-
-      const savings = btcStackAtActivation * (formData.savingsPct / 100);
-      const investments =
-        btcStackAtActivation *
-        (formData.investmentsPct / 100) *
-        (1 + investmentsYield / 100);
-      const speculation =
-        btcStackAtActivation *
-        (formData.speculationPct / 100) *
-        (1 + speculationYield / 100);
-
-      btcStackAtActivation = savings + investments + speculation;
-    }
-
-    const btcSavingsAtActivation =
-      btcStackAtActivation * (formData.savingsPct / 100);
-    const collateralBtc =
-      btcSavingsAtActivation * (formData.collateralPct / 100);
-
-    const btcPriceAtActivation = getBtcPriceAtYear(formData.activationYear);
-
-    const loanPrincipal =
-      collateralBtc * (formData.ltvRatio / 100) * btcPriceAtActivation;
-    const liquidationPrice = btcPriceAtActivation * (formData.ltvRatio / 80);
-
-    const annualPayments = formData.interestOnly
-      ? loanPrincipal * (formData.loanRate / 100)
-      : (loanPrincipal *
-          ((formData.loanRate / 100) *
-            Math.pow(1 + formData.loanRate / 100, formData.loanTermYears))) /
-        (Math.pow(1 + formData.loanRate / 100, formData.loanTermYears) - 1);
-
-    return { loanPrincipal, liquidationPrice, annualPayments };
-  };
-
-  const dynamicLoanValues = calculateDynamicLoanValues();
-
-  // Calculate USD cashflows (income minus expenses)
-  const calculateCashflows = () => {
-    const activationYearExpenses =
-      results.annualExpenses[formData.activationYear] || 0;
-    const finalYearExpenses =
-      results.annualExpenses[results.annualExpenses.length - 1] || 0;
-
-    const activationYearIncome =
-      results.usdIncome[formData.activationYear] || 0;
-    const activationYearIncomeWithLeverage =
-      results.usdIncomeWithLeverage[formData.activationYear] || 0;
-
-    const finalYearIncome =
-      results.usdIncome[results.usdIncome.length - 1] || 0;
-    const finalYearIncomeWithLeverage =
-      results.usdIncomeWithLeverage[results.usdIncomeWithLeverage.length - 1] ||
-      0;
-
-    return {
-      activationYear: {
-        withoutLeverage: activationYearIncome - activationYearExpenses,
-        withLeverage: activationYearIncomeWithLeverage - activationYearExpenses,
-      },
-      finalYear: {
-        withoutLeverage: finalYearIncome - finalYearExpenses,
-        withLeverage: finalYearIncomeWithLeverage - finalYearExpenses,
-      },
-    };
-  };
-
+  // Use the centralized cashflow calculation from the hook
   const cashflows = calculateCashflows();
+
+  // Use the centralized portfolio growth calculation from the hook
+  const portfolioGrowth = calculatePortfolioGrowth();
 
   const insights = [];
 
-  // BTC Stack Growth Analysis
-  const finalBtcWithIncome =
-    calculationResults[calculationResults.length - 1].btcWithIncome;
-  const finalBtcWithoutIncome =
-    calculationResults[calculationResults.length - 1].btcWithoutIncome;
-  const btcGrowthWithIncome =
-    ((finalBtcWithIncome - formData.btcStack) / formData.btcStack) * 100;
-  const btcGrowthWithoutIncome =
-    ((finalBtcWithoutIncome - formData.btcStack) / formData.btcStack) * 100;
+  // BTC Stack Growth Analysis - use values from the hook
+  const {
+    btcGrowthWithIncome,
+    btcGrowthWithoutIncome,
+    finalBtcWithIncome,
+    finalBtcWithoutIncome,
+  } = portfolioGrowth;
 
   if (btcGrowthWithIncome > 1000) {
     insights.push(

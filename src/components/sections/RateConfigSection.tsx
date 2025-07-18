@@ -1,6 +1,6 @@
 import React from "react";
-import economicScenarios, { ScenarioKey } from "../config/economicScenarios";
-import { InputType } from "../types";
+import economicScenarios, { ScenarioKey } from "../../config/economicScenarios";
+import { InputType } from "../../types";
 
 interface Props {
   title: string;
