@@ -1,6 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useRateGeneration } from "../../hooks/useRateGeneration";
+import { useScenarioManagement } from "../../hooks/useScenarioManagement";
+import { useUIStateManagement } from "../../hooks/useUIStateManagement";
 import { FormData } from "../../types";
 import { DraggableRateChart } from "../charts/DraggableRateChart";
+import LockedStateMessage from "./LockedStateMessage";
+import RateInputs from "./RateInputs";
+import ScenarioDropdown from "./ScenarioDropdown";
 import { ToggleSwitch } from "./ToggleSwitch";
 
 interface RateAssumptionConfig {
@@ -70,433 +76,167 @@ export const RateAssumptionsSection: React.FC<Props> = ({
     : false;
   const preset = presetKey ? (formData[presetKey] as string) : "";
 
+  // Use extracted hooks
+  const { generateRates, applyRatesToArray, calculateAverageRate } =
+    useRateGeneration();
+  const {
+    handleScenarioChange: handleScenarioChangeHook,
+    handleScenarioToggle: handleScenarioToggleHook,
+    handleIncomeScenarioSync: handleIncomeScenarioSyncHook,
+  } = useScenarioManagement(
+    formData,
+    updateFormData,
+    config,
+    economicScenarios,
+  );
+  const { showLockedMessage, handleLockedInteraction } = useUIStateManagement();
+
   // Calculate average rate
-  const calculateAverageRate = (): number => {
-    if (customRates.length === 0) return 0;
-    const sum = customRates
-      .slice(0, formData.timeHorizon)
-      .reduce((acc, val) => acc + val, 0);
-    return Math.round(sum / formData.timeHorizon);
-  };
-
-  const generateRates = (
-    type: "flat" | "linear" | "preset" | "saylor" | "manual" = inputType as any,
-  ): number[] => {
-    const rates = [];
-
-    if (type === "flat") {
-      // Generate rates for the full time horizon + 1 (to include the final year)
-      for (let i = 0; i <= formData.timeHorizon; i++) {
-        rates.push(flatRate);
-      }
-    } else if (type === "linear") {
-      for (let i = 0; i <= formData.timeHorizon; i++) {
-        const progress = i / Math.max(1, formData.timeHorizon - 1);
-        const rate = startRate + (endRate - startRate) * progress;
-        rates.push(Math.round(rate));
-      }
-    } else if (type === "saylor") {
-      // Saylor projection: 37% -> 21% over timeHorizon, following the 21-year curve
-      for (let i = 0; i <= formData.timeHorizon; i++) {
-        const progress = i / Math.max(1, formData.timeHorizon - 1);
-        // 37% declining to 21% linearly
-        const rate = 37 - (37 - 21) * progress;
-        rates.push(Math.round(rate));
-      }
-    } else if (type === "preset" && presetScenarios && preset !== "custom") {
-      const scenario = presetScenarios[preset];
-      if (scenario) {
-        for (let i = 0; i <= formData.timeHorizon; i++) {
-          const progress = i / Math.max(1, formData.timeHorizon - 1);
-          const curvedProgress = Math.pow(progress, 1.5);
-          const rate =
-            scenario.startRate +
-            (scenario.endRate - scenario.startRate) * curvedProgress;
-          rates.push(Math.round(rate / 2) * 2);
-        }
-      }
-    }
-
-    return rates;
-  };
+  const avgRate = calculateAverageRate(customRates, formData.timeHorizon);
 
   const applyToChart = (
     type: "flat" | "linear" | "preset" | "manual" | "saylor" = inputType as any,
   ) => {
-    const rates = generateRates(type);
-
-    // Make sure we have a properly sized array that includes the final year
-    const newRates = [...customRates];
-
-    // Ensure the array is at least as long as timeHorizon + 1
-    while (newRates.length <= formData.timeHorizon) {
-      newRates.push(flatRate || 8);
-    }
-
-    // Apply the generated rates
-    rates.forEach((rate, index) => {
-      if (index <= formData.timeHorizon) {
-        newRates[index] = rate;
-      }
+    const rates = generateRates({
+      type,
+      flatRate,
+      startRate,
+      endRate,
+      timeHorizon: formData.timeHorizon,
+      preset,
+      presetScenarios,
     });
-
-    // Keep a reasonable buffer but ensure we have enough for timeHorizon + 1
-    const trimmedRates = newRates.slice(
-      0,
-      Math.max(formData.timeHorizon + 1, 30),
+    const newRates = applyRatesToArray(
+      rates,
+      customRates,
+      formData.timeHorizon,
+      flatRate || 8,
     );
-
-    updateFormData({ [dataKey]: trimmedRates });
+    updateFormData({ [dataKey]: newRates });
   };
 
   const handleScenarioChange = (selectedScenario: string) => {
-    if (selectedScenario === "custom-flat") {
-      const customScenario =
-        economicScenarios?.custom?.[
-          dataKey === "btcPriceCustomRates" ? "btcPrice" : "inflation"
-        ];
-      updateFormData({
-        ...(presetKey ? { [presetKey]: "custom" } : {}),
-        ...(followScenarioKey ? { [followScenarioKey]: false } : {}),
-        ...(inputTypeKey ? { [inputTypeKey]: "flat" } : {}),
-        ...(flatRateKey && customScenario
-          ? { [flatRateKey]: customScenario.startRate }
-          : {}),
-      });
-      setTimeout(() => applyToChart("flat"), 0);
-    } else if (selectedScenario === "custom-linear") {
-      const customScenario =
-        economicScenarios?.custom?.[
-          dataKey === "btcPriceCustomRates" ? "btcPrice" : "inflation"
-        ];
-      updateFormData({
-        ...(presetKey ? { [presetKey]: "custom" } : {}),
-        ...(followScenarioKey ? { [followScenarioKey]: false } : {}),
-        ...(inputTypeKey ? { [inputTypeKey]: "linear" } : {}),
-        ...(startRateKey && customScenario
-          ? { [startRateKey]: customScenario.startRate }
-          : {}),
-        ...(endRateKey && customScenario
-          ? { [endRateKey]: customScenario.endRate }
-          : {}),
-      });
-      setTimeout(() => applyToChart("linear"), 0);
-    } else if (
-      selectedScenario === "custom-saylor" &&
-      dataKey === "btcPriceCustomRates"
-    ) {
-      // Handle Saylor projection selection
-      updateFormData({
-        ...(presetKey ? { [presetKey]: "custom" } : {}),
-        ...(followScenarioKey ? { [followScenarioKey]: false } : {}),
-        ...(inputTypeKey ? { [inputTypeKey]: "saylor" } : {}),
-        ...(startRateKey ? { [startRateKey]: 37 } : {}),
-        ...(endRateKey ? { [endRateKey]: 21 } : {}),
-      });
-      setTimeout(() => applyToChart("saylor"), 0);
-    } else {
-      // Handle preset scenario selection
-      updateFormData({
-        ...(presetKey ? { [presetKey]: selectedScenario } : {}),
-        ...(inputTypeKey ? { [inputTypeKey]: "preset" } : {}),
-        ...(manualModeKey ? { [manualModeKey]: false } : {}),
-      });
-    }
+    handleScenarioChangeHook(selectedScenario);
   };
 
   const handleScenarioToggle = (follow: boolean) => {
-    if (followScenarioKey) {
-      updateFormData({
-        [followScenarioKey]: follow,
-        ...(follow &&
-        formData.economicScenario !== "custom" &&
-        presetKey &&
-        manualModeKey &&
-        inputTypeKey
-          ? {
-              [manualModeKey]: false,
-              [inputTypeKey]: "preset",
-              [presetKey]: formData.economicScenario,
-            }
-          : {}),
-      });
-    }
+    handleScenarioToggleHook(follow);
   };
 
-  // Auto-apply when values change (but not in manual mode)
-  React.useEffect(() => {
-    if (inputType === "flat" && !manualMode && flatRateKey) {
-      applyToChart();
-    }
-  }, [flatRate, formData.timeHorizon]);
-
-  React.useEffect(() => {
-    if (inputType === "linear" && !manualMode && startRateKey && endRateKey) {
-      applyToChart();
-    }
-  }, [startRate, endRate, formData.timeHorizon]);
-
-  React.useEffect(() => {
-    if (inputType === "preset" && !manualMode) {
-      applyToChart();
-    }
-  }, [preset, formData.timeHorizon]);
-
-  React.useEffect(() => {
-    if (!manualMode) {
-      applyToChart(inputType as any);
-    }
-  }, [manualMode]);
-
-  // Add effect to handle economic scenario changes for income
-  React.useEffect(() => {
+  // Sync economic scenario preset when following scenario
+  useEffect(() => {
     if (
       followScenario &&
       formData.economicScenario !== "custom" &&
       economicScenarios
     ) {
-      const scenario = economicScenarios[formData.economicScenario];
-      if (scenario && dataKey === "incomeCustomRates" && scenario.incomeYield) {
-        // Generate rates based on the selected economic scenario
-        const newRates = [];
-        for (let i = 0; i < formData.timeHorizon; i++) {
-          const progress = i / Math.max(1, formData.timeHorizon - 1);
-          const curvedProgress = Math.pow(progress, 1.5);
-          const rate =
-            scenario.incomeYield.startRate +
-            (scenario.incomeYield.endRate - scenario.incomeYield.startRate) *
-              curvedProgress;
-          newRates.push(Math.round(rate));
-        }
-
-        // Update the custom rates to match the economic scenario
-        const updatedRates = [...(formData[dataKey] as number[])];
-        newRates.forEach((rate, index) => {
-          if (index < updatedRates.length) {
-            updatedRates[index] = rate;
-          }
-        });
-        updateFormData({ [dataKey]: updatedRates });
-      }
+      handleIncomeScenarioSyncHook();
     }
   }, [followScenario, formData.economicScenario, formData.timeHorizon]);
 
-  const [showLockedMessage, setShowLockedMessage] = React.useState(false);
-
-  // Show locked message temporarily when user tries to interact with locked controls
-  const handleLockedInteraction = () => {
-    if (followScenario || manualMode) {
-      setShowLockedMessage(true);
-      setTimeout(() => setShowLockedMessage(false), 3000);
-    }
-  };
-
   return (
-    <div
-      className={`p-4 ${colorClass.background} rounded-lg border-l-4 ${colorClass.border}`}
-    >
-      <h4 className={`font-semibold ${colorClass.text} mb-3`}>
-        {emoji} {title}
-      </h4>
+    <div className="w-full">
+      <LockedStateMessage
+        show={showLockedMessage}
+        message={
+          followScenario
+            ? `🔒 Settings controlled by global scenario. Current selection shown for reference.`
+            : `🔒 Settings locked in direct edit mode. Current selection shown for reference.`
+        }
+      />
 
-      {/* Follow Scenario Toggle */}
-      {followScenarioKey && formData.economicScenario !== "custom" && (
-        <ToggleSwitch
-          checked={followScenario}
-          onChange={(checked) => handleScenarioToggle(checked)}
-          id={`${dataKey}-scenario-toggle`}
-          label="Follow Global Scenario"
-          colorClass={{ on: "bg-green-500", off: "bg-gray-300" }}
-          disabled={manualMode}
-          description={{
-            on: `Following scenario with ${calculateAverageRate()}${unit} average rate. Settings are controlled by the selected scenario.`,
-            off: "Manual configuration with custom parameters.",
-          }}
-        />
-      )}
-
-      {/* Locked Control Message */}
-      {showLockedMessage && (
-        <div className="mb-3 p-2 bg-yellow-100 border border-yellow-300 rounded text-yellow-800 text-sm">
-          ⚠️ Controls are locked.{" "}
-          {followScenario
-            ? 'Disable "Follow Global Scenario"'
-            : 'Disable "Direct edit chart"'}{" "}
-          to modify these settings.
-        </div>
-      )}
-
-      {/* Growth Scenario Dropdown Section */}
+      {/* Header */}
       <div
-        className={`p-4 rounded-lg border transition-all duration-200 ${
-          followScenario || manualMode
-            ? `${colorClass.background} opacity-50 cursor-not-allowed border-gray-300`
-            : `${colorClass.background} border-gray-200 hover:border-gray-300`
-        }`}
+        className={`p-4 rounded-lg mb-4 ${colorClass.background} ${colorClass.border}`}
       >
-        <label className="block font-medium mb-2">Growth Scenario:</label>
-        <select
-          value={
-            inputType === "flat"
-              ? "custom-flat"
-              : inputType === "linear"
-                ? "custom-linear"
-                : inputType === "saylor"
-                  ? "custom-saylor"
-                  : preset
-          }
-          onChange={(e) => {
+        <h3 className={`text-lg font-semibold ${colorClass.text}`}>
+          {emoji} {title}
+        </h3>
+        <p className={`text-sm mt-1 ${colorClass.text}`}>
+          Configure your {title.toLowerCase()} forecast
+        </p>
+      </div>
+
+      {/* Controls */}
+      <div className="mb-4">
+        {/* Scenario Dropdown */}
+        {presetKey && presetScenarios && (
+          <ScenarioDropdown
+            selectedScenario={preset as any}
+            onScenarioChange={handleScenarioChange}
+            isLocked={followScenario || manualMode}
+            onLockedInteraction={handleLockedInteraction}
+            presetScenarios={presetScenarios}
+          />
+        )}
+
+        {/* Input Type Selection */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Input Type
+          </label>
+          <select
+            value={inputType}
+            onChange={(e) => {
+              if (followScenario || manualMode) {
+                handleLockedInteraction();
+              } else {
+                updateFormData({
+                  [inputTypeKey as keyof FormData]: e.target.value,
+                });
+              }
+            }}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            disabled={followScenario || manualMode}
+          >
+            <option value="flat">Flat Rate</option>
+            <option value="linear">Linear Change</option>
+            <option value="preset">Preset Scenario</option>
+            <option value="saylor">Saylor's Forecast</option>
+          </select>
+        </div>
+
+        {/* Rate Inputs */}
+        <RateInputs
+          rateType={title}
+          inputType={inputType as any}
+          flatRate={flatRate}
+          startRate={startRate}
+          endRate={endRate}
+          onFlatRateChange={(value) => {
             if (followScenario || manualMode) {
               handleLockedInteraction();
-              return;
+            } else {
+              flatRateKey && updateFormData({ [flatRateKey]: value });
             }
-            handleScenarioChange(e.target.value);
           }}
-          className={`w-full p-2 border rounded mb-3 transition-all duration-200 ${
-            followScenario || manualMode
-              ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
-              : "bg-white border-gray-300 hover:border-gray-400"
-          }`}
-          disabled={followScenario || manualMode}
-          onClick={
-            followScenario || manualMode ? handleLockedInteraction : undefined
-          }
-        >
-          {/* Economic scenario presets */}
-          {presetScenarios && (
-            <optgroup label="Preset Scenarios">
-              {Object.entries(presetScenarios).map(
-                ([key, scenario]: [string, any]) => {
-                  if (key !== "custom") {
-                    return (
-                      <option key={key} value={key}>
-                        {scenario.name} ({scenario.startRate}
-                        {unit} → {scenario.endRate}
-                        {unit})
-                      </option>
-                    );
-                  }
-                  return null;
-                },
-              )}
-            </optgroup>
-          )}
+          onStartRateChange={(value) => {
+            if (followScenario || manualMode) {
+              handleLockedInteraction();
+            } else {
+              startRateKey && updateFormData({ [startRateKey]: value });
+            }
+          }}
+          onEndRateChange={(value) => {
+            if (followScenario || manualMode) {
+              handleLockedInteraction();
+            } else {
+              endRateKey && updateFormData({ [endRateKey]: value });
+            }
+          }}
+          isLocked={followScenario || manualMode}
+          onLockedInteraction={handleLockedInteraction}
+        />
 
-          {/* Custom options */}
-          <optgroup label="Custom Configurations">
-            <option value="custom-flat">Custom - Flat Rate</option>
-            <option value="custom-linear">Custom - Linear Progression</option>
-            {dataKey === "btcPriceCustomRates" && (
-              <option value="custom-saylor">
-                Custom - Strategy/Saylor projection (37% → 21%)
-              </option>
-            )}
-          </optgroup>
-        </select>
-
-        {/* Show appropriate fields based on selection */}
-        {inputType === "flat" && flatRateKey && (
-          <div className="mt-3">
-            <label className="block font-medium mb-1">
-              Flat Rate ({unit}):
-            </label>
-            <input
-              type="number"
-              value={flatRate}
-              onChange={(e) => {
-                if (followScenario || manualMode) {
-                  handleLockedInteraction();
-                  return;
-                }
-                updateFormData({ [flatRateKey]: Number(e.target.value) });
-              }}
-              className={`w-full p-2 border rounded transition-all duration-200 ${
-                followScenario || manualMode
-                  ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
-                  : "bg-white border-gray-300 hover:border-gray-400 focus:border-blue-500"
-              }`}
-              min="0"
-              max="500"
-              disabled={followScenario || manualMode}
-              onClick={
-                followScenario || manualMode
-                  ? handleLockedInteraction
-                  : undefined
-              }
-            />
-          </div>
-        )}
-
-        {inputType === "linear" && startRateKey && endRateKey && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-            <div>
-              <label className="block font-medium mb-1">
-                Start Rate ({unit}):
-              </label>
-              <input
-                type="number"
-                value={startRate}
-                onChange={(e) => {
-                  if (followScenario || manualMode) {
-                    handleLockedInteraction();
-                    return;
-                  }
-                  updateFormData({ [startRateKey]: Number(e.target.value) });
-                }}
-                className={`w-full p-2 border rounded transition-all duration-200 ${
-                  followScenario || manualMode
-                    ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
-                    : "bg-white border-gray-300 hover:border-gray-400 focus:border-blue-500"
-                }`}
-                min="0"
-                max="500"
-                disabled={followScenario || manualMode}
-                onClick={
-                  followScenario || manualMode
-                    ? handleLockedInteraction
-                    : undefined
-                }
-              />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">
-                End Rate ({unit}):
-              </label>
-              <input
-                type="number"
-                value={endRate}
-                onChange={(e) => {
-                  if (followScenario || manualMode) {
-                    handleLockedInteraction();
-                    return;
-                  }
-                  updateFormData({ [endRateKey]: Number(e.target.value) });
-                }}
-                className={`w-full p-2 border rounded transition-all duration-200 ${
-                  followScenario || manualMode
-                    ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
-                    : "bg-white border-gray-300 hover:border-gray-400 focus:border-blue-500"
-                }`}
-                min="0"
-                max="500"
-                disabled={followScenario || manualMode}
-                onClick={
-                  followScenario || manualMode
-                    ? handleLockedInteraction
-                    : undefined
-                }
-              />
-            </div>
-          </div>
-        )}
-
+        {/* Saylor explanation */}
         {inputType === "saylor" && (
-          <div className="mt-3 p-3 bg-blue-50 rounded border">
-            <p className="text-sm text-blue-800 font-medium mb-2">
-              📈 Strategy/Saylor Projection
-            </p>
-            <p className="text-xs text-blue-600">
-              Based on MicroStrategy's long-term Bitcoin adoption model:
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <h4 className="text-sm font-semibold text-blue-800 mb-2">
+              Michael Saylor's BTC Forecast
+            </h4>
+            <p className="text-xs text-blue-700">
+              Based on Saylor's public statements about Bitcoin's long-term
+              price trajectory:
               <br />• Starts at 37% annual appreciation in year 0
               <br />• Declines linearly to 21% by the final year
               <br />• Curve adjusts automatically for your selected time horizon
@@ -504,21 +244,29 @@ export const RateAssumptionsSection: React.FC<Props> = ({
           </div>
         )}
 
-        {/* Enhanced locked state message */}
-        {(followScenario || manualMode) && (
-          <div className="mt-3 p-2 bg-gray-100 border border-gray-300 rounded text-gray-600 text-xs">
-            {followScenario ? (
-              <>
-                🔒 Settings controlled by global scenario. Current selection
-                shown for reference.
-              </>
-            ) : (
-              <>
-                🔒 Settings locked in direct edit mode. Current selection shown
-                for reference. Adjust values directly on the chart below.
-              </>
-            )}
-          </div>
+        {/* Apply Button */}
+        {!followScenario && !manualMode && (
+          <button
+            onClick={() => applyToChart(inputType as any)}
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors mb-4"
+          >
+            Apply to Chart
+          </button>
+        )}
+
+        {/* Follow Scenario Toggle */}
+        {followScenarioKey && formData.economicScenario !== "custom" && (
+          <ToggleSwitch
+            checked={followScenario}
+            onChange={handleScenarioToggle}
+            id={`${dataKey}-follow-scenario-toggle`}
+            label="Follow scenario"
+            colorClass={{ on: "bg-green-400", off: "bg-gray-300" }}
+            description={{
+              on: `Following scenario with ${avgRate}${unit} average rate. Settings are controlled by the selected scenario.`,
+              off: `Independent configuration. Average rate: ${avgRate}${unit}. Enable to sync with the selected economic scenario.`,
+            }}
+          />
         )}
       </div>
 

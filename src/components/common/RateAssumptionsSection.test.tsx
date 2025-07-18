@@ -177,7 +177,7 @@ describe("RateAssumptionsSection", () => {
         />,
       );
 
-      expect(screen.getByRole("combobox")).toBeInTheDocument();
+      expect(screen.getAllByRole("combobox")).toHaveLength(2); // Scenario dropdown and input type dropdown
     });
 
     it("should render custom configuration options", () => {
@@ -189,7 +189,7 @@ describe("RateAssumptionsSection", () => {
         />,
       );
 
-      expect(screen.getByText("Custom - Flat Rate")).toBeInTheDocument();
+      expect(screen.getByText("Flat Rate")).toBeInTheDocument();
     });
   });
 
@@ -203,7 +203,7 @@ describe("RateAssumptionsSection", () => {
         />,
       );
 
-      expect(screen.getByText("Follow Global Scenario")).toBeInTheDocument();
+      expect(screen.getByText("Follow scenario")).toBeInTheDocument();
     });
 
     it("should handle follow scenario toggle change", async () => {
@@ -219,7 +219,7 @@ describe("RateAssumptionsSection", () => {
 
       // Click the label that corresponds to the scenario toggle
       const scenarioToggleLabel = document.querySelector(
-        'label[for="inflationCustomRates-scenario-toggle"]',
+        'label[for="inflationCustomRates-follow-scenario-toggle"]',
       );
       if (scenarioToggleLabel) {
         await user.click(scenarioToggleLabel);
@@ -246,8 +246,9 @@ describe("RateAssumptionsSection", () => {
         />,
       );
 
-      const dropdown = screen.getByRole("combobox");
-      await user.selectOptions(dropdown, "custom-flat");
+      const dropdowns = screen.getAllByRole("combobox");
+      const dropdown = dropdowns.length > 1 ? dropdowns[1] : dropdowns[0]; // Select the input type dropdown if available
+      await user.selectOptions(dropdown, "flat");
 
       expect(mockUpdateFormData).toHaveBeenCalled();
     });
@@ -266,7 +267,8 @@ describe("RateAssumptionsSection", () => {
         />,
       );
 
-      const dropdown = screen.getByRole("combobox");
+      const dropdowns = screen.getAllByRole("combobox");
+      const dropdown = dropdowns.length > 1 ? dropdowns[1] : dropdowns[0]; // Select the input type dropdown if available
       expect(dropdown).toBeDisabled();
     });
 
@@ -283,7 +285,7 @@ describe("RateAssumptionsSection", () => {
       );
 
       expect(
-        screen.getByText(/Settings controlled by global scenario/),
+        screen.getByText(/Settings are controlled by the selected scenario/),
       ).toBeInTheDocument();
     });
   });
