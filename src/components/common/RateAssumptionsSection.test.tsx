@@ -167,23 +167,30 @@ describe("RateAssumptionsSection", () => {
       expect(screen.getByTestId("chart-readonly")).toHaveTextContent("true");
     });
 
-    it("should render growth scenario dropdown", () => {
+    it("should render growth scenario dropdown when not following scenario and input type is preset", () => {
       render(
         <RateAssumptionsSection
-          formData={mockFormData}
+          formData={{
+            ...mockFormData,
+            followEconomicScenarioInflation: false,
+            inflationInputType: "preset",
+          }}
           updateFormData={mockUpdateFormData}
           config={mockInflationConfig}
           presetScenarios={mockPresetScenarios}
         />,
       );
 
-      expect(screen.getAllByRole("combobox")).toHaveLength(2); // Scenario dropdown and input type dropdown
+      expect(screen.getAllByRole("combobox")).toHaveLength(2); // Input type dropdown and scenario dropdown
     });
 
-    it("should render custom configuration options", () => {
+    it("should render custom configuration options when not following scenario", () => {
       render(
         <RateAssumptionsSection
-          formData={mockFormData}
+          formData={{
+            ...mockFormData,
+            followEconomicScenarioInflation: false,
+          }}
           updateFormData={mockUpdateFormData}
           config={mockInflationConfig}
         />,
@@ -255,7 +262,7 @@ describe("RateAssumptionsSection", () => {
   });
 
   describe("Locked State Behavior", () => {
-    it("should disable controls when following scenario", () => {
+    it("should not show input controls when following scenario", () => {
       render(
         <RateAssumptionsSection
           formData={{
@@ -267,9 +274,10 @@ describe("RateAssumptionsSection", () => {
         />,
       );
 
-      const dropdowns = screen.getAllByRole("combobox");
-      const dropdown = dropdowns.length > 1 ? dropdowns[1] : dropdowns[0]; // Select the input type dropdown if available
-      expect(dropdown).toBeDisabled();
+      // When following scenario, input type dropdown should not be present
+      expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+      // Flat Rate option should not be present
+      expect(screen.queryByText("Flat Rate")).not.toBeInTheDocument();
     });
 
     it("should show appropriate locked state description", () => {

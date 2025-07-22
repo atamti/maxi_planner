@@ -7,7 +7,7 @@ export const IncomeCashflowSection: React.FC = () => {
   const { formData, updateFormData } = usePortfolio();
 
   return (
-    <CollapsibleSection title="4. 💰 Income & Cashflow">
+    <CollapsibleSection title="5. 💰 Income & Cashflow">
       <div className="col-span-2">
         <IncomeExpensesSection
           formData={formData}

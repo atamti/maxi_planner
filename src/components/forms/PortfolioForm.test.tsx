@@ -326,7 +326,7 @@ describe("PortfolioForm", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByText("4. 💰 Income & Cashflow")).toBeInTheDocument();
+    expect(screen.getByText("5. 💰 Income & Cashflow")).toBeInTheDocument();
   });
 });
 

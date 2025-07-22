@@ -159,77 +159,101 @@ export const RateAssumptionsSection: React.FC<Props> = ({
 
       {/* Controls */}
       <div className="mb-4">
-        {/* Scenario Dropdown */}
-        {presetKey && presetScenarios && (
-          <ScenarioDropdown
-            selectedScenario={preset as any}
-            onScenarioChange={handleScenarioChange}
-            isLocked={followScenario || manualMode}
-            onLockedInteraction={handleLockedInteraction}
-            presetScenarios={presetScenarios}
-          />
+        {/* Follow Scenario Toggle */}
+        {followScenarioKey && formData.economicScenario !== "custom" && (
+          <div className="mb-4">
+            <ToggleSwitch
+              checked={followScenario}
+              onChange={handleScenarioToggle}
+              id={`${dataKey}-follow-scenario-toggle`}
+              label="Follow scenario"
+              colorClass={{ on: "bg-green-400", off: "bg-gray-300" }}
+              description={{
+                on: `Following scenario with ${avgRate}${unit} average rate. Settings are controlled by the selected scenario.`,
+                off: `Independent configuration. Average rate: ${avgRate}${unit}. Enable to sync with the selected economic scenario.`,
+              }}
+            />
+          </div>
         )}
 
         {/* Input Type Selection */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Input Type
-          </label>
-          <select
-            value={inputType}
-            onChange={(e) => {
-              if (followScenario || manualMode) {
-                handleLockedInteraction();
-              } else {
-                updateFormData({
-                  [inputTypeKey as keyof FormData]: e.target.value,
-                });
-              }
-            }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            disabled={followScenario || manualMode}
-          >
-            <option value="flat">Flat Rate</option>
-            <option value="linear">Linear Change</option>
-            <option value="preset">Preset Scenario</option>
-            <option value="saylor">Saylor's Forecast</option>
-          </select>
-        </div>
+        {!followScenario && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Input Type
+            </label>
+            <select
+              value={inputType}
+              onChange={(e) => {
+                if (manualMode) {
+                  handleLockedInteraction();
+                } else {
+                  updateFormData({
+                    [inputTypeKey as keyof FormData]: e.target.value,
+                  });
+                }
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              disabled={manualMode}
+            >
+              <option value="flat">Flat Rate</option>
+              <option value="linear">Linear Change</option>
+              <option value="preset">Preset Scenario</option>
+              <option value="saylor">Saylor's Forecast</option>
+            </select>
+          </div>
+        )}
+
+        {/* Scenario Dropdown - Only show when input type is preset and not following scenario */}
+        {!followScenario &&
+          inputType === "preset" &&
+          presetKey &&
+          presetScenarios && (
+            <ScenarioDropdown
+              selectedScenario={preset as any}
+              onScenarioChange={handleScenarioChange}
+              isLocked={manualMode}
+              onLockedInteraction={handleLockedInteraction}
+              presetScenarios={presetScenarios}
+            />
+          )}
 
         {/* Rate Inputs */}
-        <RateInputs
-          rateType={title}
-          inputType={inputType as any}
-          flatRate={flatRate}
-          startRate={startRate}
-          endRate={endRate}
-          onFlatRateChange={(value) => {
-            if (followScenario || manualMode) {
-              handleLockedInteraction();
-            } else {
-              flatRateKey && updateFormData({ [flatRateKey]: value });
-            }
-          }}
-          onStartRateChange={(value) => {
-            if (followScenario || manualMode) {
-              handleLockedInteraction();
-            } else {
-              startRateKey && updateFormData({ [startRateKey]: value });
-            }
-          }}
-          onEndRateChange={(value) => {
-            if (followScenario || manualMode) {
-              handleLockedInteraction();
-            } else {
-              endRateKey && updateFormData({ [endRateKey]: value });
-            }
-          }}
-          isLocked={followScenario || manualMode}
-          onLockedInteraction={handleLockedInteraction}
-        />
+        {!followScenario && (
+          <RateInputs
+            rateType={title}
+            inputType={inputType as any}
+            flatRate={flatRate}
+            startRate={startRate}
+            endRate={endRate}
+            onFlatRateChange={(value) => {
+              if (manualMode) {
+                handleLockedInteraction();
+              } else {
+                flatRateKey && updateFormData({ [flatRateKey]: value });
+              }
+            }}
+            onStartRateChange={(value) => {
+              if (manualMode) {
+                handleLockedInteraction();
+              } else {
+                startRateKey && updateFormData({ [startRateKey]: value });
+              }
+            }}
+            onEndRateChange={(value) => {
+              if (manualMode) {
+                handleLockedInteraction();
+              } else {
+                endRateKey && updateFormData({ [endRateKey]: value });
+              }
+            }}
+            isLocked={manualMode}
+            onLockedInteraction={handleLockedInteraction}
+          />
+        )}
 
         {/* Saylor explanation */}
-        {inputType === "saylor" && (
+        {!followScenario && inputType === "saylor" && (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
             <h4 className="text-sm font-semibold text-blue-800 mb-2">
               Michael Saylor's BTC Forecast
@@ -252,21 +276,6 @@ export const RateAssumptionsSection: React.FC<Props> = ({
           >
             Apply to Chart
           </button>
-        )}
-
-        {/* Follow Scenario Toggle */}
-        {followScenarioKey && formData.economicScenario !== "custom" && (
-          <ToggleSwitch
-            checked={followScenario}
-            onChange={handleScenarioToggle}
-            id={`${dataKey}-follow-scenario-toggle`}
-            label="Follow scenario"
-            colorClass={{ on: "bg-green-400", off: "bg-gray-300" }}
-            description={{
-              on: `Following scenario with ${avgRate}${unit} average rate. Settings are controlled by the selected scenario.`,
-              off: `Independent configuration. Average rate: ${avgRate}${unit}. Enable to sync with the selected economic scenario.`,
-            }}
-          />
         )}
       </div>
 
