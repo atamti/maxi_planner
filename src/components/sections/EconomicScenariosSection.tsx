@@ -1,6 +1,7 @@
 import React from "react";
 import economicScenarios, { ScenarioKey } from "../../config/economicScenarios";
 import { FormData } from "../../types";
+import { CollapsibleSection } from "../common/CollapsibleSection";
 
 interface Props {
   formData: FormData;
@@ -108,20 +109,26 @@ export const EconomicScenariosSection: React.FC<Props> = ({
   const currentScenario =
     economicScenarios[formData.economicScenario as ScenarioKey];
 
-  return (
-    <div className="p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-100">
-      <h3 className="text-lg font-bold mb-3">Economic Scenario</h3>
+  // Create descriptive title for the section
+  const getSectionTitle = () => {
+    if (formData.economicScenario === "custom") {
+      return "2. 🌍 Economic Scenario: Custom";
+    }
+    return `2. 🌍 Economic Scenario: ${currentScenario?.name || "None"} • ${currentScenario?.inflationAvg || 0}% USD • ${currentScenario?.btcAppreciationAvg || 0}% BTC`;
+  };
 
+  return (
+    <CollapsibleSection title={getSectionTitle()} noGrid={true}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
         {Object.entries(economicScenarios).map(([key, scenario]) => (
           <div
             key={key}
             onClick={() => handleScenarioChange(key as ScenarioKey)}
-            className={`p-3 rounded-lg cursor-pointer transition-colors duration-200 
+            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 
               ${
                 formData.economicScenario === key
-                  ? "bg-blue-500 text-white"
-                  : "bg-white hover:bg-blue-100"
+                  ? "bg-blue-500 text-white border-blue-600 shadow-lg"
+                  : "bg-white hover:bg-blue-50 border-gray-200 hover:border-blue-300 shadow-sm"
               }`}
           >
             <h4 className="font-medium">{scenario.name}</h4>
@@ -135,22 +142,22 @@ export const EconomicScenariosSection: React.FC<Props> = ({
       </div>
 
       {/* Show metrics for current scenario */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
-        <div className="p-3 bg-white rounded-md shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-3 bg-white rounded-md shadow-sm border">
           <div className="text-sm text-gray-500">USD inflation</div>
           <div className="text-xl font-bold text-amber-600">
             {currentScenario.inflationAvg}% avg
           </div>
         </div>
 
-        <div className="p-3 bg-white rounded-md shadow-sm">
+        <div className="p-3 bg-white rounded-md shadow-sm border">
           <div className="text-sm text-gray-500">BTC nominal appreciation</div>
           <div className="text-xl font-bold text-green-600">
             {currentScenario.btcAppreciationAvg}% avg
           </div>
         </div>
 
-        <div className="p-3 bg-white rounded-md shadow-sm">
+        <div className="p-3 bg-white rounded-md shadow-sm border">
           <div className="text-sm text-gray-500">Income portfolio yield</div>
           <div
             className={`text-xl font-bold ${currentScenario.incomeGrowth >= 0 ? "text-blue-600" : "text-red-600"}`}
@@ -160,6 +167,6 @@ export const EconomicScenariosSection: React.FC<Props> = ({
           </div>
         </div>
       </div>
-    </div>
+    </CollapsibleSection>
   );
 };

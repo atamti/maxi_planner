@@ -7,6 +7,7 @@ import { ChartBackground } from "./draggable/ChartBackground";
 import { ChartDataLine } from "./draggable/ChartDataLine";
 import { ChartGrid } from "./draggable/ChartGrid";
 import { ChartLabels } from "./draggable/ChartLabels";
+import { ChartTooltip } from "./draggable/ChartTooltip";
 
 interface Props {
   data: number[];
@@ -54,9 +55,13 @@ export const DraggableRateChart: React.FC<Props> = ({
   const {
     isDragging,
     dragIndex,
+    hoverIndex,
+    hoverPosition,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
+    handleMouseHover,
+    handleMouseLeave,
   } = useChartDrag({
     data,
     onChange,
@@ -66,6 +71,7 @@ export const DraggableRateChart: React.FC<Props> = ({
     containerWidth,
     getNearestIndex,
     getValueFromCoordinates,
+    getPointCoordinates,
     svgRef,
   });
 
@@ -93,6 +99,8 @@ export const DraggableRateChart: React.FC<Props> = ({
         onMouseDown={readOnly ? undefined : handleMouseDown}
         onMouseMove={readOnly ? undefined : handleMouseMove}
         onMouseUp={readOnly ? undefined : handleMouseUp}
+        onMouseOver={handleMouseHover}
+        onMouseLeave={handleMouseLeave}
         preserveAspectRatio="none"
       >
         <ChartGrid
@@ -109,6 +117,8 @@ export const DraggableRateChart: React.FC<Props> = ({
           pathData={pathData}
           dataPoints={dataPoints}
           dragIndex={dragIndex}
+          hoverIndex={hoverIndex}
+          readOnly={readOnly}
         />
 
         <ChartLabels
@@ -123,6 +133,16 @@ export const DraggableRateChart: React.FC<Props> = ({
           ? "Chart is read-only. Enable editing to modify values."
           : "💡 Click and drag points to adjust rates. Values snap to 2% increments."}
       </p>
+
+      {/* Tooltip */}
+      {hoverIndex !== null && hoverPosition && (
+        <ChartTooltip
+          position={hoverPosition}
+          value={displayData[hoverIndex]}
+          yearIndex={hoverIndex}
+          yAxisLabel={yAxisLabel}
+        />
+      )}
     </div>
   );
 };

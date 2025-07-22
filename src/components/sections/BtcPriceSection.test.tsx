@@ -103,7 +103,7 @@ describe("BtcPriceSection", () => {
       "📊",
     );
     expect(screen.getByTestId("y-axis-label")).toHaveTextContent(
-      "BTC appreciation (%, nominal)",
+      "BTC appreciation (nominal)",
     );
     expect(screen.getByTestId("unit")).toHaveTextContent("%");
   });
@@ -297,7 +297,7 @@ describe("BtcPriceSection - RateAssumptionsSection Integration", () => {
       "📊",
     );
     expect(screen.getByTestId("y-axis-label")).toHaveTextContent(
-      "BTC appreciation (%, nominal)",
+      "BTC appreciation (nominal)",
     );
     expect(screen.getByTestId("unit")).toHaveTextContent("%");
   });

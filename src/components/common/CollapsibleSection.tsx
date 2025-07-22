@@ -4,12 +4,14 @@ interface Props {
   title: string;
   children: React.ReactNode;
   defaultExpanded?: boolean;
+  noGrid?: boolean; // Allow disabling the grid layout
 }
 
 export const CollapsibleSection: React.FC<Props> = ({
   title,
   children,
   defaultExpanded = false,
+  noGrid = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
@@ -24,9 +26,13 @@ export const CollapsibleSection: React.FC<Props> = ({
       </button>
       {isExpanded && (
         <div className="p-4 bg-white rounded-b-lg">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {children}
-          </div>
+          {noGrid ? (
+            children
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {children}
+            </div>
+          )}
         </div>
       )}
     </div>

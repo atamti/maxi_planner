@@ -73,7 +73,7 @@ export const BtcPriceSection: React.FC<Props> = ({
           followScenarioKey: "followEconomicScenarioBtc",
           presetKey: "btcPricePreset",
           maxValue: getChartMaxValue,
-          yAxisLabel: "BTC appreciation (%, nominal)",
+          yAxisLabel: "BTC appreciation (nominal)",
           unit: "%",
         }}
         economicScenarios={economicScenarios}

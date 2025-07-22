@@ -6,8 +6,13 @@ import { AllocationSliders } from "../forms/AllocationSliders";
 export const PortfolioSetupSection: React.FC = () => {
   const { formData, updateFormData } = usePortfolio();
 
+  // Create descriptive title
+  const getSectionTitle = () => {
+    return `1. 💼 Portfolio Setup: ${formData.btcStack} BTC over ${formData.timeHorizon} years (${formData.savingsPct}% savings, ${formData.investmentsPct}% investments, ${formData.speculationPct}% speculation)`;
+  };
+
   return (
-    <CollapsibleSection title="1. 💼 Portfolio Setup" defaultExpanded={true}>
+    <CollapsibleSection title={getSectionTitle()} defaultExpanded={true}>
       <div>
         <label className="block font-medium mb-1">BTC Stack Size (₿):</label>
         <input

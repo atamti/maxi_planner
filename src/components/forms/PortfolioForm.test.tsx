@@ -20,7 +20,10 @@ vi.mock("../sections/BtcPriceSection", () => ({
 
 vi.mock("../sections/EconomicScenariosSection", () => ({
   EconomicScenariosSection: () => (
-    <div data-testid="economic-scenarios-section">Economic Scenarios</div>
+    <div data-testid="economic-scenarios-section">
+      <div>2. 🌍 Economic Scenario: Debasement • 8% USD • 50% BTC</div>
+      Economic Scenarios
+    </div>
   ),
 }));
 
@@ -67,9 +70,9 @@ describe("PortfolioForm", () => {
     );
 
     // Check section titles
-    expect(screen.getByText("1. 💼 Portfolio Setup")).toBeInTheDocument();
-    expect(screen.getByText("2. 🌍 Economic Scenario")).toBeInTheDocument();
-    expect(screen.getByText("3. 📊 Market Assumptions")).toBeInTheDocument();
+    expect(screen.getByText(/1\. 💼 Portfolio Setup/)).toBeInTheDocument();
+    expect(screen.getByText(/2\. 🌍 Economic Scenario/)).toBeInTheDocument();
+    expect(screen.getByText(/3\. 📊 Market Assumptions/)).toBeInTheDocument();
   });
 
   it("should have Portfolio Setup section expanded by default", () => {
@@ -173,7 +176,7 @@ describe("PortfolioForm", () => {
     );
 
     // Market Assumptions should be collapsed by default
-    const marketButton = screen.getByText("3. 📊 Market Assumptions");
+    const marketButton = screen.getByText(/3\. 📊 Market Assumptions/);
     expect(marketButton.parentElement).toHaveTextContent("+");
 
     // Click to expand
@@ -194,11 +197,17 @@ describe("PortfolioForm", () => {
     );
 
     // Expand market assumptions
-    const marketButton = screen.getByText("3. 📊 Market Assumptions");
+    const marketButton = screen.getByText(/3\. 📊 Market Assumptions/);
     await user.click(marketButton);
 
-    // Should show inflation section
-    expect(screen.getByText("3a. 💵 USD Inflation")).toBeInTheDocument();
+    // Should show inflation section header
+    expect(screen.getByText(/3a\. 💵 USD Inflation/)).toBeInTheDocument();
+
+    // Click to expand inflation subsection
+    const inflationButton = screen.getByText(/3a\. 💵 USD Inflation/);
+    await user.click(inflationButton);
+
+    // Now should show the actual inflation section component
     expect(screen.getByTestId("inflation-section")).toBeInTheDocument();
   });
 
@@ -211,13 +220,19 @@ describe("PortfolioForm", () => {
     );
 
     // Expand market assumptions
-    const marketButton = screen.getByText("3. 📊 Market Assumptions");
+    const marketButton = screen.getByText(/3\. 📊 Market Assumptions/);
     await user.click(marketButton);
 
-    // Should show BTC price section
+    // Should show BTC price section header
     expect(
-      screen.getByText("3b. ₿ BTC Price Appreciation"),
+      screen.getByText(/3b\. ₿ BTC Price Appreciation/),
     ).toBeInTheDocument();
+
+    // Click to expand BTC price subsection
+    const btcButton = screen.getByText(/3b\. ₿ BTC Price Appreciation/);
+    await user.click(btcButton);
+
+    // Now should show the actual BTC price section component
     expect(screen.getByTestId("btc-price-section")).toBeInTheDocument();
   });
 
@@ -285,11 +300,11 @@ describe("PortfolioForm", () => {
     );
 
     // Portfolio Setup should show "−" (expanded)
-    const portfolioButton = screen.getByText("1. 💼 Portfolio Setup");
+    const portfolioButton = screen.getByText(/1\. 💼 Portfolio Setup/);
     expect(portfolioButton.parentElement).toHaveTextContent("−");
 
     // Market Assumptions should show "+" (collapsed)
-    const marketButton = screen.getByText("3. 📊 Market Assumptions");
+    const marketButton = screen.getByText(/3\. 📊 Market Assumptions/);
     expect(marketButton.parentElement).toHaveTextContent("+");
 
     // Click to toggle
@@ -326,7 +341,7 @@ describe("PortfolioForm", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByText("5. 💰 Income & Cashflow")).toBeInTheDocument();
+    expect(screen.getByText(/5\. 💰 Income & Cashflow/)).toBeInTheDocument();
   });
 });
 
@@ -340,7 +355,7 @@ describe("PortfolioForm - CollapsibleSection", () => {
       </TestWrapper>,
     );
 
-    const marketButton = screen.getByText("3. 📊 Market Assumptions");
+    const marketButton = screen.getByText(/3\. 📊 Market Assumptions/);
 
     // Should be collapsed initially (showing "+")
     expect(marketButton.parentElement).toHaveTextContent("+");
@@ -353,6 +368,6 @@ describe("PortfolioForm - CollapsibleSection", () => {
     expect(marketButton.parentElement).toHaveTextContent("−");
 
     // Should show inflation section when expanded
-    expect(screen.getByText("3a. 💵 USD Inflation")).toBeInTheDocument();
+    expect(screen.getByText(/3a\. 💵 USD Inflation/)).toBeInTheDocument();
   });
 });

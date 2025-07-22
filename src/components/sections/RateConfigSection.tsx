@@ -42,13 +42,13 @@ export const RateConfigSection: React.FC<Props> = ({
   const presetScenarios = React.useMemo(() => {
     const presets: Record<string, any> = {};
     Object.entries(economicScenarios).forEach(([key, scenario]) => {
-      if (key !== "custom" || showPresets) {
+      if (key !== "custom") {
         presets[key] =
           scenarioType === "inflation" ? scenario.inflation : scenario.btcPrice;
       }
     });
     return presets;
-  }, [scenarioType, showPresets]);
+  }, [scenarioType]);
 
   return (
     <div

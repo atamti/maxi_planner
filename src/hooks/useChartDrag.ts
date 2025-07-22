@@ -9,6 +9,10 @@ interface UseChartDragProps {
   containerWidth: number;
   getNearestIndex: (x: number) => number;
   getValueFromCoordinates: (x: number, y: number) => number;
+  getPointCoordinates: (
+    index: number,
+    value: number,
+  ) => { x: number; y: number };
   svgRef: React.RefObject<SVGSVGElement | null>;
 }
 
@@ -21,10 +25,16 @@ export const useChartDrag = ({
   containerWidth,
   getNearestIndex,
   getValueFromCoordinates,
+  getPointCoordinates,
   svgRef,
 }: UseChartDragProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const [hoverPosition, setHoverPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   const handleMouseDown = useCallback(
     (event: React.MouseEvent<SVGSVGElement>) => {
@@ -90,6 +100,51 @@ export const useChartDrag = ({
     setDragIndex(null);
   }, []);
 
+  // Hover handlers for tooltip
+  const handleMouseHover = useCallback(
+    (event: React.MouseEvent<SVGSVGElement>) => {
+      if (isDragging) return; // Only prevent hover during dragging, not when readOnly
+      if (!svgRef.current) return;
+
+      const rect = svgRef.current.getBoundingClientRect();
+      const svgX = (event.clientX - rect.left) * (containerWidth / rect.width);
+
+      const index = getNearestIndex(svgX);
+
+      // Use a more generous hover area - if mouse is within the chart area and near a point
+      const paddingLeft = 90;
+      const paddingRight = 40;
+
+      if (svgX >= paddingLeft && svgX <= containerWidth - paddingRight) {
+        setHoverIndex(index);
+
+        // Calculate the actual data point position and convert to screen coordinates
+        const dataPoint = getPointCoordinates(index, data[index]);
+        const screenX = rect.left + (dataPoint.x / containerWidth) * rect.width;
+        const screenY = rect.top + (dataPoint.y / height) * rect.height;
+
+        setHoverPosition({ x: screenX, y: screenY });
+      } else {
+        setHoverIndex(null);
+        setHoverPosition(null);
+      }
+    },
+    [
+      isDragging,
+      svgRef,
+      containerWidth,
+      height,
+      getNearestIndex,
+      getPointCoordinates,
+      data,
+    ],
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    setHoverIndex(null);
+    setHoverPosition(null);
+  }, []);
+
   // Document-level mouse event handlers
   const handleDocumentMouseMove = useCallback(
     (event: MouseEvent) => {
@@ -136,8 +191,12 @@ export const useChartDrag = ({
   return {
     isDragging,
     dragIndex,
+    hoverIndex,
+    hoverPosition,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
+    handleMouseHover,
+    handleMouseLeave,
   };
 };

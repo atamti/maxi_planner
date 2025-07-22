@@ -28,7 +28,6 @@ const ScenarioDropdown: React.FC<ScenarioDropdownProps> = ({
         disabled={isLocked}
         onClick={isLocked ? onLockedInteraction : undefined}
       >
-        <option value="custom">Custom</option>
         {presetScenarios &&
           Object.entries(presetScenarios).map(
             ([key, scenario]: [string, any]) => (

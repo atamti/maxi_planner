@@ -20,7 +20,9 @@ export const SpeculationDisplay: React.FC<SpeculationDisplayProps> = ({
           Speculation ({speculationPct}%)
         </label>
       </div>
-      <div className="text-sm text-gray-600 p-2 bg-gray-100 rounded">
+      {/* Match the height of the slider and input box from AllocationSlider */}
+      <div className="mb-2 h-6"></div> {/* Match slider height */}
+      <div className="text-sm text-gray-600 p-1 bg-gray-100 rounded text-center h-8 flex items-center justify-center">
         Auto-adjusted to {speculationPct}%
       </div>
       <span className="text-xs text-gray-600 block mt-1 text-center">

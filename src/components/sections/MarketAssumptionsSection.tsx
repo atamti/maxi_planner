@@ -8,36 +8,57 @@ import { InflationSection } from "./InflationSection";
 export const MarketAssumptionsSection: React.FC = () => {
   const { formData, updateFormData } = usePortfolio();
 
+  // Calculate averages for use in titles
+  const avgInflation = formData.inflationCustomRates
+    ? (
+        formData.inflationCustomRates.reduce((sum, rate) => sum + rate, 0) /
+        formData.inflationCustomRates.length
+      ).toFixed(1)
+    : "0";
+  const avgBtcGrowth = formData.btcPriceCustomRates
+    ? (
+        formData.btcPriceCustomRates.reduce((sum, rate) => sum + rate, 0) /
+        formData.btcPriceCustomRates.length
+      ).toFixed(1)
+    : "0";
+
+  // Create descriptive title with current settings
+  const getSectionTitle = () => {
+    return `3. 📊 Market Assumptions: ${avgInflation}% avg inflation, ${avgBtcGrowth}% avg BTC growth, ${formData.investmentsStartYield}-${formData.investmentsEndYield}% investment yields`;
+  };
+
   return (
-    <CollapsibleSection title="3. 📊 Market Assumptions">
-      <div className="col-span-2 space-y-6">
+    <CollapsibleSection title={getSectionTitle()} noGrid={true}>
+      <div className="space-y-4">
         {/* Subsection 3a: USD Inflation */}
-        <div>
-          <h4 className="text-lg font-semibold mb-3 text-gray-700">
-            3a. 💵 USD Inflation
-          </h4>
+        <CollapsibleSection
+          title={`3a. 💵 USD Inflation: ${avgInflation}% average (${formData.inflationMode === "simple" ? formData.inflationFlat + "% flat" : formData.inflationStart + "-" + formData.inflationEnd + "% range"})`}
+          defaultExpanded={false}
+          noGrid={true}
+        >
           <InflationSection
             formData={formData}
             updateFormData={updateFormData}
           />
-        </div>
+        </CollapsibleSection>
 
         {/* Subsection 3b: BTC Price Appreciation */}
-        <div>
-          <h4 className="text-lg font-semibold mb-3 text-gray-700">
-            3b. ₿ BTC Price Appreciation
-          </h4>
+        <CollapsibleSection
+          title={`3b. ₿ BTC Price Appreciation: ${avgBtcGrowth}% average (${formData.btcPriceMode === "simple" ? formData.btcPriceFlat + "% flat" : formData.btcPriceStart + "-" + formData.btcPriceEnd + "% range"})`}
+          defaultExpanded={false}
+          noGrid={true}
+        >
           <BtcPriceSection
             formData={formData}
             updateFormData={updateFormData}
           />
-        </div>
+        </CollapsibleSection>
 
         {/* Subsection 3c: BTC Yield Assumptions */}
-        <div>
-          <h4 className="text-lg font-semibold mb-3 text-gray-700">
-            3c. 📈 BTC Yield Assumptions
-          </h4>
+        <CollapsibleSection
+          title={`3c. 📈 BTC Yield Assumptions: ${formData.investmentsStartYield}-${formData.investmentsEndYield}% investments, ${formData.speculationStartYield}-${formData.speculationEndYield}% speculation`}
+          defaultExpanded={false}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block font-medium mb-1">
@@ -128,7 +149,7 @@ export const MarketAssumptionsSection: React.FC = () => {
               <YieldChart formData={formData} />
             </div>
           </div>
-        </div>
+        </CollapsibleSection>
       </div>
     </CollapsibleSection>
   );

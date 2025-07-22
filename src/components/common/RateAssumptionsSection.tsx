@@ -194,11 +194,15 @@ export const RateAssumptionsSection: React.FC<Props> = ({
                       [inputTypeKey as keyof FormData]: "preset",
                       [presetKey as keyof FormData]: value,
                     });
+                    // Auto-apply the preset to the chart
+                    setTimeout(() => applyToChart("preset"), 0);
                   } else {
                     // It's a custom input type
                     updateFormData({
                       [inputTypeKey as keyof FormData]: value,
                     });
+                    // Auto-apply the configuration to the chart
+                    setTimeout(() => applyToChart(value as any), 0);
                   }
                 }
               }}
@@ -272,16 +276,6 @@ export const RateAssumptionsSection: React.FC<Props> = ({
               <br />• Curve adjusts automatically for your selected time horizon
             </p>
           </div>
-        )}
-
-        {/* Apply Button */}
-        {!followScenario && !manualMode && (
-          <button
-            onClick={() => applyToChart(inputType as any)}
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition-colors mb-4"
-          >
-            Apply to Chart
-          </button>
         )}
       </div>
 

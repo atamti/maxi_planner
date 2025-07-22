@@ -10,12 +10,16 @@ interface ChartDataLineProps {
     baseRadius: number;
   }>;
   dragIndex: number | null;
+  hoverIndex?: number | null;
+  readOnly?: boolean;
 }
 
 export const ChartDataLine: React.FC<ChartDataLineProps> = ({
   pathData,
   dataPoints,
   dragIndex,
+  hoverIndex = null,
+  readOnly = false,
 }) => {
   return (
     <g>
@@ -24,17 +28,25 @@ export const ChartDataLine: React.FC<ChartDataLineProps> = ({
 
       {/* Data points */}
       {dataPoints.map(({ x, y, index, baseRadius }) => {
-        const radius = dragIndex === index ? 6 : baseRadius;
+        const isDragging = dragIndex === index;
+        const isHovering = hoverIndex === index;
+        const radius = isDragging ? 6 : isHovering ? 5 : baseRadius;
+        const fillColor = isDragging
+          ? "#DC2626"
+          : isHovering
+            ? "#EF4444"
+            : "#DC2626";
+
         return (
           <circle
             key={index}
             cx={x}
             cy={y}
             r={radius}
-            fill="#DC2626"
+            fill={fillColor}
             stroke="white"
             strokeWidth="2"
-            className="cursor-pointer"
+            className={readOnly ? "cursor-not-allowed" : "cursor-pointer"}
           />
         );
       })}
