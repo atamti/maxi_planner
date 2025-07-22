@@ -167,7 +167,7 @@ describe("RateAssumptionsSection", () => {
       expect(screen.getByTestId("chart-readonly")).toHaveTextContent("true");
     });
 
-    it("should render growth scenario dropdown when not following scenario and input type is preset", () => {
+    it("should render unified scenario dropdown when not following scenario", () => {
       render(
         <RateAssumptionsSection
           formData={{
@@ -181,7 +181,7 @@ describe("RateAssumptionsSection", () => {
         />,
       );
 
-      expect(screen.getAllByRole("combobox")).toHaveLength(2); // Input type dropdown and scenario dropdown
+      expect(screen.getAllByRole("combobox")).toHaveLength(1); // Unified dropdown combining input types and scenarios
     });
 
     it("should render custom configuration options when not following scenario", () => {
