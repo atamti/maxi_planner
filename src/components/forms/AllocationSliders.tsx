@@ -7,7 +7,6 @@ import { useFormValidation } from "../../hooks/useFormValidation";
 import { AllocationBar } from "./allocation/AllocationBar";
 import { AllocationErrorDisplay } from "./allocation/AllocationErrorDisplay";
 import { AllocationSlider } from "./allocation/AllocationSlider";
-import { AllocationSummary } from "./allocation/AllocationSummary";
 import { SpeculationDisplay } from "./allocation/SpeculationDisplay";
 
 interface Props {
@@ -59,12 +58,6 @@ export const AllocationSliders: React.FC<Props> = ({ minThreshold = 0 }) => {
 
         <SpeculationDisplay speculationPct={speculationPct} />
       </div>
-
-      <AllocationSummary
-        savingsPct={savingsPct}
-        investmentsPct={investmentsPct}
-        speculationPct={speculationPct}
-      />
     </div>
   );
 };
