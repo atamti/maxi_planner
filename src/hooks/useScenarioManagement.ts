@@ -29,11 +29,28 @@ export const useScenarioManagement = (
   } = config;
 
   const handleScenarioChange = (selectedScenario: string) => {
+    console.log(`🎮 [useScenarioManagement] handleScenarioChange called:`, {
+      selectedScenario,
+      dataKey,
+      presetKey,
+      followScenarioKey,
+      inputTypeKey,
+      currentFormData: {
+        economicScenario: formData.economicScenario,
+        preset: presetKey ? formData[presetKey] : "N/A",
+        inputType: inputTypeKey ? formData[inputTypeKey] : "N/A",
+        followScenario: followScenarioKey ? formData[followScenarioKey] : "N/A",
+      },
+    });
+
     if (selectedScenario === "custom-flat") {
       const customScenario =
         economicScenarios?.custom?.[
           dataKey === "btcPriceCustomRates" ? "btcPrice" : "inflation"
         ];
+      console.log(`🎯 [useScenarioManagement] Setting custom-flat:`, {
+        customScenario,
+      });
       updateFormData({
         ...(presetKey ? { [presetKey]: "custom" } : {}),
         ...(followScenarioKey ? { [followScenarioKey]: false } : {}),
@@ -47,6 +64,9 @@ export const useScenarioManagement = (
         economicScenarios?.custom?.[
           dataKey === "btcPriceCustomRates" ? "btcPrice" : "inflation"
         ];
+      console.log(`📈 [useScenarioManagement] Setting custom-linear:`, {
+        customScenario,
+      });
       updateFormData({
         ...(presetKey ? { [presetKey]: "custom" } : {}),
         ...(followScenarioKey ? { [followScenarioKey]: false } : {}),
@@ -63,6 +83,7 @@ export const useScenarioManagement = (
       dataKey === "btcPriceCustomRates"
     ) {
       // Handle Saylor projection selection
+      console.log(`🚀 [useScenarioManagement] Setting custom-saylor`);
       updateFormData({
         ...(presetKey ? { [presetKey]: "custom" } : {}),
         ...(followScenarioKey ? { [followScenarioKey]: false } : {}),
@@ -72,11 +93,17 @@ export const useScenarioManagement = (
       });
     } else {
       // Handle preset scenario selection
-      updateFormData({
+      console.log(
+        `📋 [useScenarioManagement] Setting preset scenario:`,
+        selectedScenario,
+      );
+      const updates = {
         ...(presetKey ? { [presetKey]: selectedScenario } : {}),
         ...(inputTypeKey ? { [inputTypeKey]: "preset" } : {}),
         ...(manualModeKey ? { [manualModeKey]: false } : {}),
-      });
+      };
+      console.log(`📝 [useScenarioManagement] Updates to apply:`, updates);
+      updateFormData(updates);
     }
   };
 

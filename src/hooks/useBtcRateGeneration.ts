@@ -15,6 +15,17 @@ export const useBtcRateGeneration = (
     return presets;
   }, []);
 
+  // Get dropdown presets (excludes custom)
+  const dropdownPresets = useMemo(() => {
+    const presets: Record<string, any> = {};
+    Object.entries(economicScenarios).forEach(([key, scenario]) => {
+      if (key !== "custom") {
+        presets[key] = scenario.btcPrice;
+      }
+    });
+    return presets;
+  }, []);
+
   // Calculate average BTC appreciation rate
   const calculateAverageBtcAppreciation = useMemo((): number => {
     if (formData.btcPriceCustomRates.length === 0) return 0;
@@ -126,6 +137,7 @@ export const useBtcRateGeneration = (
 
   return {
     presetScenarios,
+    dropdownPresets,
     calculateAverageBtcAppreciation,
     generateBtcRates,
     applyToChart,
