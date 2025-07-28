@@ -13,6 +13,12 @@ export const InflationSection: React.FC<Props> = ({
   formData,
   updateFormData,
 }) => {
+  console.log(`🏛️ [InflationSection] Render:`, {
+    inflationPreset: formData.inflationPreset,
+    economicScenario: formData.economicScenario,
+    followScenario: formData.followEconomicScenarioInflation,
+  });
+
   const getScenarioPresets = () => {
     const presets: Record<string, any> = {};
     Object.entries(economicScenarios).forEach(([key, scenario]) => {
@@ -22,7 +28,19 @@ export const InflationSection: React.FC<Props> = ({
     return presets;
   };
 
+  // Get presets for dropdown (excludes custom)
+  const getDropdownPresets = () => {
+    const presets: Record<string, any> = {};
+    Object.entries(economicScenarios).forEach(([key, scenario]) => {
+      if (key !== "custom") {
+        presets[key] = scenario.inflation;
+      }
+    });
+    return presets;
+  };
+
   const presetScenarios = getScenarioPresets();
+  const dropdownPresets = getDropdownPresets();
 
   // Determine chart max value based on input type
   const getChartMaxValue = (): number => {
@@ -73,6 +91,7 @@ export const InflationSection: React.FC<Props> = ({
         }}
         economicScenarios={economicScenarios}
         presetScenarios={presetScenarios}
+        dropdownPresets={dropdownPresets}
       />
 
       {/* Section 2: USD Purchasing Power Decay Chart */}

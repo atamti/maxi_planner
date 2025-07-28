@@ -20,6 +20,7 @@ export const BtcPriceSection: React.FC<Props> = ({
 }) => {
   const {
     presetScenarios,
+    dropdownPresets,
     calculateAverageBtcAppreciation,
     generateBtcRates,
     applyToChart,
@@ -78,6 +79,7 @@ export const BtcPriceSection: React.FC<Props> = ({
         }}
         economicScenarios={economicScenarios}
         presetScenarios={presetScenarios}
+        dropdownPresets={dropdownPresets}
       />
 
       {/* Section 3: Price Projection Chart */}

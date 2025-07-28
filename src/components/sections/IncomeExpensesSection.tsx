@@ -22,7 +22,19 @@ export const IncomeExpensesSection: React.FC<Props> = ({
     return presets;
   };
 
+  // Get presets for dropdown (excludes custom)
+  const getIncomeDropdownPresets = () => {
+    const presets: Record<string, any> = {};
+    Object.entries(economicScenarios).forEach(([key, scenario]) => {
+      if (key !== "custom") {
+        presets[key] = scenario.incomeYield;
+      }
+    });
+    return presets;
+  };
+
   const incomePresetScenarios = getIncomeScenarioPresets();
+  const incomeDropdownPresets = getIncomeDropdownPresets();
 
   // Format number with commas for display
   const formatNumberForDisplay = (value: number): string => {
@@ -176,6 +188,7 @@ export const IncomeExpensesSection: React.FC<Props> = ({
         }}
         economicScenarios={economicScenarios}
         presetScenarios={incomePresetScenarios}
+        dropdownPresets={incomeDropdownPresets}
       />
 
       {/* Section 3: Expenses Inflation Chart */}

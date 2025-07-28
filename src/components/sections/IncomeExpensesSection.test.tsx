@@ -88,7 +88,9 @@ describe("IncomeExpensesSection", () => {
       render(<IncomeExpensesSection {...defaultProps} />);
 
       const presetScenarios = screen.getByTestId("rate-preset-scenarios");
-      const expectedKeys = Object.keys(economicScenarios);
+      const expectedKeys = Object.keys(economicScenarios).filter(
+        (key) => key !== "custom",
+      );
       expectedKeys.forEach((key) => {
         expect(presetScenarios.textContent).toContain(key);
       });
@@ -505,8 +507,11 @@ describe("IncomeExpensesSection", () => {
 
       const presetScenarios = screen.getByTestId("rate-preset-scenarios");
 
-      // Should include all economic scenario keys
-      Object.keys(economicScenarios).forEach((key) => {
+      // Should include all economic scenario keys except custom (which is excluded from dropdown)
+      const expectedKeys = Object.keys(economicScenarios).filter(
+        (key) => key !== "custom",
+      );
+      expectedKeys.forEach((key) => {
         expect(presetScenarios.textContent).toContain(key);
       });
     });
