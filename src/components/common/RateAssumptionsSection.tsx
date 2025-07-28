@@ -35,6 +35,7 @@ interface Props {
   config: RateAssumptionConfig;
   economicScenarios?: any;
   presetScenarios?: any;
+  dropdownPresets?: any;
 }
 
 export const RateAssumptionsSection: React.FC<Props> = ({
@@ -43,7 +44,18 @@ export const RateAssumptionsSection: React.FC<Props> = ({
   config,
   economicScenarios,
   presetScenarios,
+  dropdownPresets,
 }) => {
+  console.log(`🔍 [RateAssumptionsSection] Component render:`, {
+    preset: config.presetKey ? formData[config.presetKey] : "N/A",
+    inputType: config.inputTypeKey ? formData[config.inputTypeKey] : "N/A",
+    followScenario: config.followScenarioKey
+      ? formData[config.followScenarioKey]
+      : "N/A",
+    economicScenario: formData.economicScenario,
+    title: config.title,
+  });
+
   const {
     title,
     emoji,
@@ -95,43 +107,167 @@ export const RateAssumptionsSection: React.FC<Props> = ({
 
   const applyToChart = (
     type: "flat" | "linear" | "preset" | "manual" | "saylor" = inputType as any,
+    overridePreset?: string,
   ) => {
+    console.log(`🎯 [${title}] applyToChart called:`, {
+      type,
+      overridePreset,
+      currentPreset: preset,
+      finalPreset: overridePreset || preset,
+      flatRate,
+      startRate,
+      endRate,
+      timeHorizon: formData.timeHorizon,
+      dataKey,
+      presetScenarios: Object.keys(presetScenarios || {}),
+    });
+
     const rates = generateRates({
       type,
       flatRate,
       startRate,
       endRate,
       timeHorizon: formData.timeHorizon,
-      preset,
+      preset: overridePreset || preset,
       presetScenarios,
     });
+
+    console.log(`📊 [${title}] generateRates result:`, rates);
+
     const newRates = applyRatesToArray(
-      rates,
       customRates,
+      rates,
       formData.timeHorizon,
       flatRate || 8,
     );
+
+    console.log(`📈 [${title}] applyRatesToArray result:`, newRates);
+    console.log(`💾 [${title}] Updating form data with key:`, dataKey);
+
     updateFormData({ [dataKey]: newRates });
   };
 
   const handleScenarioChange = (selectedScenario: string) => {
-    handleScenarioChangeHook(selectedScenario);
-  };
+    console.log(`🔄 [${title}] handleScenarioChange called:`, {
+      selectedScenario,
+      currentPreset: preset,
+      currentInputType: inputType,
+      currentFollowScenario: followScenario,
+    });
 
+    handleScenarioChangeHook(selectedScenario);
+
+    // Apply the selected scenario to the chart immediately
+    setTimeout(() => {
+      console.log(
+        `⏰ [${title}] setTimeout executing for scenario:`,
+        selectedScenario,
+      );
+
+      if (selectedScenario === "custom-flat") {
+        console.log(`🎯 [${title}] Applying custom-flat`);
+        applyToChart("flat");
+      } else if (selectedScenario === "custom-linear") {
+        console.log(`🎯 [${title}] Applying custom-linear`);
+        applyToChart("linear");
+      } else if (selectedScenario === "custom-saylor") {
+        console.log(`🎯 [${title}] Applying custom-saylor`);
+        applyToChart("saylor");
+      } else if (selectedScenario === "custom") {
+        console.log(
+          `🎯 [${title}] Handling custom preset - using current custom rates`,
+        );
+        // For custom preset, just use the current custom rates
+        applyToChart("manual");
+      } else {
+        console.log(
+          `🎯 [${title}] Applying preset scenario:`,
+          selectedScenario,
+        );
+        // For preset scenarios, pass the scenario name directly
+        applyToChart("preset", selectedScenario);
+      }
+    }, 0);
+  };
   const handleScenarioToggle = (follow: boolean) => {
     handleScenarioToggleHook(follow);
   };
 
   // Sync economic scenario preset when following scenario
   useEffect(() => {
+    console.log(`🔄 [${title}] useEffect triggered:`, {
+      followScenario,
+      economicScenario: formData.economicScenario,
+      timeHorizon: formData.timeHorizon,
+      hasEconomicScenarios: !!economicScenarios,
+      willCallSync:
+        followScenario &&
+        formData.economicScenario !== "custom" &&
+        economicScenarios,
+    });
+
     if (
       followScenario &&
       formData.economicScenario !== "custom" &&
       economicScenarios
     ) {
+      console.log(`🔗 [${title}] Calling handleIncomeScenarioSyncHook`);
       handleIncomeScenarioSyncHook();
     }
   }, [followScenario, formData.economicScenario, formData.timeHorizon]);
+
+  // Initialize chart with preset scenario on component mount
+  useEffect(() => {
+    console.log(`🎬 [${title}] Initialization useEffect:`, {
+      inputType,
+      preset,
+      hasPresetScenarios: !!presetScenarios,
+      presetScenariosKeys: presetScenarios
+        ? Object.keys(presetScenarios)
+        : "null",
+    });
+
+    if (
+      inputType === "preset" &&
+      preset &&
+      preset !== "custom" &&
+      presetScenarios
+    ) {
+      console.log(`🚀 [${title}] Initializing with preset scenario:`, preset);
+      // Apply the preset scenario to initialize the chart correctly
+      setTimeout(() => {
+        applyToChart("preset", preset);
+      }, 0);
+    }
+  }, [inputType, preset, presetScenarios]); // Only run when these dependencies change
+
+  // Watch for preset changes (e.g., when switching to/from custom mode)
+  useEffect(() => {
+    console.log(`🔄 [${title}] Preset change detected:`, {
+      preset,
+      inputType,
+      followScenario,
+    });
+
+    if (preset === "custom" && inputType === "preset") {
+      console.log(
+        `🎯 [${title}] Switching to custom mode - applying manual rates`,
+      );
+      setTimeout(() => {
+        applyToChart("manual");
+      }, 0);
+    } else if (
+      preset &&
+      preset !== "custom" &&
+      inputType === "preset" &&
+      presetScenarios
+    ) {
+      console.log(`🎯 [${title}] Switching to preset mode:`, preset);
+      setTimeout(() => {
+        applyToChart("preset", preset);
+      }, 0);
+    }
+  }, [preset]); // Watch for preset changes
 
   return (
     <div className="w-full">
@@ -189,13 +325,16 @@ export const RateAssumptionsSection: React.FC<Props> = ({
                 } else {
                   const value = e.target.value;
                   // Check if it's a preset scenario
-                  if (presetScenarios && presetScenarios[value]) {
+                  if (
+                    (dropdownPresets || presetScenarios) &&
+                    (dropdownPresets || presetScenarios)[value]
+                  ) {
                     updateFormData({
                       [inputTypeKey as keyof FormData]: "preset",
                       [presetKey as keyof FormData]: value,
                     });
                     // Auto-apply the preset to the chart
-                    setTimeout(() => applyToChart("preset"), 0);
+                    setTimeout(() => applyToChart("preset", value), 0);
                   } else {
                     // It's a custom input type
                     updateFormData({
@@ -210,8 +349,8 @@ export const RateAssumptionsSection: React.FC<Props> = ({
               disabled={manualMode}
             >
               <optgroup label="Preset Scenarios">
-                {presetScenarios &&
-                  Object.entries(presetScenarios).map(
+                {(dropdownPresets || presetScenarios) &&
+                  Object.entries(dropdownPresets || presetScenarios).map(
                     ([key, scenario]: [string, any]) => (
                       <option key={key} value={key}>
                         {scenario.name}
