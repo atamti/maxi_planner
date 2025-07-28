@@ -16,7 +16,14 @@ export const EconomicScenariosSection: React.FC<Props> = ({
     updateFormData({ economicScenario: scenario });
 
     // If following scenarios, update the respective sections
-    if (formData.followEconomicScenarioInflation && scenario !== "custom") {
+    if (
+      formData.followEconomicScenarioInflation &&
+      scenario !== ("custom" as ScenarioKey)
+    ) {
+      console.log(
+        `🌡️ [EconomicScenariosSection] Updating inflation for scenario:`,
+        scenario,
+      );
       // Update inflation rates
       const inflationScenario = economicScenarios[scenario].inflation;
       const newInflationRates = [];
@@ -43,7 +50,10 @@ export const EconomicScenariosSection: React.FC<Props> = ({
       });
     }
 
-    if (formData.followEconomicScenarioBtc && scenario !== "custom") {
+    if (
+      formData.followEconomicScenarioBtc &&
+      scenario !== ("custom" as ScenarioKey)
+    ) {
       // Update BTC price rates
       const btcScenario = economicScenarios[scenario].btcPrice;
       const newBtcRates = [];
@@ -70,7 +80,10 @@ export const EconomicScenariosSection: React.FC<Props> = ({
     }
 
     // Add income yield updates
-    if (formData.followEconomicScenarioIncome && scenario !== "custom") {
+    if (
+      formData.followEconomicScenarioIncome &&
+      scenario !== ("custom" as ScenarioKey)
+    ) {
       const incomeScenario = economicScenarios[scenario].incomeYield;
       const newIncomeRates = [];
       for (let i = 0; i < formData.timeHorizon; i++) {
