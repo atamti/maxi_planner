@@ -1,10 +1,9 @@
 import React from "react";
 import economicScenarios from "../../config/economicScenarios";
 import { useBtcAutoApplyEffects } from "../../hooks/useBtcAutoApplyEffects";
-import { useBtcRateGeneration } from "../../hooks/useBtcRateGeneration";
 import { useBtcScenarioManagement } from "../../hooks/useBtcScenarioManagement";
-import { useExchangeRateHandling } from "../../hooks/useExchangeRateHandling";
 import { FormData } from "../../types";
+import { useBtcRateSystem } from "../../utils/shared/useBtcRateSystem";
 import { RateAssumptionsSection } from "../common/RateAssumptionsSection";
 import { ExchangeRateInput } from "./btc-price/ExchangeRateInput";
 import { PriceProjectionChart } from "./btc-price/PriceProjectionChart";
@@ -18,11 +17,6 @@ export const BtcPriceSection: React.FC<Props> = ({
   formData,
   updateFormData,
 }) => {
-  console.log(`₿ [BtcPriceSection] Render:`, {
-    btcPricePreset: formData.btcPricePreset,
-    economicScenario: formData.economicScenario,
-    followScenario: formData.followEconomicScenarioBtc,
-  });
   const {
     presetScenarios,
     dropdownPresets,
@@ -33,18 +27,15 @@ export const BtcPriceSection: React.FC<Props> = ({
     isManualRateSelected,
     isDirectEditMode,
     isCustomEconomicScenario,
-  } = useBtcRateGeneration(formData, updateFormData);
-
-  const { handleInputTypeChange, handleScenarioChange, handleScenarioToggle } =
-    useBtcScenarioManagement(formData, updateFormData, applyToChart);
-
-  const {
     showLockedMessage,
     formatNumberForDisplay,
     parseFormattedNumber,
     handleExchangeRateChange,
     handleLockedInteraction,
-  } = useExchangeRateHandling(formData, updateFormData);
+  } = useBtcRateSystem(formData, updateFormData);
+
+  const { handleInputTypeChange, handleScenarioChange, handleScenarioToggle } =
+    useBtcScenarioManagement(formData, updateFormData, applyToChart);
 
   // Set up auto-apply effects
   useBtcAutoApplyEffects(formData, applyToChart);

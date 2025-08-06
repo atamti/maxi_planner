@@ -1,12 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { PortfolioProvider, usePortfolio } from "./PortfolioContext";
+import { CentralizedStateProvider, usePortfolioCompat } from "../store";
 
 // Test component that uses the context
 const TestComponent = () => {
   const { formData, updateFormData, allocationError, resetForm } =
-    usePortfolio();
+    usePortfolioCompat();
 
   return (
     <div>
@@ -29,9 +29,9 @@ const TestComponent = () => {
 describe("PortfolioContext", () => {
   it("should provide default form data", () => {
     render(
-      <PortfolioProvider>
+      <CentralizedStateProvider>
         <TestComponent />
-      </PortfolioProvider>,
+      </CentralizedStateProvider>,
     );
 
     expect(screen.getByTestId("btc-stack")).toHaveTextContent("5");
@@ -42,9 +42,9 @@ describe("PortfolioContext", () => {
     const user = userEvent.setup();
 
     render(
-      <PortfolioProvider>
+      <CentralizedStateProvider>
         <TestComponent />
-      </PortfolioProvider>,
+      </CentralizedStateProvider>,
     );
 
     await user.click(screen.getByTestId("update-btc"));
@@ -55,9 +55,9 @@ describe("PortfolioContext", () => {
     const user = userEvent.setup();
 
     render(
-      <PortfolioProvider>
+      <CentralizedStateProvider>
         <TestComponent />
-      </PortfolioProvider>,
+      </CentralizedStateProvider>,
     );
 
     // First update the data
@@ -76,7 +76,9 @@ describe("PortfolioContext", () => {
 
     expect(() => {
       render(<TestComponent />);
-    }).toThrow("usePortfolio must be used within a PortfolioProvider");
+    }).toThrow(
+      "useCentralizedStateContext must be used within a CentralizedStateProvider",
+    );
 
     console.error = originalError;
   });

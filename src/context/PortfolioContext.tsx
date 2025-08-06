@@ -3,6 +3,7 @@ import { DEFAULT_FORM_DATA } from "../config/defaults";
 import { useCalculations } from "../hooks/useCalculations";
 import { useFormReset } from "../hooks/useFormReset";
 import { CalculationResults, FormData } from "../types";
+import { logError, logFormUpdate, logUserAction } from "../utils/logger";
 
 interface PortfolioContextType {
   // Form state
@@ -35,19 +36,47 @@ export const PortfolioProvider: React.FC<PortfolioProviderProps> = ({
   const [allocationError, setAllocationError] = useState<string>("");
 
   const updateFormData = (updates: Partial<FormData>) => {
+    const updatedFields = Object.keys(updates);
+    logFormUpdate(
+      "PortfolioContext",
+      `fields: ${updatedFields.join(", ")}`,
+      formData,
+      updates,
+    );
+
     setFormData((prev) => ({ ...prev, ...updates }));
   };
 
   const { resetForm } = useFormReset(setFormData);
 
+  const handleResetForm = () => {
+    logUserAction("PortfolioContext", "resetForm");
+    resetForm();
+  };
+
   // Calculate allocation error
   useEffect(() => {
     const total =
       formData.savingsPct + formData.investmentsPct + formData.speculationPct;
-    setAllocationError(
-      total !== 100 ? `Allocations must sum to 100% (current: ${total}%)` : "",
-    );
-  }, [formData.savingsPct, formData.investmentsPct, formData.speculationPct]);
+    const errorMessage =
+      total !== 100 ? `Allocations must sum to 100% (current: ${total}%)` : "";
+
+    if (errorMessage !== allocationError) {
+      logFormUpdate(
+        "PortfolioContext",
+        "allocationError",
+        allocationError,
+        errorMessage,
+      );
+    }
+
+    setAllocationError(errorMessage);
+  }, [
+    formData.savingsPct,
+    formData.investmentsPct,
+    formData.speculationPct,
+    allocationError,
+  ]);
 
   // Get calculation results
   const calculationResults = useCalculations(formData);
@@ -55,7 +84,7 @@ export const PortfolioProvider: React.FC<PortfolioProviderProps> = ({
   const contextValue: PortfolioContextType = {
     formData,
     updateFormData,
-    resetForm,
+    resetForm: handleResetForm,
     calculationResults,
     showUSD,
     setShowUSD,
@@ -72,6 +101,14 @@ export const PortfolioProvider: React.FC<PortfolioProviderProps> = ({
 export const usePortfolio = (): PortfolioContextType => {
   const context = useContext(PortfolioContext);
   if (context === undefined) {
+    logError(
+      "PortfolioContext",
+      "usePortfolio",
+      new Error("usePortfolio hook used outside provider"),
+      {
+        stack: new Error().stack,
+      },
+    );
     throw new Error("usePortfolio must be used within a PortfolioProvider");
   }
   return context;

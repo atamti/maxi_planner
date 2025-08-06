@@ -13,12 +13,6 @@ export const InflationSection: React.FC<Props> = ({
   formData,
   updateFormData,
 }) => {
-  console.log(`🏛️ [InflationSection] Render:`, {
-    inflationPreset: formData.inflationPreset,
-    economicScenario: formData.economicScenario,
-    followScenario: formData.followEconomicScenarioInflation,
-  });
-
   const getScenarioPresets = () => {
     const presets: Record<string, any> = {};
     Object.entries(economicScenarios).forEach(([key, scenario]) => {
