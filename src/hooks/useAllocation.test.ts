@@ -1,12 +1,12 @@
 import { act, renderHook } from "@testing-library/react";
 import React from "react";
 import { describe, expect, it } from "vitest";
-import { PortfolioProvider } from "../context/PortfolioContext";
+import { CentralizedStateProvider } from "../store";
 import { useAllocation } from "./useAllocation";
 
 // Wrapper component for testing hooks that use context
 const wrapper = ({ children }: { children: React.ReactNode }) =>
-  React.createElement(PortfolioProvider, { children });
+  React.createElement(CentralizedStateProvider, { children });
 
 describe("useAllocation", () => {
   it("should return default allocation percentages", () => {
