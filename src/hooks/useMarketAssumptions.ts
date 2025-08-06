@@ -1,12 +1,12 @@
 import { ScenarioKey } from "../config/economicScenarios";
-import { usePortfolio } from "../context/PortfolioContext";
+import { usePortfolioCompat } from "../store";
 import { InputType, Mode } from "../types";
 
 /**
  * Custom hook for managing market assumptions (BTC price, inflation, income)
  */
 export const useMarketAssumptions = () => {
-  const { formData, updateFormData } = usePortfolio();
+  const { formData, updateFormData } = usePortfolioCompat();
 
   const updateInflationSettings = (updates: {
     inflationMode?: Mode;

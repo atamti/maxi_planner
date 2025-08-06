@@ -1,10 +1,10 @@
-import { usePortfolio } from "../context/PortfolioContext";
+import { usePortfolioCompat } from "../store";
 
 /**
  * Custom hook for managing portfolio allocation logic
  */
 export const useAllocation = () => {
-  const { formData, updateFormData, allocationError } = usePortfolio();
+  const { formData, updateFormData, allocationError } = usePortfolioCompat();
 
   const updateAllocation = (updates: {
     savingsPct?: number;
