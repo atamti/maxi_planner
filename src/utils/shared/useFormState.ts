@@ -18,7 +18,12 @@ export const useFormState = <T>(
 
   const validation = useMemo(() => {
     if (!validator) return { isValid: true };
-    return validator(value);
+    const result = validator(value);
+    // Ensure isValid is always a boolean for safety
+    return {
+      isValid: Boolean(result?.isValid),
+      error: result?.error,
+    };
   }, [value, validator]);
 
   const updateValue = useCallback(

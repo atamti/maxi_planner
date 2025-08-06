@@ -80,7 +80,7 @@ export const useRateCalculationEngine = () => {
    */
   const normalizeRatesArray = useCallback(
     (rates: number[], targetLength: number): number[] => {
-      if (rates.length === targetLength) return rates;
+      if (rates.length === targetLength) return [...rates]; // Return a copy
 
       if (rates.length > targetLength) {
         return rates.slice(0, targetLength);

@@ -30,8 +30,8 @@ export const createLoanService = (): LoanService => {
     // Calculate collateral value
     const collateralBtc = (formData.btcStack * collateralPct) / 100;
     const btcPriceAtActivation = getBtcPriceAtYear(activationYear);
-    const collateralValueUSD =
-      collateralBtc * btcPriceAtActivation * exchangeRate;
+    // BTC price is already in USD, so no need to multiply by exchange rate
+    const collateralValueUSD = collateralBtc * btcPriceAtActivation;
 
     // Calculate loan amount based on LTV ratio
     const loanAmount = collateralValueUSD * (ltvRatio / 100);
@@ -61,7 +61,8 @@ export const createLoanService = (): LoanService => {
     }
 
     // Calculate liquidation price (price at which LTV becomes 100%)
-    const liquidationPrice = loanAmount / collateralBtc / exchangeRate;
+    // This should give us the BTC price in USD at which the loan becomes 100% LTV
+    const liquidationPrice = loanAmount / collateralBtc;
 
     // Calculate risk level based on current price vs liquidation price
     const currentBuffer =

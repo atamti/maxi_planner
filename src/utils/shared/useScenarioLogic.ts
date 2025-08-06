@@ -17,7 +17,7 @@ export const useScenarioLogic = (
       rateGenerator: (scenarioData: any, horizon: number) => number[],
     ): number[] => {
       const scenario = economicScenarios[scenarioKey];
-      if (!scenario) {
+      if (scenario === undefined) {
         throw new Error(`Scenario not found: ${scenarioKey}`);
       }
       return rateGenerator(scenario, timeHorizon);
