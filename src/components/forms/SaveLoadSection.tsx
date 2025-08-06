@@ -44,7 +44,7 @@ export const SaveLoadSection: React.FC<Props> = ({ formData, onLoad }) => {
 
   // Add debug effect to see what's happening
   React.useEffect(() => {
-    console.log("SaveLoadSection: savedConfigs changed:", savedConfigs.length);
+    
   }, [savedConfigs]);
 
   return (

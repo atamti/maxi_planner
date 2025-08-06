@@ -17,11 +17,11 @@ export const useLocalStorage = () => {
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      console.log("Loading from localStorage:", stored); // Debug log
+       // Debug log
       if (stored) {
         const configs = JSON.parse(stored);
         setSavedConfigs(configs);
-        console.log("Loaded configs:", configs); // Debug log
+         // Debug log
       }
     } catch (error) {
       console.error("Error loading saved configurations:", error);
@@ -35,7 +35,7 @@ export const useLocalStorage = () => {
         // Only save if we have configs
         const configsJson = JSON.stringify(savedConfigs);
         localStorage.setItem(STORAGE_KEY, configsJson);
-        console.log("Saved to localStorage:", configsJson); // Debug log
+         // Debug log
       }
     } catch (error) {
       console.error("Error saving configurations:", error);
@@ -53,7 +53,7 @@ export const useLocalStorage = () => {
 
     setSavedConfigs((prev) => {
       const newConfigs = [newConfig, ...prev];
-      console.log("Adding new config, total configs:", newConfigs.length); // Debug log
+       // Debug log
       return newConfigs;
     });
     return id;
