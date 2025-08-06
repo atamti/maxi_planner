@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { PortfolioProvider } from "../../context/PortfolioContext";
+import { CentralizedStateProvider } from "../../store";
 import { PortfolioForm } from "./PortfolioForm";
 
 // Mock child components to focus on PortfolioForm logic
@@ -45,7 +45,7 @@ vi.mock("../charts/YieldChart", () => ({
 
 // Wrapper component for tests
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
-  <PortfolioProvider>{children}</PortfolioProvider>
+  <CentralizedStateProvider>{children}</CentralizedStateProvider>
 );
 
 describe("PortfolioForm", () => {
