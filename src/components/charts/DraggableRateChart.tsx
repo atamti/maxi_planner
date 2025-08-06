@@ -1,8 +1,5 @@
 import React, { useRef } from "react";
-import { useChartCoordinates } from "../../hooks/useChartCoordinates";
-import { useChartDrag } from "../../hooks/useChartDrag";
-import { useChartRendering } from "../../hooks/useChartRendering";
-import { useResponsiveSize } from "../../hooks/useResponsiveSize";
+import { useInteractiveChartSystem } from "../../utils/shared";
 import { ChartBackground } from "./draggable/ChartBackground";
 import { ChartDataLine } from "./draggable/ChartDataLine";
 import { ChartGrid } from "./draggable/ChartGrid";
@@ -33,26 +30,16 @@ export const DraggableRateChart: React.FC<Props> = ({
   title,
 }) => {
   const svgRef = useRef<SVGSVGElement>(null);
-  const { containerRef, containerWidth } = useResponsiveSize(800);
-
-  const height = 300;
-  const displayData = data.slice(0, maxYears);
 
   const {
+    containerRef,
+    containerWidth,
+    height,
     dimensions,
+    displayData,
     getPointCoordinates,
     getValueFromCoordinates,
     getNearestIndex,
-  } = useChartCoordinates({
-    containerWidth,
-    height,
-    maxYears,
-    maxValue,
-    minValue,
-    displayData,
-  });
-
-  const {
     isDragging,
     dragIndex,
     hoverIndex,
@@ -62,26 +49,20 @@ export const DraggableRateChart: React.FC<Props> = ({
     handleMouseUp,
     handleMouseHover,
     handleMouseLeave,
-  } = useChartDrag({
+    pathData,
+    yGridLines,
+    xGridLines,
+    dataPoints,
+  } = useInteractiveChartSystem({
     data,
     onChange,
     onStartDrag,
     readOnly,
-    height,
-    containerWidth,
-    getNearestIndex,
-    getValueFromCoordinates,
-    getPointCoordinates,
-    svgRef,
-  });
-
-  const { pathData, yGridLines, xGridLines, dataPoints } = useChartRendering({
-    displayData,
+    height: 300,
     maxValue,
-    containerWidth,
-    height,
-    getPointCoordinates,
-    dimensions,
+    minValue,
+    maxYears,
+    svgRef,
   });
 
   return (

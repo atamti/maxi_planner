@@ -1,7 +1,6 @@
 import React from "react";
-import { useChartConfig } from "../../hooks/useChartConfig";
-import { useChartData } from "../../hooks/useChartData";
 import { CalculationResults, FormDataSubset } from "../../types";
+import { useStaticChartSystem } from "../../utils/shared";
 import { ActivationYearControl } from "../charts/individual/ActivationYearControl";
 import { BtcGrowthChart } from "../charts/individual/BtcGrowthChart";
 import { IncomeBtcChart } from "../charts/individual/IncomeBtcChart";
@@ -26,22 +25,15 @@ export const ChartsSection: React.FC<Props> = ({
     incomeChartData,
     incomePotentialChartData,
     incomeBtcChartData,
-  } = useChartData({
-    calculationResults: results,
-    formData: formData as any, // Type assertion for compatibility
-    getBtcPriceAtYear,
-  });
-
-  const {
     btcGrowthChartConfig,
     usdIncomeChartConfig,
     incomeBtcChartConfig,
     incomePotentialChartConfig,
-  } = useChartConfig({
+  } = useStaticChartSystem({
     calculationResults: results,
     formData: formData as any, // Type assertion for compatibility
     onUpdateFormData: onUpdateFormData
-      ? (updates) =>
+      ? (updates: Partial<any>) =>
           onUpdateFormData({ activationYear: updates.activationYear! })
       : undefined,
   });

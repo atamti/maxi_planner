@@ -1,6 +1,6 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
-import { FormData } from "../types";
+import { FormData } from "../../types";
 
 interface Props {
   formData: FormData;
