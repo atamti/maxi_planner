@@ -1,19 +1,12 @@
 import React from "react";
 import economicScenarios, { ScenarioKey } from "../../config/economicScenarios";
-import { useRateGeneration } from "../../hooks/useRateGeneration";
-import { FormData } from "../../types";
+import { usePortfolioCompat } from "../../store";
+import { useGeneralRateSystem } from "../../utils/shared/useGeneralRateSystem";
 import { CollapsibleSection } from "../common/CollapsibleSection";
 
-interface Props {
-  formData: FormData;
-  updateFormData: (updates: Partial<FormData>) => void;
-}
-
-export const EconomicScenariosSection: React.FC<Props> = ({
-  formData,
-  updateFormData,
-}) => {
-  const { generateRates, calculateAverageRate } = useRateGeneration();
+export const EconomicScenariosSection: React.FC = () => {
+  const { formData, updateFormData } = usePortfolioCompat();
+  const { generateRates, calculateAverageRate } = useGeneralRateSystem();
 
   // Calculate actual average rates for a scenario
   const calculateScenarioAverages = (scenarioKey: ScenarioKey) => {
@@ -133,25 +126,11 @@ export const EconomicScenariosSection: React.FC<Props> = ({
   };
 
   const handleScenarioChange = (scenario: ScenarioKey) => {
-    console.log(`🌍 [EconomicScenariosSection] Scenario change requested:`, {
-      newScenario: scenario,
-      currentScenario: formData.economicScenario,
-      followInflation: formData.followEconomicScenarioInflation,
-      followBtc: formData.followEconomicScenarioBtc,
-      currentInflationPreset: formData.inflationPreset,
-      currentBtcPreset: formData.btcPricePreset,
-    });
-
     updateFormData({ economicScenario: scenario });
 
     if (scenario === "custom") {
-      console.log(`🔧 [EconomicScenariosSection] Setting up custom scenario`);
-
       // Before switching to custom, capture current rates from the previous scenario
       const currentScenario = formData.economicScenario;
-      console.log(
-        `📋 [EconomicScenariosSection] Copying rates from scenario: ${currentScenario}`,
-      );
 
       // Generate current scenario rates to copy to custom arrays
       let inflationCustomRates = formData.inflationCustomRates;
@@ -196,10 +175,6 @@ export const EconomicScenariosSection: React.FC<Props> = ({
         });
 
         btcPriceCustomRates = btcRates.slice(0, formData.timeHorizon);
-
-        console.log(
-          `✅ [EconomicScenariosSection] Copied rates from ${currentScenario} to custom arrays`,
-        );
       }
 
       // Set everything to custom mode and disable follow toggles
@@ -219,9 +194,6 @@ export const EconomicScenariosSection: React.FC<Props> = ({
         inflationCustomRates,
         btcPriceCustomRates,
       });
-      console.log(
-        `✅ [EconomicScenariosSection] Custom scenario setup complete`,
-      );
       return;
     }
 
@@ -230,10 +202,6 @@ export const EconomicScenariosSection: React.FC<Props> = ({
       formData.followEconomicScenarioInflation &&
       scenario !== ("custom" as ScenarioKey)
     ) {
-      console.log(
-        `🌡️ [EconomicScenariosSection] Updating inflation for scenario:`,
-        scenario,
-      );
       // Update inflation rates
       const inflationScenario = economicScenarios[scenario].inflation;
       const newInflationRates = [];
@@ -317,11 +285,6 @@ export const EconomicScenariosSection: React.FC<Props> = ({
         incomeCustomRates: updatedIncomeRates,
       });
     }
-
-    console.log(
-      `✅ [EconomicScenariosSection] Scenario change complete for:`,
-      scenario,
-    );
   };
 
   const currentScenario =

@@ -1,10 +1,10 @@
 import React from "react";
-import { usePortfolio } from "../../context/PortfolioContext";
+import { usePortfolioCompat } from "../../store";
 import { CollapsibleSection } from "../common/CollapsibleSection";
 import { AllocationSliders } from "../forms/AllocationSliders";
 
 export const PortfolioSetupSection: React.FC = () => {
-  const { formData, updateFormData } = usePortfolio();
+  const { formData, updateFormData } = usePortfolioCompat();
 
   // Create descriptive title
   const getSectionTitle = () => {

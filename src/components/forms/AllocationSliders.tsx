@@ -1,9 +1,9 @@
 import React from "react";
-import { usePortfolio } from "../../context/PortfolioContext";
 import { useAllocation } from "../../hooks/useAllocation";
 import { useAllocationAdjustment } from "../../hooks/useAllocationAdjustment";
 import { useAllocationHighlight } from "../../hooks/useAllocationHighlight";
 import { useFormValidation } from "../../hooks/useFormValidation";
+import { usePortfolioCompat } from "../../store";
 import { AllocationBar } from "./allocation/AllocationBar";
 import { AllocationErrorDisplay } from "./allocation/AllocationErrorDisplay";
 import { AllocationSlider } from "./allocation/AllocationSlider";
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export const AllocationSliders: React.FC<Props> = ({ minThreshold = 0 }) => {
-  const { formData } = usePortfolio();
+  const { formData } = usePortfolioCompat();
   const { allocationError } = useAllocation();
   const { validateAllocation } = useFormValidation(formData);
 

@@ -1,17 +1,10 @@
 import React from "react";
-import { FormData } from "../../types";
+import { usePortfolioCompat } from "../../store";
 import { formatCurrency, formatNumber } from "../../utils/formatNumber";
 import { CollapsibleSection } from "../common/CollapsibleSection";
 
-interface Props {
-  formData: FormData;
-  updateFormData: (updates: Partial<FormData>) => void;
-}
-
-export const LeverageSection: React.FC<Props> = ({
-  formData,
-  updateFormData,
-}) => {
+export const LeverageSection: React.FC = () => {
+  const { formData, updateFormData } = usePortfolioCompat();
   // Create descriptive title
   const getSectionTitle = () => {
     if (formData.collateralPct === 0) {

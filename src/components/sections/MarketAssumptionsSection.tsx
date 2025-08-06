@@ -1,24 +1,18 @@
 import React, { useEffect } from "react";
 import economicScenarios from "../../config/economicScenarios";
-import { usePortfolio } from "../../context/PortfolioContext";
-import { useRateGeneration } from "../../hooks/useRateGeneration";
+import { usePortfolioCompat } from "../../store";
+import { useGeneralRateSystem } from "../../utils/shared/useGeneralRateSystem";
 import { YieldChart } from "../charts/YieldChart";
 import { CollapsibleSection } from "../common/CollapsibleSection";
 import { BtcPriceSection } from "./BtcPriceSection";
 import { InflationSection } from "./InflationSection";
 
 export const MarketAssumptionsSection: React.FC = () => {
-  const { formData, updateFormData } = usePortfolio();
-  const { generateRates, applyRatesToArray } = useRateGeneration();
+  const { formData, updateFormData } = usePortfolioCompat();
+  const { generateRates, applyRatesToArray } = useGeneralRateSystem();
 
   // Initialize rates on component mount to ensure headers show correct averages
   useEffect(() => {
-    console.log(`🎬 [MarketAssumptionsSection] Initializing rates:`, {
-      inflationPreset: formData.inflationPreset,
-      btcPricePreset: formData.btcPricePreset,
-      economicScenario: formData.economicScenario,
-    });
-
     let updatedData: Partial<typeof formData> = {};
 
     // Initialize inflation rates if using preset
@@ -87,10 +81,6 @@ export const MarketAssumptionsSection: React.FC = () => {
 
     // Update form data if we have any changes
     if (Object.keys(updatedData).length > 0) {
-      console.log(
-        `💾 [MarketAssumptionsSection] Updated:`,
-        Object.keys(updatedData),
-      );
       updateFormData(updatedData);
     }
   }, [
@@ -103,11 +93,7 @@ export const MarketAssumptionsSection: React.FC = () => {
 
   // Check for economic scenario changes (for debugging)
   useEffect(() => {
-    console.log(`🔧 [MarketAssumptionsSection] Scenario state:`, {
-      inflationPreset: formData.inflationPreset,
-      btcPricePreset: formData.btcPricePreset,
-      economicScenario: formData.economicScenario,
-    });
+    // Scenario state tracking for debugging
   }, [
     formData.economicScenario,
     formData.inflationPreset,
@@ -138,17 +124,6 @@ export const MarketAssumptionsSection: React.FC = () => {
           ).length
         ).toFixed(1)
       : "0";
-
-  // Debug logging for header calculations
-  console.log(`📊 [MarketAssumptionsSection] Header calculation:`, {
-    scenario: formData.economicScenario,
-    inflationPreset: formData.inflationPreset,
-    btcPreset: formData.btcPricePreset,
-    avgInflation,
-    avgBtcGrowth,
-    inflationRatesLength: formData.inflationCustomRates?.length || 0,
-    btcRatesLength: formData.btcPriceCustomRates?.length || 0,
-  });
 
   // Helper function to get inflation description
   const getInflationDescription = () => {

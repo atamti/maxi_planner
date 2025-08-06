@@ -11,12 +11,14 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import React from "react";
+import React, { useEffect } from "react";
 import { PortfolioForm } from "./components/forms/PortfolioForm";
 import { SaveLoadSection } from "./components/forms/SaveLoadSection";
 import { ResultsSection } from "./components/sections/ResultsSection";
-import { PortfolioProvider, usePortfolio } from "./context/PortfolioContext";
+import { PortfolioProvider } from "./context/PortfolioContext";
+import { CentralizedStateProvider, usePortfolioCompat } from "./store";
 import { FormData } from "./types";
+import { logError, logUserAction } from "./utils/logger";
 
 ChartJS.register(
   CategoryScale,
@@ -32,10 +34,51 @@ ChartJS.register(
 );
 
 const App: React.FC = () => {
+  useEffect(() => {
+    logUserAction("App", "appMounted", {
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+    });
+
+    // Log any uncaught errors
+    const handleError = (event: ErrorEvent) => {
+      logError("App", "uncaughtError", new Error(event.message), {
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+      });
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      logError(
+        "App",
+        "unhandledPromiseRejection",
+        new Error(String(event.reason)),
+        {
+          reason: event.reason,
+        },
+      );
+    };
+
+    window.addEventListener("error", handleError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener("error", handleError);
+      window.removeEventListener(
+        "unhandledrejection",
+        handleUnhandledRejection,
+      );
+      logUserAction("App", "appUnmounted");
+    };
+  }, []);
+
   return (
-    <PortfolioProvider>
-      <AppContent />
-    </PortfolioProvider>
+    <CentralizedStateProvider>
+      <PortfolioProvider>
+        <AppContent />
+      </PortfolioProvider>
+    </CentralizedStateProvider>
   );
 };
 
@@ -46,9 +89,15 @@ const AppContent: React.FC = () => {
     resetForm,
     calculationResults,
     allocationError,
-  } = usePortfolio();
+  } = usePortfolioCompat();
 
   const handleLoadConfig = (data: FormData) => {
+    logUserAction("App", "loadConfig", {
+      hasCustomBtcRates: data.btcPriceCustomRates?.length > 0,
+      timeHorizon: data.timeHorizon,
+      activationYear: data.activationYear,
+      btcStack: data.btcStack,
+    });
     updateFormData(data);
   };
 

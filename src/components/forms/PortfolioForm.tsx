@@ -1,5 +1,5 @@
 import React from "react";
-import { usePortfolio } from "../../context/PortfolioContext";
+import { usePortfolioCompat } from "../../store";
 import { EconomicScenariosSection } from "../sections/EconomicScenariosSection";
 import { IncomeCashflowSection } from "../sections/IncomeCashflowSection";
 import { LeverageSection } from "../sections/LeverageSection";
@@ -7,7 +7,7 @@ import { MarketAssumptionsSection } from "../sections/MarketAssumptionsSection";
 import { PortfolioSetupSection } from "../sections/PortfolioSetupSection";
 
 export const PortfolioForm: React.FC = () => {
-  const { formData, updateFormData, resetForm } = usePortfolio();
+  const { formData, updateFormData, resetForm } = usePortfolioCompat();
 
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4">
@@ -17,16 +17,13 @@ export const PortfolioForm: React.FC = () => {
       <PortfolioSetupSection />
 
       {/* Section 2: Economic Scenario */}
-      <EconomicScenariosSection
-        formData={formData}
-        updateFormData={updateFormData}
-      />
+      <EconomicScenariosSection />
 
       {/* Section 3: Market Assumptions */}
       <MarketAssumptionsSection />
 
       {/* Section 4: Leverage & Borrowing */}
-      <LeverageSection formData={formData} updateFormData={updateFormData} />
+      <LeverageSection />
 
       {/* Section 5: Income & Cashflow */}
       <IncomeCashflowSection />
