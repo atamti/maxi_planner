@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { CalculationResults, FormDataSubset } from "../../types";
 import { ChartsSection } from "../results/ChartsSection";
 import { EscapeVelocitySection } from "../results/EscapeVelocitySection";
@@ -25,14 +25,18 @@ export const ResultsSection: React.FC<Props> = ({
   const { results: calculationResults } = results;
 
   // Helper function to get BTC price at a specific year using custom rates
-  const getBtcPriceAtYear = (year: number): number => {
-    let price = formData.exchangeRate;
-    for (let i = 0; i < year; i++) {
-      const appreciationRate = (formData.btcPriceCustomRates?.[i] || 50) / 100;
-      price = price * (1 + appreciationRate);
-    }
-    return price;
-  };
+  const getBtcPriceAtYear = useCallback(
+    (year: number): number => {
+      let price = formData.exchangeRate;
+      for (let i = 0; i < year; i++) {
+        const appreciationRate =
+          (formData.btcPriceCustomRates?.[i] || 50) / 100;
+        price = price * (1 + appreciationRate);
+      }
+      return price;
+    },
+    [formData.exchangeRate, formData.btcPriceCustomRates],
+  );
 
   return (
     <div className="bg-white p-4 rounded-lg shadow">
