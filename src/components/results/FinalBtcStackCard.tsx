@@ -18,6 +18,11 @@ export const FinalBtcStackCard: React.FC<Props> = ({
   const { timeHorizon } = formData;
   const finalResult = calculationResults[calculationResults.length - 1];
 
+  // Safety check: if no calculation results are available, return null
+  if (!finalResult) {
+    return null;
+  }
+
   return (
     <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
       <h3 className="text-lg font-semibold text-orange-800 mb-3">

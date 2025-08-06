@@ -1,5 +1,8 @@
+import { useMemo } from "react";
 import { CalculationResults, FormDataSubset } from "../types";
+import { useLoanCalculations } from "./useLoanCalculations";
 
+// Core analysis interfaces (from usePortfolioAnalysis)
 export interface CashflowAnalysis {
   activationYear: {
     withoutLeverage: number;
@@ -26,14 +29,51 @@ export interface PortfolioMixEvolution {
   mixChange: number;
 }
 
+// Enhanced insights interface (from usePortfolioInsights)
+export interface InsightData {
+  btcGrowthWithIncome: number;
+  btcGrowthWithoutIncome: number;
+  finalBtcWithIncome: number;
+  finalBtcWithoutIncome: number;
+  btcGrowthDifference: number;
+  liquidationData?: {
+    liquidationPrice: number;
+    minBtcPrice: number;
+    maxBtcPrice: number;
+    liquidationBuffer: number;
+  };
+  cashflows: {
+    activationYear: {
+      withoutLeverage: number;
+      withLeverage: number;
+    };
+  };
+  portfolioMix?: {
+    finalSavingsPct: number;
+    finalInvestmentsPct: number;
+    finalSpeculationPct: number;
+    mixChange: number;
+  };
+}
+
 /**
- * Custom hook for portfolio analysis calculations
- * Consolidates complex portfolio analysis logic
+ * Enhanced portfolio analysis hook that consolidates:
+ * - usePortfolioAnalysis: Core portfolio calculations (cashflows, growth, mix)
+ * - usePortfolioInsights: Higher-level insights with loan integration
+ *
+ * Provides both granular analysis methods and comprehensive insight data
  */
-export const usePortfolioAnalysis = (
+export const usePortfolioAnalysisEnhanced = (
   results: CalculationResults,
   formData: FormDataSubset,
+  getBtcPriceAtYear?: (year: number) => number,
 ) => {
+  const { calculateLoanDetails } = useLoanCalculations(
+    formData,
+    getBtcPriceAtYear || (() => 0),
+  );
+
+  // Core analysis methods (from usePortfolioAnalysis)
   const calculateCashflows = (): CashflowAnalysis => {
     const activationYearExpenses =
       results.annualExpenses[formData.activationYear] || 0;
@@ -141,6 +181,7 @@ export const usePortfolioAnalysis = (
     };
   };
 
+  // Utility methods (from usePortfolioAnalysis)
   const formatCashflow = (
     value: number,
   ): { formatted: string; isPositive: boolean } => {
@@ -175,12 +216,92 @@ export const usePortfolioAnalysis = (
     return "low";
   };
 
+  // Enhanced insights (from usePortfolioInsights)
+  const getInsightData = useMemo((): InsightData => {
+    const portfolioGrowth = calculatePortfolioGrowth();
+    const cashflows = calculateCashflows();
+    const dynamicLoanValues = getBtcPriceAtYear
+      ? calculateLoanDetails(formData.activationYear)
+      : null;
+
+    const {
+      btcGrowthWithIncome,
+      btcGrowthWithoutIncome,
+      finalBtcWithIncome,
+      finalBtcWithoutIncome,
+    } = portfolioGrowth;
+
+    const btcGrowthDifference = btcGrowthWithoutIncome - btcGrowthWithIncome;
+
+    // Liquidation risk analysis
+    let liquidationData: InsightData["liquidationData"];
+    if (formData.collateralPct > 0 && dynamicLoanValues && getBtcPriceAtYear) {
+      const liquidationPrice = dynamicLoanValues.liquidationPrice;
+      let minBtcPrice = Infinity;
+      let maxBtcPrice = 0;
+
+      for (
+        let year = formData.activationYear;
+        year <= formData.timeHorizon;
+        year++
+      ) {
+        const btcPrice = getBtcPriceAtYear(year);
+        minBtcPrice = Math.min(minBtcPrice, btcPrice);
+        maxBtcPrice = Math.max(maxBtcPrice, btcPrice);
+      }
+
+      if (minBtcPrice !== Infinity) {
+        const liquidationBuffer =
+          ((minBtcPrice - liquidationPrice) / liquidationPrice) * 100;
+
+        liquidationData = {
+          liquidationPrice,
+          minBtcPrice,
+          maxBtcPrice,
+          liquidationBuffer,
+        };
+      }
+    }
+
+    // Portfolio mix evolution
+    let portfolioMix: InsightData["portfolioMix"];
+    if (formData.savingsPct < 100) {
+      const mixEvolution = calculatePortfolioMixEvolution();
+      portfolioMix = mixEvolution;
+    }
+
+    return {
+      btcGrowthWithIncome,
+      btcGrowthWithoutIncome,
+      finalBtcWithIncome,
+      finalBtcWithoutIncome,
+      btcGrowthDifference,
+      liquidationData,
+      cashflows,
+      portfolioMix,
+    };
+  }, [
+    results,
+    formData,
+    getBtcPriceAtYear,
+    calculateLoanDetails,
+    calculateCashflows,
+    calculatePortfolioGrowth,
+  ]);
+
   return {
+    // Core analysis methods (usePortfolioAnalysis API)
     calculateCashflows,
     calculatePortfolioGrowth,
     calculatePortfolioMixEvolution,
     formatCashflow,
     getGrowthCategory,
     getRiskLevel,
+
+    // Enhanced insights (usePortfolioInsights API)
+    insightData: getInsightData,
+
+    // Convenience methods for backward compatibility
+    getInsightData: () => getInsightData,
   };
 };

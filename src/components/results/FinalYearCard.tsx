@@ -28,6 +28,7 @@ export const FinalYearCard: React.FC<Props> = ({ results, formData }) => {
   const finalYearIncome = usdIncome[usdIncome.length - 1] || 0;
   const finalYearIncomeWithLeverage =
     usdIncomeWithLeverage[usdIncomeWithLeverage.length - 1] || 0;
+  const finalYearBtcIncome = btcIncome[btcIncome.length - 1] || 0;
 
   const finalYearCashflows = {
     withoutLeverage: finalYearIncome - finalYearExpenses,
@@ -46,8 +47,7 @@ export const FinalYearCard: React.FC<Props> = ({ results, formData }) => {
             <strong>USD:</strong> {formatCurrency(finalYearIncome, 0)}
           </p>
           <p className="text-sm">
-            <strong>BTC:</strong>{" "}
-            {formatNumber(btcIncome[btcIncome.length - 1], 3)} BTC
+            <strong>BTC:</strong> {formatNumber(finalYearBtcIncome, 3)} BTC
           </p>
           {formData.collateralPct > 0 && (
             <p className="text-sm">
