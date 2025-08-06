@@ -1,6 +1,4 @@
 import economicScenarios, { ScenarioKey } from "../config/economicScenarios";
-// TODO: Fix after hook consolidation complete
-// import { useRateGenerationEnhanced } from "../hooks/useRateGeneration.enhanced";
 import { FormData } from "../types";
 
 export interface ScenarioManager {
