@@ -212,7 +212,7 @@ describe("useCalculations", () => {
       // With no collateral, loan principal should be zero
       expect(result.current.loanPrincipal).toBe(0);
       expect(result.current.loanInterest).toBe(0);
-      
+
       // Should still have valid BTC growth
       expect(result.current.results).toHaveLength(
         noCollateralData.timeHorizon + 1,
@@ -233,26 +233,34 @@ describe("useCalculations", () => {
       // Should handle custom rate arrays correctly
       expect(result.current.results).toHaveLength(5); // years 0-4
       expect(result.current.annualExpenses.length).toBe(5);
-      
+
       // Expenses should increase due to inflation
       expect(result.current.annualExpenses[4]).toBeGreaterThan(
-        result.current.annualExpenses[0]
+        result.current.annualExpenses[0],
       );
     });
 
     it("should calculate consistent results across multiple runs", () => {
       // Test deterministic behavior
-      const { result: result1 } = renderHook(() => useCalculations(DEFAULT_FORM_DATA));
-      const { result: result2 } = renderHook(() => useCalculations(DEFAULT_FORM_DATA));
+      const { result: result1 } = renderHook(() =>
+        useCalculations(DEFAULT_FORM_DATA),
+      );
+      const { result: result2 } = renderHook(() =>
+        useCalculations(DEFAULT_FORM_DATA),
+      );
 
       // Results should be identical for same inputs
       expect(result1.current.loanPrincipal).toBe(result2.current.loanPrincipal);
       expect(result1.current.loanInterest).toBe(result2.current.loanInterest);
-      expect(result1.current.results.length).toBe(result2.current.results.length);
-      
+      expect(result1.current.results.length).toBe(
+        result2.current.results.length,
+      );
+
       // Compare final BTC values
-      const final1 = result1.current.results[result1.current.results.length - 1];
-      const final2 = result2.current.results[result2.current.results.length - 1];
+      const final1 =
+        result1.current.results[result1.current.results.length - 1];
+      const final2 =
+        result2.current.results[result2.current.results.length - 1];
       expect(final1.btcWithIncome).toBe(final2.btcWithIncome);
       expect(final1.btcWithoutIncome).toBe(final2.btcWithoutIncome);
     });
