@@ -10,7 +10,9 @@ export const useRateCalculationEngine = () => {
    */
   const generateFlat = useCallback(
     (rate: number, horizon: number): number[] => {
-      return Array(horizon + 1).fill(rate);
+      // Protect against negative and non-integer horizons
+      const safeHorizon = Math.max(0, Math.floor(horizon));
+      return Array(safeHorizon + 1).fill(rate);
     },
     [],
   );
@@ -20,10 +22,27 @@ export const useRateCalculationEngine = () => {
    */
   const generateLinear = useCallback(
     (start: number, end: number, horizon: number): number[] => {
+      // Protect against negative and non-integer horizons
+      const safeHorizon = Math.max(0, Math.floor(horizon));
       const rates = [];
-      for (let i = 0; i <= horizon; i++) {
-        const progress = horizon === 0 ? 0 : i / horizon;
-        rates.push(start + (end - start) * progress);
+      for (let i = 0; i <= safeHorizon; i++) {
+        const progress = safeHorizon === 0 ? 0 : i / safeHorizon;
+
+        // Handle infinite bounds gracefully - prevent NaN from infinity arithmetic
+        if (!isFinite(start) && !isFinite(end)) {
+          // Both bounds infinite - use first bound for all values except final
+          rates.push(progress === 1 ? end : start);
+        } else if (!isFinite(start)) {
+          // Start infinite, end finite - use start except at final position
+          rates.push(progress === 1 ? end : start);
+        } else if (!isFinite(end)) {
+          // End infinite, start finite - use start except at final position
+          rates.push(progress === 1 ? end : start);
+        } else {
+          // Both finite - normal linear interpolation
+          const interpolatedValue = start + (end - start) * progress;
+          rates.push(interpolatedValue);
+        }
       }
       return rates;
     },
@@ -35,19 +54,22 @@ export const useRateCalculationEngine = () => {
    */
   const generateFromScenario = useCallback(
     (scenarioData: number[], horizon: number): number[] => {
+      // Protect against negative and non-integer horizons
+      const safeHorizon = Math.max(0, Math.floor(horizon));
+
       if (!scenarioData || scenarioData.length === 0) {
-        return Array(horizon + 1).fill(0);
+        return Array(safeHorizon + 1).fill(0);
       }
 
       // If scenario has enough data, use it directly (padded to horizon + 1)
-      if (scenarioData.length >= horizon + 1) {
-        return scenarioData.slice(0, horizon + 1);
+      if (scenarioData.length >= safeHorizon + 1) {
+        return scenarioData.slice(0, safeHorizon + 1);
       }
 
       // If scenario is shorter, pad with the last value
       const result = [...scenarioData];
       const lastValue = scenarioData[scenarioData.length - 1] || 0;
-      while (result.length < horizon + 1) {
+      while (result.length < safeHorizon + 1) {
         result.push(lastValue);
       }
       return result;
@@ -64,11 +86,21 @@ export const useRateCalculationEngine = () => {
       horizon: number,
       decayFactor: number = 0.85,
     ): number[] => {
+      // Protect against negative and non-integer horizons
+      const safeHorizon = Math.max(0, Math.floor(horizon));
+
+      // Protect against invalid decay factors
+      const safeDecayFactor =
+        isFinite(decayFactor) && decayFactor > 0 ? decayFactor : 0.85;
+
       const rates = [];
-      for (let i = 0; i <= horizon; i++) {
+      for (let i = 0; i <= safeHorizon; i++) {
         // Saylor model: high initial returns that decay over time
-        const decayedRate = initialRate * Math.pow(decayFactor, i / 4); // Decay every 4 years
-        rates.push(Math.max(decayedRate, 5)); // Minimum 5% rate
+        const decayedRate = initialRate * Math.pow(safeDecayFactor, i / 4); // Decay every 4 years
+
+        // Enforce minimum 5% rate and ensure finite result
+        const finalRate = Math.max(isFinite(decayedRate) ? decayedRate : 5, 5);
+        rates.push(finalRate);
       }
       return rates;
     },
@@ -80,16 +112,23 @@ export const useRateCalculationEngine = () => {
    */
   const normalizeRatesArray = useCallback(
     (rates: number[], targetLength: number): number[] => {
-      if (rates.length === targetLength) return [...rates]; // Return a copy
+      // Protect against negative target lengths
+      const safeTargetLength = Math.max(0, Math.floor(targetLength));
 
-      if (rates.length > targetLength) {
-        return rates.slice(0, targetLength);
+      if (!rates || rates.length === 0) {
+        return Array(safeTargetLength).fill(0);
+      }
+
+      if (rates.length === safeTargetLength) return [...rates]; // Return a copy
+
+      if (rates.length > safeTargetLength) {
+        return rates.slice(0, safeTargetLength);
       }
 
       // Pad with last value if array is too short
       const result = [...rates];
       const lastValue = rates[rates.length - 1] || 0;
-      while (result.length < targetLength) {
+      while (result.length < safeTargetLength) {
         result.push(lastValue);
       }
       return result;
