@@ -97,7 +97,8 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       const speculation =
         btcAmount * (speculationPct / 100) * (1 + speculationYield);
 
-      return savings + investments + speculation;
+      // Prevent negative BTC amounts
+      return Math.max(0, savings + investments + speculation);
     };
 
     // Calculate BTC stack at a specific year
@@ -135,8 +136,11 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       const btcSavingsAtActivation = btcStackAtActivation * (savingsPct / 100);
       const collateralBtc = btcSavingsAtActivation * (collateralPct / 100);
       const btcPriceAtActivation = getBtcPriceAtYear(activationYear);
-      const loanPrincipal =
-        collateralBtc * (formData.ltvRatio / 100) * btcPriceAtActivation;
+      
+      // Prevent negative loan principals from invalid exchange rates or negative BTC prices
+      const loanPrincipal = Math.max(0,
+        collateralBtc * (formData.ltvRatio / 100) * Math.max(0, btcPriceAtActivation)
+      );
 
       const debtService = interestOnly
         ? loanPrincipal * (loanRate / 100)
@@ -246,11 +250,11 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       }
     }
 
-    // Apply price crash
-    const crashMultiplier = 1 - priceCrash / 100;
+    // Apply price crash (prevent negative values)
+    const crashMultiplier = Math.max(0, 1 - priceCrash / 100);
     results.forEach((r) => {
-      r.btcWithIncome *= crashMultiplier;
-      r.btcWithoutIncome *= crashMultiplier;
+      r.btcWithIncome = Math.max(0, r.btcWithIncome * crashMultiplier);
+      r.btcWithoutIncome = Math.max(0, r.btcWithoutIncome * crashMultiplier);
     });
 
     // Calculate income potential for each possible activation year
@@ -306,8 +310,9 @@ export const useCalculations = (formData: FormData): CalculationResults => {
     // Calculate loan details for display (using year 0 values for simplicity)
     const displayCollateralValue =
       btcStack * (savingsPct / 100) * (collateralPct / 100);
-    const displayLoanPrincipal =
-      displayCollateralValue * (formData.ltvRatio / 100) * exchangeRate;
+    const displayLoanPrincipal = Math.max(0,
+      displayCollateralValue * (formData.ltvRatio / 100) * Math.max(0, exchangeRate)
+    );
     const displayLoanInterest = displayLoanPrincipal * (loanRate / 100);
 
     return {

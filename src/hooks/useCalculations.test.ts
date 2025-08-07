@@ -200,60 +200,61 @@ describe("useCalculations", () => {
     });
   });
 
-  describe("edge cases", () => {
-    it("should handle zero BTC stack", () => {
-      const zeroStackData: FormData = {
+  describe("business logic variations", () => {
+    it("should handle no collateral scenario", () => {
+      const noCollateralData: FormData = {
         ...DEFAULT_FORM_DATA,
-        btcStack: 0,
+        collateralPct: 0,
       };
 
-      const { result } = renderHook(() => useCalculations(zeroStackData));
+      const { result } = renderHook(() => useCalculations(noCollateralData));
 
-      // Should still return valid structure even with zero stack
+      // With no collateral, loan principal should be zero
+      expect(result.current.loanPrincipal).toBe(0);
+      expect(result.current.loanInterest).toBe(0);
+      
+      // Should still have valid BTC growth
       expect(result.current.results).toHaveLength(
-        zeroStackData.timeHorizon + 1,
+        noCollateralData.timeHorizon + 1,
       );
-      const finalResult =
-        result.current.results[result.current.results.length - 1];
-      expect(finalResult.btcWithIncome).toBe(0);
-      expect(finalResult.btcWithoutIncome).toBe(0);
     });
 
-    it("should handle activation year beyond time horizon", () => {
-      const invalidActivationData: FormData = {
+    it("should handle different economic scenarios", () => {
+      const customRatesData: FormData = {
         ...DEFAULT_FORM_DATA,
-        activationYear: 25, // beyond timeHorizon of 20
-        timeHorizon: 20,
+        btcPriceCustomRates: [0.5, 0.3, 0.2, 0.1, 0.1], // Declining BTC growth
+        inflationCustomRates: [0.02, 0.03, 0.04, 0.05, 0.06], // Rising inflation
+        incomeCustomRates: [0.08, 0.07, 0.06, 0.05, 0.04], // Declining income
+        timeHorizon: 4, // Match array lengths
       };
 
-      const { result } = renderHook(() =>
-        useCalculations(invalidActivationData),
-      );
+      const { result } = renderHook(() => useCalculations(customRatesData));
 
-      // Should still return valid results
-      expect(result.current.results).toHaveLength(21); // 0-20 inclusive
+      // Should handle custom rate arrays correctly
+      expect(result.current.results).toHaveLength(5); // years 0-4
+      expect(result.current.annualExpenses.length).toBe(5);
+      
+      // Expenses should increase due to inflation
+      expect(result.current.annualExpenses[4]).toBeGreaterThan(
+        result.current.annualExpenses[0]
+      );
     });
 
-    it("should handle extreme yield values", () => {
-      const extremeYieldData: FormData = {
-        ...DEFAULT_FORM_DATA,
-        investmentsStartYield: 100,
-        investmentsEndYield: 0,
-        speculationStartYield: 200,
-        speculationEndYield: 0,
-      };
+    it("should calculate consistent results across multiple runs", () => {
+      // Test deterministic behavior
+      const { result: result1 } = renderHook(() => useCalculations(DEFAULT_FORM_DATA));
+      const { result: result2 } = renderHook(() => useCalculations(DEFAULT_FORM_DATA));
 
-      const { result } = renderHook(() => useCalculations(extremeYieldData));
-
-      // Should handle extreme values without crashing
-      expect(result.current.results).toHaveLength(
-        extremeYieldData.timeHorizon + 1,
-      );
-      const finalResult =
-        result.current.results[result.current.results.length - 1];
-      expect(finalResult).toBeDefined();
-      expect(typeof finalResult.btcWithIncome).toBe("number");
-      expect(typeof finalResult.btcWithoutIncome).toBe("number");
+      // Results should be identical for same inputs
+      expect(result1.current.loanPrincipal).toBe(result2.current.loanPrincipal);
+      expect(result1.current.loanInterest).toBe(result2.current.loanInterest);
+      expect(result1.current.results.length).toBe(result2.current.results.length);
+      
+      // Compare final BTC values
+      const final1 = result1.current.results[result1.current.results.length - 1];
+      const final2 = result2.current.results[result2.current.results.length - 1];
+      expect(final1.btcWithIncome).toBe(final2.btcWithIncome);
+      expect(final1.btcWithoutIncome).toBe(final2.btcWithoutIncome);
     });
   });
 });

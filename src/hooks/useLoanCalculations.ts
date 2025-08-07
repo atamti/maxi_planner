@@ -42,7 +42,7 @@ export const useLoanCalculations = (
         (formData.speculationPct / 100) *
         (1 + speculationYield / 100);
 
-      btcStackAtActivation = savings + investments + speculation;
+      btcStackAtActivation = Math.max(0, savings + investments + speculation);
     }
 
     return btcStackAtActivation;
@@ -62,9 +62,10 @@ export const useLoanCalculations = (
       btcSavingsAtActivation * (formData.collateralPct / 100);
     const btcPriceAtActivation = getBtcPriceAtYear(activationYear);
 
-    const loanPrincipal =
-      collateralBtc * (formData.ltvRatio / 100) * btcPriceAtActivation;
-    const liquidationPrice = btcPriceAtActivation * (formData.ltvRatio / 80);
+    const loanPrincipal = Math.max(0,
+      collateralBtc * (formData.ltvRatio / 100) * Math.max(0, btcPriceAtActivation)
+    );
+    const liquidationPrice = Math.max(0, btcPriceAtActivation * (formData.ltvRatio / 80));
 
     const annualPayments = formData.interestOnly
       ? loanPrincipal * (formData.loanRate / 100)
