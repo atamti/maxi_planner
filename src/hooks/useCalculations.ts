@@ -177,9 +177,9 @@ export const useCalculations = (formData: FormData): CalculationResults => {
         const currentBtcPrice = getBtcPriceAtYear(year);
         usdIncomePool = btcToRemove * currentBtcPrice;
 
-        // Initialize leveraged pool with original pool + loan proceeds
+        // Initialize leveraged pool with original pool + loan proceeds (only if income allocation > 0)
         leveragedUsdPool =
-          usdIncomePool + (collateralPct > 0 ? loanDetails.loanPrincipal : 0);
+          usdIncomePool + (collateralPct > 0 && incomeAllocationPct > 0 ? loanDetails.loanPrincipal : 0);
 
         // Scale down btcWithIncome by the allocation percentage
         btcWithIncome *= (100 - incomeAllocationPct) / 100;
@@ -213,7 +213,7 @@ export const useCalculations = (formData: FormData): CalculationResults => {
 
       // Calculate net leveraged income after debt service
       const netLeveragedIncome =
-        year >= activationYear && collateralPct > 0
+        year >= activationYear && collateralPct > 0 && incomeAllocationPct > 0
           ? leveragedIncomeValue - loanDetails.debtService
           : baseUsdIncomeValue;
 

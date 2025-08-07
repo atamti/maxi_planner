@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { useNumberFormatting } from "./useNumberFormatting";
 
 describe("useNumberFormatting", () => {
@@ -38,8 +38,12 @@ describe("useNumberFormatting", () => {
 
     it("should handle edge cases", () => {
       const { formatNumberForDisplay } = getHook();
-      expect(formatNumberForDisplay(Number.MAX_SAFE_INTEGER)).toBe("9,007,199,254,740,991");
-      expect(formatNumberForDisplay(Number.MIN_SAFE_INTEGER)).toBe("-9,007,199,254,740,991");
+      expect(formatNumberForDisplay(Number.MAX_SAFE_INTEGER)).toBe(
+        "9,007,199,254,740,991",
+      );
+      expect(formatNumberForDisplay(Number.MIN_SAFE_INTEGER)).toBe(
+        "-9,007,199,254,740,991",
+      );
     });
   });
 
@@ -267,14 +271,14 @@ describe("useNumberFormatting", () => {
       const originalNumber = 1234567.89;
       const formatted = formatNumberForDisplay(originalNumber);
       const parsed = parseFormattedNumber(formatted);
-      
+
       // Should be close due to rounding
       expect(parsed).toBe(1234568); // Rounded version
     });
 
     it("should handle the round-trip for currency formatting", () => {
       const { formatCurrency } = getHook();
-      // Currency format doesn't have a corresponding parse function, 
+      // Currency format doesn't have a corresponding parse function,
       // but let's test the formatting is consistent
       expect(formatCurrency(1234.56)).toBe("$1,235");
       expect(formatCurrency(1234.4)).toBe("$1,234");
