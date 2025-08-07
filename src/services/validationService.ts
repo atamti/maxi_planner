@@ -42,16 +42,18 @@ export const createValidationService = (): ValidationService => {
     if (totalAllocation !== 100) {
       errors.allocation = `Allocations must sum to 100% (current: ${totalAllocation}%)`;
     }
-    
+
     // Validate individual allocation bounds
     if (formData.savingsPct < 0 || formData.savingsPct > 100) {
       errors.savingsPct = "Savings percentage must be between 0% and 100%";
     }
     if (formData.investmentsPct < 0 || formData.investmentsPct > 100) {
-      errors.investmentsPct = "Investments percentage must be between 0% and 100%";
+      errors.investmentsPct =
+        "Investments percentage must be between 0% and 100%";
     }
     if (formData.speculationPct < 0 || formData.speculationPct > 100) {
-      errors.speculationPct = "Speculation percentage must be between 0% and 100%";
+      errors.speculationPct =
+        "Speculation percentage must be between 0% and 100%";
     }
 
     // Validate exchange rate
@@ -98,12 +100,17 @@ export const createValidationService = (): ValidationService => {
 
     // Validate collateral percentage
     if (formData.collateralPct < 0 || formData.collateralPct > 100) {
-      errors.collateralPct = "Collateral percentage must be between 0% and 100%";
+      errors.collateralPct =
+        "Collateral percentage must be between 0% and 100%";
     }
 
     // Validate income allocation percentage
-    if (formData.incomeAllocationPct < 0 || formData.incomeAllocationPct > 100) {
-      errors.incomeAllocationPct = "Income allocation percentage must be between 0% and 100%";
+    if (
+      formData.incomeAllocationPct < 0 ||
+      formData.incomeAllocationPct > 100
+    ) {
+      errors.incomeAllocationPct =
+        "Income allocation percentage must be between 0% and 100%";
     }
 
     // Validate activation year

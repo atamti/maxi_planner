@@ -38,11 +38,12 @@ describe("ValidationService Deep Edge Case Tests", () => {
       formData.savingsPct = 33.33;
       formData.investmentsPct = 33.33;
       formData.speculationPct = 33.34; // Should sum to 100
-      
+
       const result = validationService.validateFormData(formData);
       // Without array validation, this now passes
       expect(result.isValid).toBe(true);
-    });    it("should reject negative allocation percentages", () => {
+    });
+    it("should reject negative allocation percentages", () => {
       const formData = createValidFormData();
       formData.savingsPct = -10;
       formData.investmentsPct = 60;
@@ -90,7 +91,7 @@ describe("ValidationService Deep Edge Case Tests", () => {
     it("should validate negative exchange rate", () => {
       const formData = createValidFormData();
       formData.exchangeRate = -50000; // Negative exchange rate
-      
+
       const result = validationService.validateFormData(formData);
       // Changed to warning for compatibility, still valid
       expect(result.isValid).toBe(true);
@@ -130,12 +131,13 @@ describe("ValidationService Deep Edge Case Tests", () => {
     it("should validate LTV ratio bounds", () => {
       const formData = createValidFormData();
       formData.ltvRatio = 150; // 150% LTV (now using percentage values)
-      
+
       const result = validationService.validateFormData(formData);
       // Now properly validates LTV ratio bounds
       expect(result.isValid).toBe(false);
       expect(result.errors.ltvRatio).toBeDefined();
-    });    it("should validate negative LTV ratio", () => {
+    });
+    it("should validate negative LTV ratio", () => {
       const formData = createValidFormData();
       formData.ltvRatio = -0.5; // Negative LTV
 
@@ -222,11 +224,11 @@ describe("ValidationService Deep Edge Case Tests", () => {
   describe("Array Validation Gaps (Future Enhancement)", () => {
     // NOTE: Array validation temporarily disabled for compatibility
     // These tests show gaps that should be addressed after understanding data formats
-    
+
     it("should validate btcPriceCustomRates bounds (disabled for compatibility)", () => {
       const formData = createValidFormData();
       formData.btcPriceCustomRates = [5, -0.5, 2, 1, 0.5]; // Negative growth rate
-      
+
       const result = validationService.validateFormData(formData);
       // Currently passes due to disabled validation
       expect(result.isValid).toBe(true);
@@ -235,7 +237,7 @@ describe("ValidationService Deep Edge Case Tests", () => {
     it("should validate inflationCustomRates bounds (disabled for compatibility)", () => {
       const formData = createValidFormData();
       formData.inflationCustomRates = [0.03, 10, 0.03, 0.03, 0.03]; // 1000% inflation
-      
+
       const result = validationService.validateFormData(formData);
       // Currently passes due to disabled validation
       expect(result.isValid).toBe(true);
@@ -244,7 +246,7 @@ describe("ValidationService Deep Edge Case Tests", () => {
     it("should validate incomeCustomRates bounds (disabled for compatibility)", () => {
       const formData = createValidFormData();
       formData.incomeCustomRates = [-0.5, 0.05, 0.05, 0.05, 0.05]; // Negative income growth
-      
+
       const result = validationService.validateFormData(formData);
       // Currently passes due to disabled validation
       expect(result.isValid).toBe(true);
@@ -253,12 +255,13 @@ describe("ValidationService Deep Edge Case Tests", () => {
     it("should validate array lengths (disabled for compatibility)", () => {
       const formData = createValidFormData();
       formData.btcPriceCustomRates = [0.2, 0.2]; // Wrong length for timeHorizon=10
-      
+
       const result = validationService.validateFormData(formData);
       // Currently passes due to disabled validation
       expect(result.isValid).toBe(true);
     });
-  });  describe("Activation Year Logic Gaps", () => {
+  });
+  describe("Activation Year Logic Gaps", () => {
     it("should validate activation year bounds", () => {
       const formData = createValidFormData();
       formData.activationYear = -5; // Negative activation year
