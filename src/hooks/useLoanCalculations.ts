@@ -49,7 +49,8 @@ export const useLoanCalculations = (
   };
 
   const calculateLoanDetails = (activationYear: number): LoanDetails | null => {
-    if (formData.collateralPct === 0) return null;
+    // No loan if no collateral or no LTV ratio
+    if (formData.collateralPct === 0 || formData.ltvRatio === 0) return null;
 
     const btcStackAtActivation = calculateBtcStackAtActivation(
       activationYear,
