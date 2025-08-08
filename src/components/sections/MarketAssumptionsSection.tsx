@@ -1,15 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import economicScenarios from "../../config/economicScenarios";
 import { usePortfolioCompat } from "../../store";
 import { useGeneralRateSystem } from "../../utils/shared/useGeneralRateSystem";
 import { YieldChart } from "../charts/YieldChart";
 import { CollapsibleSection } from "../common/CollapsibleSection";
+import { ScenarioRestoreMessage } from "../common/ScenarioRestoreMessage";
 import { BtcPriceSection } from "./BtcPriceSection";
 import { InflationSection } from "./InflationSection";
 
 export const MarketAssumptionsSection: React.FC = () => {
   const { formData, updateFormData } = usePortfolioCompat();
   const { generateRates, applyRatesToArray } = useGeneralRateSystem();
+  const [showRestoreMessage, setShowRestoreMessage] = useState(false);
 
   // Initialize rates on component mount to ensure headers show correct averages
   useEffect(() => {
@@ -200,9 +202,63 @@ export const MarketAssumptionsSection: React.FC = () => {
     return `3. 📊 Market Assumptions: ${avgInflation}% avg inflation, ${avgBtcGrowth}% avg BTC growth, ${formData.investmentsStartYield}-${formData.investmentsEndYield}% investment yields`;
   };
 
+  // Check if we should show the scenario restore message
+  const sectionsInManualMode = [];
+  if (formData.economicScenario !== "custom") {
+    if (!formData.followEconomicScenarioInflation) {
+      sectionsInManualMode.push("USD Inflation");
+    }
+    if (!formData.followEconomicScenarioBtc) {
+      sectionsInManualMode.push("BTC Price Appreciation");
+    }
+  }
+
+  const shouldShowRestoreMessage =
+    sectionsInManualMode.length > 0 && showRestoreMessage;
+
+  // Show restore message when scenario changes from custom to non-custom
+  useEffect(() => {
+    if (
+      formData.economicScenario !== "custom" &&
+      sectionsInManualMode.length > 0
+    ) {
+      setShowRestoreMessage(true);
+    } else {
+      setShowRestoreMessage(false);
+    }
+  }, [
+    formData.economicScenario,
+    formData.followEconomicScenarioInflation,
+    formData.followEconomicScenarioBtc,
+  ]);
+
+  // Handler to restore all sections to follow scenario
+  const handleRestoreAllToScenario = () => {
+    updateFormData({
+      followEconomicScenarioInflation: true,
+      followEconomicScenarioBtc: true,
+      inflationPreset: formData.economicScenario,
+      btcPricePreset: formData.economicScenario,
+    });
+    setShowRestoreMessage(false);
+  };
+
+  // Handler to dismiss the restore message
+  const handleDismissRestoreMessage = () => {
+    setShowRestoreMessage(false);
+  };
+
   return (
     <CollapsibleSection title={getSectionTitle()} noGrid={true}>
       <div className="space-y-4">
+        {/* Scenario Restore Message */}
+        <ScenarioRestoreMessage
+          show={shouldShowRestoreMessage}
+          onRestoreAll={handleRestoreAllToScenario}
+          onDismiss={handleDismissRestoreMessage}
+          sectionCount={sectionsInManualMode.length}
+        />
+
         {/* Subsection 3a: USD Inflation */}
         <CollapsibleSection
           title={`3a. 💵 USD Inflation: ${avgInflation}% average (${getInflationDescription()})`}

@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import economicScenarios, { ScenarioKey } from "../../config/economicScenarios";
 import { usePortfolioCompat } from "../../store";
 import { useGeneralRateSystem } from "../../utils/shared/useGeneralRateSystem";
 import { CollapsibleSection } from "../common/CollapsibleSection";
+import { ScenarioRestoreMessage } from "../common/ScenarioRestoreMessage";
 
 export const EconomicScenariosSection: React.FC = () => {
   const { formData, updateFormData } = usePortfolioCompat();
   const { generateRates, calculateAverageRate } = useGeneralRateSystem();
+  const [showRestoreMessage, setShowRestoreMessage] = useState(false);
 
   // Calculate actual average rates for a scenario
   const calculateScenarioAverages = (scenarioKey: ScenarioKey) => {
@@ -125,6 +127,55 @@ export const EconomicScenariosSection: React.FC = () => {
     }
   };
 
+  // Check which sections are in manual mode for restoration message
+  const getSectionsInManualMode = () => {
+    const sections = [];
+    if (!formData.followEconomicScenarioInflation) {
+      sections.push("USD Inflation");
+    }
+    if (!formData.followEconomicScenarioBtc) {
+      sections.push("BTC Price Appreciation");
+    }
+    if (!formData.followEconomicScenarioIncome) {
+      sections.push("Income Yield Assumptions");
+    }
+    return sections;
+  };
+
+  // Show restore message when switching from custom to non-custom scenario with manual sections
+  useEffect(() => {
+    const sectionsInManualMode = getSectionsInManualMode();
+
+    if (
+      formData.economicScenario !== "custom" &&
+      sectionsInManualMode.length > 0
+    ) {
+      setShowRestoreMessage(true);
+    } else {
+      setShowRestoreMessage(false);
+    }
+  }, [
+    formData.economicScenario,
+    formData.followEconomicScenarioInflation,
+    formData.followEconomicScenarioBtc,
+    formData.followEconomicScenarioIncome,
+  ]);
+
+  // Handler to restore all sections to follow scenario
+  const handleRestoreAllToScenario = () => {
+    updateFormData({
+      followEconomicScenarioInflation: true,
+      followEconomicScenarioBtc: true,
+      followEconomicScenarioIncome: true,
+    });
+    setShowRestoreMessage(false);
+  };
+
+  // Handler to dismiss the restore message
+  const handleDismissRestoreMessage = () => {
+    setShowRestoreMessage(false);
+  };
+
   const handleScenarioChange = (scenario: ScenarioKey) => {
     updateFormData({ economicScenario: scenario });
 
@@ -135,6 +186,7 @@ export const EconomicScenariosSection: React.FC = () => {
       // Generate current scenario rates to copy to custom arrays
       let inflationCustomRates = formData.inflationCustomRates;
       let btcPriceCustomRates = formData.btcPriceCustomRates;
+      let incomeCustomRates = formData.incomeCustomRates; // Fix 2: Include income rates
 
       if (
         currentScenario !== "custom" &&
@@ -175,6 +227,24 @@ export const EconomicScenariosSection: React.FC = () => {
         });
 
         btcPriceCustomRates = btcRates.slice(0, formData.timeHorizon);
+
+        // Fix 2: Generate income rates from current scenario
+        const incomePresetScenarios: Record<string, any> = {};
+        Object.entries(economicScenarios).forEach(([key, scen]) => {
+          incomePresetScenarios[key] = scen.incomeYield;
+        });
+
+        const incomeRates = generateRates({
+          type: "preset",
+          flatRate: formData.incomeFlat,
+          startRate: formData.incomeStart,
+          endRate: formData.incomeEnd,
+          preset: currentScenario,
+          timeHorizon: formData.timeHorizon,
+          presetScenarios: incomePresetScenarios,
+        });
+
+        incomeCustomRates = incomeRates.slice(0, formData.timeHorizon);
       }
 
       // Set everything to custom mode and disable follow toggles
@@ -182,6 +252,7 @@ export const EconomicScenariosSection: React.FC = () => {
         economicScenario: scenario,
         followEconomicScenarioBtc: false,
         followEconomicScenarioInflation: false,
+        followEconomicScenarioIncome: false, // Fix 2: Also disable income follow
         // Update preset keys to custom so sections know to use custom mode
         inflationPreset: "custom",
         btcPricePreset: "custom",
@@ -193,9 +264,19 @@ export const EconomicScenariosSection: React.FC = () => {
         // Copy the current scenario rates to custom arrays
         inflationCustomRates,
         btcPriceCustomRates,
+        incomeCustomRates, // Fix 2: Include income rates
       });
       return;
     }
+
+    // For non-custom scenarios, just update the presets but don't force follow toggles
+    // This preserves user's manual configurations while updating the preset references
+    updateFormData({
+      // Update preset keys to match the new scenario, but don't force follow toggles
+      inflationPreset: scenario,
+      btcPricePreset: scenario,
+      incomePreset: scenario,
+    });
 
     // If following scenarios, update the respective sections
     if (
@@ -304,6 +385,17 @@ export const EconomicScenariosSection: React.FC = () => {
     return "2. 🌍 Economic Scenario: None";
   };
 
+  const handleRestoreAll = () => {
+    updateFormData({
+      followEconomicScenarioBtc: true,
+      followEconomicScenarioInflation: true,
+      followEconomicScenarioIncome: true,
+    });
+    setShowRestoreMessage(false);
+  };
+
+  const sectionsInManualMode = getSectionsInManualMode().length;
+
   return (
     <CollapsibleSection title={getSectionTitle()} noGrid={true}>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
@@ -378,6 +470,18 @@ export const EconomicScenariosSection: React.FC = () => {
             </div>
           );
         })()}
+
+      {/* Scenario restoration message */}
+      {showRestoreMessage && (
+        <div className="mt-4">
+          <ScenarioRestoreMessage
+            show={showRestoreMessage}
+            onRestoreAll={handleRestoreAll}
+            onDismiss={() => setShowRestoreMessage(false)}
+            sectionCount={sectionsInManualMode}
+          />
+        </div>
+      )}
     </CollapsibleSection>
   );
 };

@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import economicScenarios, { ScenarioKey } from "../../config/economicScenarios";
 import { FormData } from "../../types";
 import { ExpensesInflationChart } from "../charts/ExpensesInflationChart";
 import { RateAssumptionsSection } from "../common/RateAssumptionsSection";
+import { ScenarioRestoreMessage } from "../common/ScenarioRestoreMessage";
 
 interface Props {
   formData: FormData;
@@ -13,6 +14,7 @@ export const IncomeExpensesSection: React.FC<Props> = ({
   formData,
   updateFormData,
 }) => {
+  const [showRestoreMessage, setShowRestoreMessage] = useState(false);
   const getIncomeScenarioPresets = () => {
     const presets: Record<string, any> = {};
     Object.entries(economicScenarios).forEach(([key, scenario]) => {
@@ -79,8 +81,53 @@ export const IncomeExpensesSection: React.FC<Props> = ({
     return 100; // Default
   };
 
+  // Check if we should show the scenario restore message
+  const sectionsInManualMode = [];
+  if (formData.economicScenario !== "custom") {
+    if (!formData.followEconomicScenarioIncome) {
+      sectionsInManualMode.push("Income Yield Assumptions");
+    }
+  }
+
+  const shouldShowRestoreMessage =
+    sectionsInManualMode.length > 0 && showRestoreMessage;
+
+  // Show restore message when scenario changes from custom to non-custom
+  useEffect(() => {
+    if (
+      formData.economicScenario !== "custom" &&
+      sectionsInManualMode.length > 0
+    ) {
+      setShowRestoreMessage(true);
+    } else {
+      setShowRestoreMessage(false);
+    }
+  }, [formData.economicScenario, formData.followEconomicScenarioIncome]);
+
+  // Handler to restore all sections to follow scenario
+  const handleRestoreAllToScenario = () => {
+    updateFormData({
+      followEconomicScenarioIncome: true,
+      incomePreset: formData.economicScenario,
+    });
+    setShowRestoreMessage(false);
+  };
+
+  // Handler to dismiss the restore message
+  const handleDismissRestoreMessage = () => {
+    setShowRestoreMessage(false);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Scenario Restore Message */}
+      <ScenarioRestoreMessage
+        show={shouldShowRestoreMessage}
+        onRestoreAll={handleRestoreAllToScenario}
+        onDismiss={handleDismissRestoreMessage}
+        sectionCount={sectionsInManualMode.length}
+      />
+
       {/* Section 1: Income Configuration */}
       <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-400">
         <h4 className="font-semibold text-purple-800 mb-3">

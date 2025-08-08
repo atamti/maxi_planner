@@ -234,7 +234,7 @@ export const RateAssumptionsSection: React.FC<Props> = ({
         )}
 
         {/* Unified Scenario Selection */}
-        {!followScenario && (
+        {(!followScenario || formData.economicScenario === "custom") && (
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Rate Configuration
@@ -290,7 +290,7 @@ export const RateAssumptionsSection: React.FC<Props> = ({
         )}
 
         {/* Rate Inputs */}
-        {!followScenario && (
+        {(!followScenario || formData.economicScenario === "custom") && (
           <RateInputs
             rateType={title}
             inputType={inputType as any}
@@ -324,20 +324,22 @@ export const RateAssumptionsSection: React.FC<Props> = ({
         )}
 
         {/* Saylor explanation */}
-        {!followScenario && inputType === "saylor" && (
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-            <h4 className="text-sm font-semibold text-blue-800 mb-2">
-              Michael Saylor's BTC Forecast
-            </h4>
-            <p className="text-xs text-blue-700">
-              Based on Saylor's public statements about Bitcoin's long-term
-              price trajectory:
-              <br />• Starts at 37% annual appreciation in year 0
-              <br />• Declines linearly to 21% by the final year
-              <br />• Curve adjusts automatically for your selected time horizon
-            </p>
-          </div>
-        )}
+        {(!followScenario || formData.economicScenario === "custom") &&
+          inputType === "saylor" && (
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+              <h4 className="text-sm font-semibold text-blue-800 mb-2">
+                Michael Saylor's BTC Forecast
+              </h4>
+              <p className="text-xs text-blue-700">
+                Based on Saylor's public statements about Bitcoin's long-term
+                price trajectory:
+                <br />• Starts at 37% annual appreciation in year 0
+                <br />• Declines linearly to 21% by the final year
+                <br />• Curve adjusts automatically for your selected time
+                horizon
+              </p>
+            </div>
+          )}
       </div>
 
       {/* Interactive Chart Editor */}
@@ -373,24 +375,27 @@ export const RateAssumptionsSection: React.FC<Props> = ({
       </div>
 
       {/* Direct Edit Toggle */}
-      {!followScenario && manualModeKey && (
-        <ToggleSwitch
-          checked={manualMode}
-          onChange={(checked) =>
-            updateFormData({
-              [manualModeKey]: checked,
-              ...(checked && inputTypeKey ? { [inputTypeKey]: "manual" } : {}),
-            })
-          }
-          id={`${dataKey}-manual-mode-toggle`}
-          label="Direct edit chart"
-          colorClass={{ on: "bg-yellow-400", off: "bg-gray-300" }}
-          description={{
-            on: "🔓 Chart unlocked. Click and drag points to customize your forecast.",
-            off: "🔒 Chart locked. Enable to directly edit by dragging points on the chart.",
-          }}
-        />
-      )}
+      {(!followScenario || formData.economicScenario === "custom") &&
+        manualModeKey && (
+          <ToggleSwitch
+            checked={manualMode}
+            onChange={(checked) =>
+              updateFormData({
+                [manualModeKey]: checked,
+                ...(checked && inputTypeKey
+                  ? { [inputTypeKey]: "manual" }
+                  : {}),
+              })
+            }
+            id={`${dataKey}-manual-mode-toggle`}
+            label="Direct edit chart"
+            colorClass={{ on: "bg-yellow-400", off: "bg-gray-300" }}
+            description={{
+              on: "🔓 Chart unlocked. Click and drag points to customize your forecast.",
+              off: "🔒 Chart locked. Enable to directly edit by dragging points on the chart.",
+            }}
+          />
+        )}
     </div>
   );
 };
