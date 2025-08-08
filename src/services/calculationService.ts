@@ -14,11 +14,35 @@ export const createCalculationService = (): CalculationService => {
     const finalBtcWithoutIncome =
       calculationResults[calculationResults.length - 1]?.btcWithoutIncome || 0;
 
-    const btcGrowthWithIncome =
+    // Enhanced mathematical robustness: Check for division by zero and handle edge cases
+    if (formData.btcStack === 0) {
+      return {
+        btcGrowthWithIncome: finalBtcWithIncome === 0 ? 0 : Infinity,
+        btcGrowthWithoutIncome: finalBtcWithoutIncome === 0 ? 0 : Infinity,
+        btcGrowthDifference: NaN, // Infinity - Infinity = NaN
+        finalBtcWithIncome,
+        finalBtcWithoutIncome,
+      };
+    }
+
+    // Enhanced mathematical robustness: Apply proper rounding to prevent floating point precision errors
+    let btcGrowthWithIncome =
       ((finalBtcWithIncome - formData.btcStack) / formData.btcStack) * 100;
-    const btcGrowthWithoutIncome =
+    let btcGrowthWithoutIncome =
       ((finalBtcWithoutIncome - formData.btcStack) / formData.btcStack) * 100;
-    const btcGrowthDifference = btcGrowthWithoutIncome - btcGrowthWithIncome;
+
+    // Handle special cases before rounding
+    if (isFinite(btcGrowthWithIncome)) {
+      btcGrowthWithIncome = Math.round(btcGrowthWithIncome * 100) / 100;
+    }
+    if (isFinite(btcGrowthWithoutIncome)) {
+      btcGrowthWithoutIncome = Math.round(btcGrowthWithoutIncome * 100) / 100;
+    }
+
+    let btcGrowthDifference = btcGrowthWithoutIncome - btcGrowthWithIncome;
+    if (isFinite(btcGrowthDifference)) {
+      btcGrowthDifference = Math.round(btcGrowthDifference * 100) / 100;
+    }
 
     return {
       btcGrowthWithIncome,
@@ -65,6 +89,16 @@ export const createCalculationService = (): CalculationService => {
     results: CalculationResults,
     formData: FormDataSubset,
   ) => {
+    // Enhanced mathematical robustness: Guard against zero time horizon
+    if (formData.timeHorizon <= 0) {
+      return {
+        finalSavingsPct: formData.savingsPct,
+        finalInvestmentsPct: formData.investmentsPct,
+        finalSpeculationPct: formData.speculationPct,
+        mixChange: 0,
+      };
+    }
+
     // Calculate what investments and speculation would be at final year
     let investmentGrowth = 1;
     let speculationGrowth = 1;
@@ -83,18 +117,25 @@ export const createCalculationService = (): CalculationService => {
       speculationGrowth *= 1 + speculationYield / 100;
     }
 
+    // Enhanced mathematical robustness: Guard against division by zero in total allocation
+    const totalAllocation =
+      formData.savingsPct +
+      formData.investmentsPct * investmentGrowth +
+      formData.speculationPct * speculationGrowth;
+
+    if (totalAllocation === 0) {
+      return {
+        finalSavingsPct: 0,
+        finalInvestmentsPct: 0,
+        finalSpeculationPct: 0,
+        mixChange: 0,
+      };
+    }
+
     const finalInvestmentsPct =
-      ((formData.investmentsPct * investmentGrowth) /
-        (formData.savingsPct +
-          formData.investmentsPct * investmentGrowth +
-          formData.speculationPct * speculationGrowth)) *
-      100;
+      ((formData.investmentsPct * investmentGrowth) / totalAllocation) * 100;
     const finalSpeculationPct =
-      ((formData.speculationPct * speculationGrowth) /
-        (formData.savingsPct +
-          formData.investmentsPct * investmentGrowth +
-          formData.speculationPct * speculationGrowth)) *
-      100;
+      ((formData.speculationPct * speculationGrowth) / totalAllocation) * 100;
     const finalSavingsPct = 100 - finalInvestmentsPct - finalSpeculationPct;
 
     const mixChange = Math.abs(finalSavingsPct - formData.savingsPct);
@@ -110,17 +151,34 @@ export const createCalculationService = (): CalculationService => {
   const formatCurrency = (
     value: number,
   ): { formatted: string; isPositive: boolean } => {
+    // Enhanced mathematical robustness: Handle special numeric values
+    if (!isFinite(value)) {
+      if (value === Infinity) {
+        return { formatted: "$∞", isPositive: true };
+      }
+      if (value === -Infinity) {
+        return { formatted: "($∞)", isPositive: false };
+      }
+      if (isNaN(value)) {
+        return { formatted: "$--", isPositive: true };
+      }
+    }
+
     const isPositive = value >= 0;
+    const roundedValue = Math.round(value);
+
     const formatted = isPositive
-      ? value.toLocaleString("en-US", {
+      ? roundedValue.toLocaleString("en-US", {
           style: "currency",
           currency: "USD",
           minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
         })
-      : `(${Math.abs(value).toLocaleString("en-US", {
+      : `(${Math.abs(roundedValue).toLocaleString("en-US", {
           style: "currency",
           currency: "USD",
           minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
         })})`;
 
     return { formatted, isPositive };
