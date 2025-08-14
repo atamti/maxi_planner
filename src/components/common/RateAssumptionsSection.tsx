@@ -191,6 +191,33 @@ export const RateAssumptionsSection: React.FC<Props> = ({
     }
   }, [preset]); // Watch for preset changes
 
+  // Watch for rate input changes and automatically update the chart
+  useEffect(() => {
+    if (
+      !manualMode &&
+      (!followScenario || formData.economicScenario === "custom")
+    ) {
+      // Only auto-apply when not in manual mode and not following a scenario
+      if (
+        inputType === "flat" &&
+        typeof flatRate === "number" &&
+        !isNaN(flatRate)
+      ) {
+        setTimeout(() => applyToChart("flat"), 0);
+      } else if (
+        inputType === "linear" &&
+        typeof startRate === "number" &&
+        typeof endRate === "number" &&
+        !isNaN(startRate) &&
+        !isNaN(endRate)
+      ) {
+        setTimeout(() => applyToChart("linear"), 0);
+      } else if (inputType === "saylor") {
+        setTimeout(() => applyToChart("saylor"), 0);
+      }
+    }
+  }, [flatRate, startRate, endRate, inputType, manualMode, followScenario]); // Watch for rate input changes
+
   return (
     <div className="w-full">
       <LockedStateMessage
