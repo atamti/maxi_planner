@@ -1,4 +1,3 @@
-// Extreme edge case tests - hunting for mathematical bugs and system robustness
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_FORM_DATA } from "../config/defaults";
@@ -6,14 +5,31 @@ import { FormData } from "../types";
 import { useCalculations } from "./useCalculations";
 import { useLoanCalculations } from "./useLoanCalculations";
 
-describe("Calculation Robustness & Edge Case Bug Hunt", () => {
+/**
+ * useCalculations Edge Case & Robustness Tests
+ * 
+ * This test suite validates the robustness of the useCalculations hook
+ * against extreme inputs, edge cases, and potential error conditions.
+ * These tests ensure the system behaves gracefully under stress and
+ * doesn't crash or produce invalid mathematical results.
+ * 
+ * Coverage areas:
+ * - Extreme input values
+ * - Boundary conditions
+ * - Invalid input handling
+ * - Mathematical edge cases
+ * - Array bounds protection
+ * - NaN/Infinity prevention
+ * - Negative value protection
+ */
+describe("useCalculations - Edge Cases & Robustness", () => {
   // Helper to create test form data
   const createTestFormData = (overrides: Partial<FormData> = {}): FormData => ({
     ...DEFAULT_FORM_DATA,
     ...overrides,
   });
 
-  describe("System Robustness - Should Not Crash", () => {
+  describe("System Robustness - Crash Prevention", () => {
     it("should handle zero time horizon without division by zero", () => {
       const formData = createTestFormData({
         timeHorizon: 0,
@@ -36,13 +52,10 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
       const formData = createTestFormData({ btcStack: 0 });
       const { result } = renderHook(() => useCalculations(formData));
 
-      expect(result.current.results.every((r) => r.btcWithIncome === 0)).toBe(
-        true,
-      );
-      expect(
-        result.current.results.every((r) => r.btcWithoutIncome === 0),
-      ).toBe(true);
+      expect(result.current.results.every((r) => r.btcWithIncome === 0)).toBe(true);
+      expect(result.current.results.every((r) => r.btcWithoutIncome === 0)).toBe(true);
       expect(result.current.loanPrincipal).toBe(0);
+      expect(result.current.loanInterest).toBe(0);
     });
 
     it("should handle activation year beyond time horizon", () => {
@@ -53,12 +66,8 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
 
       const { result } = renderHook(() => useCalculations(formData));
 
-      expect(result.current.usdIncome.every((income) => income === 0)).toBe(
-        true,
-      );
-      expect(
-        result.current.usdIncomeWithLeverage.every((income) => income === 0),
-      ).toBe(true);
+      expect(result.current.usdIncome.every((income) => income === 0)).toBe(true);
+      expect(result.current.usdIncomeWithLeverage.every((income) => income === 0)).toBe(true);
     });
 
     it("should handle extreme yield values without overflow", () => {
@@ -72,26 +81,38 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
       const { result } = renderHook(() => useCalculations(formData));
 
       expect(result.current.results).toHaveLength(formData.timeHorizon + 1);
-      const finalResult =
-        result.current.results[result.current.results.length - 1];
+      const finalResult = result.current.results[result.current.results.length - 1];
       expect(isFinite(finalResult.btcWithIncome)).toBe(true);
       expect(isFinite(finalResult.btcWithoutIncome)).toBe(true);
+    });
+
+    it("should handle very large time horizons without performance issues", () => {
+      const formData = createTestFormData({
+        timeHorizon: 100, // Very long time horizon
+      });
+
+      const startTime = Date.now();
+      const { result } = renderHook(() => useCalculations(formData));
+      const endTime = Date.now();
+
+      expect(result.current.results).toHaveLength(101); // 0-100 years
+      expect(endTime - startTime).toBeLessThan(5000); // Should complete in under 5 seconds
     });
   });
 
   describe("Mathematical Edge Cases", () => {
-    it("should fix negative exchange rate bug", () => {
+    it("should protect against negative exchange rate creating negative loan principals", () => {
       const formData = createTestFormData({
         exchangeRate: -50000, // Negative exchange rate
       });
 
       const { result } = renderHook(() => useCalculations(formData));
 
-      // Should now be protected from negative loan principals
+      // Should be protected from negative loan principals
       expect(result.current.loanPrincipal).toBeGreaterThanOrEqual(0);
     });
 
-    it("should handle extreme BTC appreciation rates", () => {
+    it("should handle extreme BTC appreciation rates without overflow", () => {
       const formData = createTestFormData({
         btcPriceCustomRates: [1000, 1000, 1000, 1000, 1000], // 100,000% annual growth
         timeHorizon: 5,
@@ -106,7 +127,7 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
       expect(hasInfiniteValues).toBe(false);
     });
 
-    it("should fix extreme negative yields causing negative BTC", () => {
+    it("should protect against extreme negative yields causing negative BTC", () => {
       const formData = createTestFormData({
         investmentsStartYield: -200, // -200% yield (more than 100% loss)
         investmentsEndYield: -200,
@@ -118,15 +139,11 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
       const { result } = renderHook(() => useCalculations(formData));
 
       // Should be protected from negative BTC amounts
-      expect(result.current.results.every((r) => r.btcWithIncome >= 0)).toBe(
-        true,
-      );
-      expect(result.current.results.every((r) => r.btcWithoutIncome >= 0)).toBe(
-        true,
-      );
+      expect(result.current.results.every((r) => r.btcWithIncome >= 0)).toBe(true);
+      expect(result.current.results.every((r) => r.btcWithoutIncome >= 0)).toBe(true);
     });
 
-    it("should fix extreme positive crash values creating negative BTC", () => {
+    it("should protect against extreme positive crash values creating negative BTC", () => {
       const formData = createTestFormData({
         priceCrash: 500, // 500% crash (mathematically impossible)
       });
@@ -134,12 +151,26 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
       const { result } = renderHook(() => useCalculations(formData));
 
       // Should be protected from negative BTC values
-      expect(result.current.results.every((r) => r.btcWithIncome >= 0)).toBe(
-        true,
-      );
-      expect(result.current.results.every((r) => r.btcWithoutIncome >= 0)).toBe(
-        true,
-      );
+      expect(result.current.results.every((r) => r.btcWithIncome >= 0)).toBe(true);
+      expect(result.current.results.every((r) => r.btcWithoutIncome >= 0)).toBe(true);
+    });
+
+    it("should handle 100% price crash correctly", () => {
+      const formData = createTestFormData({ priceCrash: 100 });
+      const { result } = renderHook(() => useCalculations(formData));
+
+      expect(result.current.results.every((r) => r.btcWithIncome === 0)).toBe(true);
+      expect(result.current.results.every((r) => r.btcWithoutIncome === 0)).toBe(true);
+    });
+
+    it("should handle negative price crash (price increase) correctly", () => {
+      const formData = createTestFormData({ priceCrash: -50 });
+      const { result } = renderHook(() => useCalculations(formData));
+
+      // Negative crash should increase BTC values (crashMultiplier = 1.5)
+      const originalBtc = DEFAULT_FORM_DATA.btcStack;
+      const finalBtc = result.current.results[result.current.results.length - 1];
+      expect(finalBtc.btcWithoutIncome).toBeGreaterThan(originalBtc);
     });
   });
 
@@ -153,6 +184,7 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
 
       const { result } = renderHook(() => useCalculations(formData));
       expect(result.current.loanInterest).toBe(0);
+      expect(result.current.loanPrincipal).toBeGreaterThan(0); // Should still have principal
     });
 
     it("should handle extreme loan rates without mathematical errors", () => {
@@ -166,29 +198,29 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
 
       const { result } = renderHook(() => useCalculations(formData));
       expect(isFinite(result.current.loanInterest)).toBe(true);
+      expect(isFinite(result.current.loanPrincipal)).toBe(true);
     });
 
-    it("should handle 100% price crash (BTC goes to zero)", () => {
-      const formData = createTestFormData({ priceCrash: 100 });
-      const { result } = renderHook(() => useCalculations(formData));
+    it("should handle zero LTV ratio", () => {
+      const formData = createTestFormData({
+        ltvRatio: 0,
+        collateralPct: 50,
+      });
 
-      expect(result.current.results.every((r) => r.btcWithIncome === 0)).toBe(
-        true,
-      );
-      expect(
-        result.current.results.every((r) => r.btcWithoutIncome === 0),
-      ).toBe(true);
+      const { result } = renderHook(() => useCalculations(formData));
+      expect(result.current.loanPrincipal).toBe(0);
+      expect(result.current.loanInterest).toBe(0);
     });
 
-    it("should handle negative price crash (price increase)", () => {
-      const formData = createTestFormData({ priceCrash: -50 });
-      const { result } = renderHook(() => useCalculations(formData));
+    it("should handle 100% LTV ratio without liquidation issues", () => {
+      const formData = createTestFormData({
+        ltvRatio: 100,
+        collateralPct: 50,
+      });
 
-      // Negative crash should increase BTC values (crashMultiplier = 1.5)
-      const originalBtc = DEFAULT_FORM_DATA.btcStack;
-      const finalBtc =
-        result.current.results[result.current.results.length - 1];
-      expect(finalBtc.btcWithoutIncome).toBeGreaterThan(originalBtc);
+      const { result } = renderHook(() => useCalculations(formData));
+      expect(isFinite(result.current.loanPrincipal)).toBe(true);
+      expect(isFinite(result.current.loanInterest)).toBe(true);
     });
   });
 
@@ -217,6 +249,7 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
 
       const { result } = renderHook(() => useCalculations(formData));
       expect(result.current.results).toBeDefined();
+      expect(result.current.results.length).toBe(6); // 0 through 5
     });
 
     it("should handle custom rate arrays with invalid values", () => {
@@ -244,6 +277,7 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
 
       // Should handle gracefully without breaking the calculation
       expect(result.current.results).toBeDefined();
+      expect(result.current.usdIncome.every((income) => income >= 0)).toBe(true);
     });
 
     it("should handle negative income reinvestment", () => {
@@ -255,6 +289,18 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
       const { result } = renderHook(() => useCalculations(formData));
       expect(result.current.results).toBeDefined();
     });
+
+    it("should handle allocation percentages over 100%", () => {
+      const formData = createTestFormData({
+        savingsPct: 150, // Over 100%
+        investmentsPct: 50,
+        speculationPct: 25,
+      });
+
+      const { result } = renderHook(() => useCalculations(formData));
+      expect(result.current.results).toBeDefined();
+      // Should not crash even with invalid allocation percentages
+    });
   });
 
   describe("Precision & Boundary Testing", () => {
@@ -264,12 +310,8 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
       });
 
       const { result } = renderHook(() => useCalculations(formData));
-      expect(
-        result.current.results.every((r) => isFinite(r.btcWithIncome)),
-      ).toBe(true);
-      expect(
-        result.current.results.every((r) => isFinite(r.btcWithoutIncome)),
-      ).toBe(true);
+      expect(result.current.results.every((r) => isFinite(r.btcWithIncome))).toBe(true);
+      expect(result.current.results.every((r) => isFinite(r.btcWithoutIncome))).toBe(true);
     });
 
     it("should handle very large BTC amounts", () => {
@@ -278,12 +320,8 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
       });
 
       const { result } = renderHook(() => useCalculations(formData));
-      expect(
-        result.current.results.every((r) => isFinite(r.btcWithIncome)),
-      ).toBe(true);
-      expect(
-        result.current.results.every((r) => isFinite(r.btcWithoutIncome)),
-      ).toBe(true);
+      expect(result.current.results.every((r) => isFinite(r.btcWithIncome))).toBe(true);
+      expect(result.current.results.every((r) => isFinite(r.btcWithoutIncome))).toBe(true);
     });
 
     it("should handle floating point precision in allocation calculations", () => {
@@ -301,6 +339,18 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
         expect(isFinite(year1Result.btcWithIncome)).toBe(true);
         expect(isFinite(year1Result.btcWithoutIncome)).toBe(true);
       }
+    });
+
+    it("should handle very small percentage values", () => {
+      const formData = createTestFormData({
+        incomeAllocationPct: 0.001, // 0.001%
+        collateralPct: 0.01, // 0.01%
+        ltvRatio: 0.1, // 0.1%
+      });
+
+      const { result } = renderHook(() => useCalculations(formData));
+      expect(result.current.results).toBeDefined();
+      expect(isFinite(result.current.loanPrincipal)).toBe(true);
     });
   });
 
@@ -361,15 +411,74 @@ describe("Calculation Robustness & Edge Case Bug Hunt", () => {
         useLoanCalculations(formData, decliningPriceFunction),
       );
 
-      const liquidationBuffer = result.current.calculateLiquidationBuffer(
-        2,
-        10,
-      );
+      const liquidationBuffer = result.current.calculateLiquidationBuffer(2, 10);
 
       if (liquidationBuffer !== null) {
         expect(typeof liquidationBuffer).toBe("number");
         expect(isFinite(liquidationBuffer)).toBe(true);
       }
+    });
+  });
+
+  describe("Stress Testing", () => {
+    it("should handle all extreme values simultaneously", () => {
+      const extremeFormData = createTestFormData({
+        btcStack: 0.00001,
+        exchangeRate: 1000000,
+        timeHorizon: 50,
+        activationYear: 45,
+        priceCrash: 99,
+        savingsPct: 0.1,
+        investmentsPct: 99.8,
+        speculationPct: 0.1,
+        collateralPct: 99.9,
+        loanRate: 999,
+        ltvRatio: 99.9,
+        incomeAllocationPct: 99.9,
+        incomeReinvestmentPct: 99.9,
+        investmentsStartYield: 10000,
+        investmentsEndYield: -1000,
+        speculationStartYield: 50000,
+        speculationEndYield: -5000,
+        startingExpenses: 1000000,
+        btcPriceCustomRates: [1000, -500, 2000, -1000],
+        inflationCustomRates: [100, -50, 200],
+        incomeCustomRates: [500, -200],
+      });
+
+      const { result } = renderHook(() => useCalculations(extremeFormData));
+
+      // Should not crash and should produce finite results
+      expect(result.current.results).toBeDefined();
+      expect(result.current.results.length).toBe(51); // 0-50 years
+
+      // All values should be finite
+      expect(isFinite(result.current.loanPrincipal)).toBe(true);
+      expect(isFinite(result.current.loanInterest)).toBe(true);
+
+      result.current.results.forEach((yearResult) => {
+        expect(isFinite(yearResult.btcWithIncome)).toBe(true);
+        expect(isFinite(yearResult.btcWithoutIncome)).toBe(true);
+        expect(yearResult.btcWithIncome).toBeGreaterThanOrEqual(0);
+        expect(yearResult.btcWithoutIncome).toBeGreaterThanOrEqual(0);
+      });
+    });
+
+    it("should maintain performance with rapid successive calculations", () => {
+      const formData = createTestFormData();
+      const startTime = Date.now();
+
+      // Run calculations 100 times rapidly
+      for (let i = 0; i < 100; i++) {
+        const { result } = renderHook(() => useCalculations({
+          ...formData,
+          btcStack: formData.btcStack + i * 0.01, // Slight variation each time
+        }));
+        expect(result.current.results).toBeDefined();
+      }
+
+      const endTime = Date.now();
+      expect(endTime - startTime).toBeLessThan(10000); // Should complete in under 10 seconds
     });
   });
 });

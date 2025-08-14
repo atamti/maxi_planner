@@ -4,11 +4,24 @@ import { DEFAULT_FORM_DATA } from "../config/defaults";
 import { useCalculations } from "../hooks/useCalculations";
 import { FormData } from "../types";
 
-describe("useCalculations", () => {
-  describe("with default form data", () => {
-    it("should return calculation results with expected structure", () => {
+/**
+ * useCalculations Core Functionality Tests
+ *
+ * This test suite covers the basic functionality, return structure,
+ * and standard use cases of the useCalculations hook.
+ *
+ * Coverage areas:
+ * - Return structure validation
+ * - Basic calculation accuracy
+ * - Standard parameter variations
+ * - Integration with default configuration
+ */
+describe("useCalculations - Core Functionality", () => {
+  describe("Return Structure & Basic Validation", () => {
+    it("should return all required properties with correct types", () => {
       const { result } = renderHook(() => useCalculations(DEFAULT_FORM_DATA));
 
+      // Validate return structure
       expect(result.current).toHaveProperty("results");
       expect(result.current).toHaveProperty("usdIncome");
       expect(result.current).toHaveProperty("usdIncomeWithLeverage");
@@ -22,71 +35,63 @@ describe("useCalculations", () => {
       expect(result.current).toHaveProperty("loanPrincipal");
       expect(result.current).toHaveProperty("loanInterest");
 
-      // Results should be an array
+      // Validate array properties
       expect(Array.isArray(result.current.results)).toBe(true);
       expect(Array.isArray(result.current.usdIncome)).toBe(true);
       expect(Array.isArray(result.current.usdIncomeWithLeverage)).toBe(true);
       expect(Array.isArray(result.current.btcIncome)).toBe(true);
       expect(Array.isArray(result.current.annualExpenses)).toBe(true);
-    });
-
-    it("should calculate results for the specified time horizon", () => {
-      const { result } = renderHook(() => useCalculations(DEFAULT_FORM_DATA));
-
-      // Should have results for years 0 through timeHorizon (inclusive)
-      expect(result.current.results).toHaveLength(
-        DEFAULT_FORM_DATA.timeHorizon + 1,
+      expect(Array.isArray(result.current.incomeAtActivationYears)).toBe(true);
+      expect(
+        Array.isArray(result.current.incomeAtActivationYearsWithLeverage),
+      ).toBe(true);
+      expect(Array.isArray(result.current.expensesAtActivationYears)).toBe(
+        true,
       );
-      expect(result.current.usdIncome).toHaveLength(
-        DEFAULT_FORM_DATA.timeHorizon + 1,
-      );
-      expect(result.current.usdIncomeWithLeverage).toHaveLength(
-        DEFAULT_FORM_DATA.timeHorizon + 1,
-      );
-    });
 
-    it("should have valid loan details when activation year is set", () => {
-      const { result } = renderHook(() => useCalculations(DEFAULT_FORM_DATA));
-
+      // Validate numeric properties
       expect(typeof result.current.loanPrincipal).toBe("number");
       expect(typeof result.current.loanInterest).toBe("number");
-      expect(result.current.loanPrincipal).toBeGreaterThanOrEqual(0);
-      expect(result.current.loanInterest).toBeGreaterThanOrEqual(0);
     });
 
-    it("should calculate final year data correctly", () => {
+    it("should calculate arrays with correct time horizon length", () => {
       const { result } = renderHook(() => useCalculations(DEFAULT_FORM_DATA));
 
-      const finalResult =
-        result.current.results[result.current.results.length - 1];
-      expect(finalResult).toBeDefined();
-      expect(finalResult.btcWithIncome).toBeGreaterThan(0);
-      expect(finalResult.btcWithoutIncome).toBeGreaterThan(0);
-      expect(finalResult.year).toBe(DEFAULT_FORM_DATA.timeHorizon);
+      const expectedLength = DEFAULT_FORM_DATA.timeHorizon + 1; // 0 through timeHorizon (inclusive)
+
+      expect(result.current.results).toHaveLength(expectedLength);
+      expect(result.current.usdIncome).toHaveLength(expectedLength);
+      expect(result.current.usdIncomeWithLeverage).toHaveLength(expectedLength);
+      expect(result.current.btcIncome).toHaveLength(expectedLength);
+      expect(result.current.annualExpenses).toHaveLength(expectedLength);
+      expect(result.current.incomeAtActivationYears).toHaveLength(
+        expectedLength,
+      );
+      expect(result.current.incomeAtActivationYearsWithLeverage).toHaveLength(
+        expectedLength,
+      );
+      expect(result.current.expensesAtActivationYears).toHaveLength(
+        expectedLength,
+      );
     });
 
-    it("should have results with proper year indexing", () => {
+    it("should have proper year indexing in results array", () => {
       const { result } = renderHook(() => useCalculations(DEFAULT_FORM_DATA));
 
       result.current.results.forEach((yearResult, index) => {
         expect(yearResult.year).toBe(index);
         expect(yearResult.btcWithIncome).toBeGreaterThanOrEqual(0);
         expect(yearResult.btcWithoutIncome).toBeGreaterThanOrEqual(0);
+        expect(typeof yearResult.btcWithIncome).toBe("number");
+        expect(typeof yearResult.btcWithoutIncome).toBe("number");
       });
     });
   });
 
-  describe("with custom form data", () => {
-    it("should handle different BTC stack sizes", () => {
-      const smallStackData: FormData = {
-        ...DEFAULT_FORM_DATA,
-        btcStack: 1,
-      };
-
-      const largeStackData: FormData = {
-        ...DEFAULT_FORM_DATA,
-        btcStack: 10,
-      };
+  describe("BTC Stack Calculations", () => {
+    it("should handle different BTC stack sizes proportionally", () => {
+      const smallStackData: FormData = { ...DEFAULT_FORM_DATA, btcStack: 1 };
+      const largeStackData: FormData = { ...DEFAULT_FORM_DATA, btcStack: 10 };
 
       const { result: smallResult } = renderHook(() =>
         useCalculations(smallStackData),
@@ -95,7 +100,6 @@ describe("useCalculations", () => {
         useCalculations(largeStackData),
       );
 
-      // Larger stack should have proportionally larger portfolio values
       const smallFinalBtc =
         smallResult.current.results[smallResult.current.results.length - 1]
           .btcWithIncome;
@@ -103,19 +107,14 @@ describe("useCalculations", () => {
         largeResult.current.results[largeResult.current.results.length - 1]
           .btcWithIncome;
 
+      // Large stack should have proportionally larger final value
       expect(largeFinalBtc).toBeGreaterThan(smallFinalBtc);
+      expect(largeFinalBtc / smallFinalBtc).toBeCloseTo(10, 1); // Should be close to 10x ratio
     });
 
-    it("should handle different time horizons", () => {
-      const shortTermData: FormData = {
-        ...DEFAULT_FORM_DATA,
-        timeHorizon: 5,
-      };
-
-      const longTermData: FormData = {
-        ...DEFAULT_FORM_DATA,
-        timeHorizon: 30,
-      };
+    it("should handle different time horizons correctly", () => {
+      const shortTermData: FormData = { ...DEFAULT_FORM_DATA, timeHorizon: 5 };
+      const longTermData: FormData = { ...DEFAULT_FORM_DATA, timeHorizon: 30 };
 
       const { result: shortResult } = renderHook(() =>
         useCalculations(shortTermData),
@@ -126,6 +125,11 @@ describe("useCalculations", () => {
 
       expect(shortResult.current.results).toHaveLength(6); // years 0-5
       expect(longResult.current.results).toHaveLength(31); // years 0-30
+
+      // Longer time horizon should generally result in larger BTC stack due to compound growth
+      const shortFinalBtc = shortResult.current.results[5].btcWithIncome;
+      const longFinalBtc = longResult.current.results[30].btcWithIncome;
+      expect(longFinalBtc).toBeGreaterThan(shortFinalBtc);
     });
 
     it("should handle different portfolio allocations", () => {
@@ -136,48 +140,76 @@ describe("useCalculations", () => {
         speculationPct: 0,
       };
 
+      const balancedData: FormData = {
+        ...DEFAULT_FORM_DATA,
+        savingsPct: 60,
+        investmentsPct: 30,
+        speculationPct: 10,
+      };
+
       const aggressiveData: FormData = {
         ...DEFAULT_FORM_DATA,
-        savingsPct: 50,
-        investmentsPct: 25,
-        speculationPct: 25,
+        savingsPct: 40,
+        investmentsPct: 30,
+        speculationPct: 30,
       };
 
       const { result: conservativeResult } = renderHook(() =>
         useCalculations(conservativeData),
       );
+      const { result: balancedResult } = renderHook(() =>
+        useCalculations(balancedData),
+      );
       const { result: aggressiveResult } = renderHook(() =>
         useCalculations(aggressiveData),
       );
 
-      // Both should produce valid results
+      // All should produce valid results
       expect(conservativeResult.current.results).toHaveLength(
-        conservativeData.timeHorizon + 1,
+        DEFAULT_FORM_DATA.timeHorizon + 1,
+      );
+      expect(balancedResult.current.results).toHaveLength(
+        DEFAULT_FORM_DATA.timeHorizon + 1,
       );
       expect(aggressiveResult.current.results).toHaveLength(
-        aggressiveData.timeHorizon + 1,
+        DEFAULT_FORM_DATA.timeHorizon + 1,
       );
 
-      // Results should have different growth patterns due to different allocations
+      // Results should reflect different growth patterns
       const conservativeFinal =
         conservativeResult.current.results[
           conservativeResult.current.results.length - 1
+        ];
+      const balancedFinal =
+        balancedResult.current.results[
+          balancedResult.current.results.length - 1
         ];
       const aggressiveFinal =
         aggressiveResult.current.results[
           aggressiveResult.current.results.length - 1
         ];
 
-      expect(conservativeFinal).toBeDefined();
-      expect(aggressiveFinal).toBeDefined();
+      expect(conservativeFinal.btcWithIncome).toBeGreaterThan(0);
+      expect(balancedFinal.btcWithIncome).toBeGreaterThan(0);
+      expect(aggressiveFinal.btcWithIncome).toBeGreaterThan(0);
+    });
+  });
+
+  describe("Loan Calculations", () => {
+    it("should calculate loan details correctly with default configuration", () => {
+      const { result } = renderHook(() => useCalculations(DEFAULT_FORM_DATA));
+
+      expect(result.current.loanPrincipal).toBeGreaterThanOrEqual(0);
+      expect(result.current.loanInterest).toBeGreaterThanOrEqual(0);
+      expect(isFinite(result.current.loanPrincipal)).toBe(true);
+      expect(isFinite(result.current.loanInterest)).toBe(true);
     });
 
-    it("should handle interest-only vs amortizing loans differently", () => {
+    it("should handle interest-only vs amortizing loans", () => {
       const interestOnlyData: FormData = {
         ...DEFAULT_FORM_DATA,
         interestOnly: true,
       };
-
       const amortizingData: FormData = {
         ...DEFAULT_FORM_DATA,
         interestOnly: false,
@@ -190,36 +222,80 @@ describe("useCalculations", () => {
         useCalculations(amortizingData),
       );
 
-      // Both should have loan details
+      // Both should have valid loan calculations
       expect(typeof interestOnlyResult.current.loanPrincipal).toBe("number");
       expect(typeof amortizingResult.current.loanPrincipal).toBe("number");
-
-      // Interest calculations should be different between the two
       expect(interestOnlyResult.current.loanInterest).toBeGreaterThanOrEqual(0);
       expect(amortizingResult.current.loanInterest).toBeGreaterThanOrEqual(0);
     });
-  });
 
-  describe("business logic variations", () => {
     it("should handle no collateral scenario", () => {
       const noCollateralData: FormData = {
         ...DEFAULT_FORM_DATA,
         collateralPct: 0,
       };
-
       const { result } = renderHook(() => useCalculations(noCollateralData));
 
-      // With no collateral, loan principal should be zero
+      // With no collateral, loan values should be zero
       expect(result.current.loanPrincipal).toBe(0);
       expect(result.current.loanInterest).toBe(0);
 
-      // Should still have valid BTC growth
+      // Should still have valid BTC growth calculations
       expect(result.current.results).toHaveLength(
-        noCollateralData.timeHorizon + 1,
+        DEFAULT_FORM_DATA.timeHorizon + 1,
       );
+      result.current.results.forEach((yearResult) => {
+        expect(yearResult.btcWithIncome).toBeGreaterThanOrEqual(0);
+        expect(yearResult.btcWithoutIncome).toBeGreaterThanOrEqual(0);
+      });
+    });
+  });
+
+  describe("Income Generation", () => {
+    it("should handle income allocation and generation", () => {
+      const incomeData: FormData = {
+        ...DEFAULT_FORM_DATA,
+        incomeAllocationPct: 25,
+        activationYear: 2,
+      };
+
+      const { result } = renderHook(() => useCalculations(incomeData));
+
+      // Before activation year, no income should be generated
+      expect(result.current.usdIncome[0]).toBe(0);
+      expect(result.current.usdIncome[1]).toBe(0);
+
+      // From activation year onwards, income should be generated (if yield > 0)
+      if (
+        DEFAULT_FORM_DATA.incomeCustomRates.length > 0 ||
+        DEFAULT_FORM_DATA.incomeFlat > 0
+      ) {
+        expect(result.current.usdIncome[2]).toBeGreaterThanOrEqual(0);
+      }
     });
 
-    it("should handle different economic scenarios", () => {
+    it("should handle income reinvestment", () => {
+      const reinvestmentData: FormData = {
+        ...DEFAULT_FORM_DATA,
+        incomeAllocationPct: 30,
+        incomeReinvestmentPct: 50,
+        activationYear: 1,
+      };
+
+      const { result } = renderHook(() => useCalculations(reinvestmentData));
+
+      // Income arrays should be properly calculated
+      expect(result.current.usdIncome).toHaveLength(
+        DEFAULT_FORM_DATA.timeHorizon + 1,
+      );
+      expect(result.current.usdIncomeWithLeverage).toHaveLength(
+        DEFAULT_FORM_DATA.timeHorizon + 1,
+      );
+    });
+  });
+
+  describe("Economic Scenarios & Custom Rates", () => {
+    it("should handle custom rate arrays", () => {
       const customRatesData: FormData = {
         ...DEFAULT_FORM_DATA,
         btcPriceCustomRates: [0.5, 0.3, 0.2, 0.1, 0.1], // Declining BTC growth
@@ -230,7 +306,6 @@ describe("useCalculations", () => {
 
       const { result } = renderHook(() => useCalculations(customRatesData));
 
-      // Should handle custom rate arrays correctly
       expect(result.current.results).toHaveLength(5); // years 0-4
       expect(result.current.annualExpenses.length).toBe(5);
 
@@ -239,9 +314,10 @@ describe("useCalculations", () => {
         result.current.annualExpenses[0],
       );
     });
+  });
 
-    it("should calculate consistent results across multiple runs", () => {
-      // Test deterministic behavior
+  describe("Deterministic Behavior", () => {
+    it("should produce consistent results across multiple runs", () => {
       const { result: result1 } = renderHook(() =>
         useCalculations(DEFAULT_FORM_DATA),
       );
@@ -249,20 +325,25 @@ describe("useCalculations", () => {
         useCalculations(DEFAULT_FORM_DATA),
       );
 
-      // Results should be identical for same inputs
+      // Core values should be identical
       expect(result1.current.loanPrincipal).toBe(result2.current.loanPrincipal);
       expect(result1.current.loanInterest).toBe(result2.current.loanInterest);
       expect(result1.current.results.length).toBe(
         result2.current.results.length,
       );
 
-      // Compare final BTC values
+      // Final BTC values should be identical
       const final1 =
         result1.current.results[result1.current.results.length - 1];
       const final2 =
         result2.current.results[result2.current.results.length - 1];
       expect(final1.btcWithIncome).toBe(final2.btcWithIncome);
       expect(final1.btcWithoutIncome).toBe(final2.btcWithoutIncome);
+
+      // All array values should be identical
+      result1.current.usdIncome.forEach((income, index) => {
+        expect(income).toBe(result2.current.usdIncome[index]);
+      });
     });
   });
 });
