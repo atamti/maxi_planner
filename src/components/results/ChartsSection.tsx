@@ -1,6 +1,7 @@
 import React from "react";
 import { CalculationResults, FormDataSubset } from "../../types";
 import { useStaticChartSystem } from "../../utils/shared";
+import { AllocationEvolutionChart } from "../charts/AllocationEvolutionChart";
 import { ActivationYearControl } from "../charts/individual/ActivationYearControl";
 import { BtcGrowthChart } from "../charts/individual/BtcGrowthChart";
 import { IncomeBtcChart } from "../charts/individual/IncomeBtcChart";
@@ -66,6 +67,11 @@ export const ChartsSection: React.FC<Props> = ({
           data={incomePotentialChartData}
           config={incomePotentialChartConfig}
         />
+      </div>
+
+      {/* Allocation Evolution Chart */}
+      <div className="mt-6">
+        <AllocationEvolutionChart formData={formData} />
       </div>
     </>
   );
