@@ -6,10 +6,11 @@ export const DEFAULT_FORM_DATA: FormData = {
   investmentsPct: 25,
   speculationPct: 10,
   collateralPct: 50,
+  enableAnnualReallocation: true, // Default to annual reallocation (traditional portfolio management)
   loanRate: 7,
   loanTermYears: 10,
   interestOnly: true,
-  ltvRatio: 40, 
+  ltvRatio: 40,
   investmentsStartYield: 30,
   investmentsEndYield: 0,
   speculationStartYield: 40,

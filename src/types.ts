@@ -56,6 +56,9 @@ export interface FormData {
   speculationPct: number;
   collateralPct: number;
 
+  // Allocation strategy
+  enableAnnualReallocation: boolean;
+
   // Loan configuration
   loanRate: number;
   loanTermYears: number;
@@ -137,6 +140,7 @@ export interface FormDataSubset {
   investmentsPct: number;
   btcStack: number;
   incomeAllocationPct: number; // Add missing income allocation
+  enableAnnualReallocation: boolean; // Allocation strategy toggle
 }
 
 export interface Result {

@@ -10,6 +10,7 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       investmentsPct,
       speculationPct,
       collateralPct,
+      enableAnnualReallocation = false,
       loanRate,
       loanTermYears,
       incomeAllocationPct,
@@ -83,8 +84,66 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       );
     };
 
-    // Calculate BTC stack growth for a given year
+    // Track allocation buckets separately for proper compound growth
+    // For btcWithoutIncome (no income allocation removed)
+    let savingsAmountWithoutIncome = btcStack * (savingsPct / 100);
+    let investmentsAmountWithoutIncome = btcStack * (investmentsPct / 100);
+    let speculationAmountWithoutIncome = btcStack * (speculationPct / 100);
+
+    // For btcWithIncome (income allocation will be removed at activation)
+    let savingsAmountWithIncome = btcStack * (savingsPct / 100);
+    let investmentsAmountWithIncome = btcStack * (investmentsPct / 100);
+    let speculationAmountWithIncome = btcStack * (speculationPct / 100);
+
+    // Calculate BTC stack growth - two methods available
+    const calculateBtcGrowthCompound = (
+      year: number,
+      buckets: { savings: number; investments: number; speculation: number },
+    ) => {
+      // Apply yields to each bucket independently (compound growth)
+      const savingsYield = 0; // Savings don't yield
+      const investmentsYield =
+        getYield(year, investmentsStartYield, investmentsEndYield) / 100;
+      const speculationYield =
+        getYield(year, speculationStartYield, speculationEndYield) / 100;
+
+      // Compound growth for each bucket
+      buckets.savings *= 1 + savingsYield;
+      buckets.investments *= 1 + investmentsYield;
+      buckets.speculation *= 1 + speculationYield;
+
+      // Return total stack
+      return Math.max(
+        0,
+        buckets.savings + buckets.investments + buckets.speculation,
+      );
+    };
+
+    // Calculate BTC growth with annual reallocation (rebalance to target percentages)
+    const calculateBtcGrowthReallocation = (
+      btcAmount: number,
+      year: number,
+    ): number => {
+      const savingsYield = 0; // Savings don't yield
+      const investmentsYield =
+        getYield(year, investmentsStartYield, investmentsEndYield) / 100;
+      const speculationYield =
+        getYield(year, speculationStartYield, speculationEndYield) / 100;
+
+      // Apply allocation percentages to current total, then apply yields
+      const savings = btcAmount * (savingsPct / 100) * (1 + savingsYield);
+      const investments =
+        btcAmount * (investmentsPct / 100) * (1 + investmentsYield);
+      const speculation =
+        btcAmount * (speculationPct / 100) * (1 + speculationYield);
+
+      // Return total stack after reallocation and growth
+      return Math.max(0, savings + investments + speculation);
+    };
+
+    // Legacy function kept for compatibility (used in other parts like getBtcStackAtYear)
     const calculateBtcGrowth = (btcAmount: number, year: number): number => {
+      // This is the old flawed calculation - should be replaced by compound tracking
       const savingsYield = 0; // Savings grows at BTC rate only
       const investmentsYield =
         getYield(year, investmentsStartYield, investmentsEndYield) / 100;
@@ -191,8 +250,24 @@ export const useCalculations = (formData: FormData): CalculationResults => {
             ? loanDetails.loanPrincipal
             : 0);
 
-        // Scale down btcWithIncome by the allocation percentage
-        btcWithIncome *= (100 - incomeAllocationPct) / 100;
+        if (enableAnnualReallocation) {
+          // In reallocation mode, directly reduce btcWithIncome by the allocation percentage
+          btcWithIncome -= btcToRemove;
+        } else {
+          // In compound growth mode, scale down individual buckets by the allocation percentage
+          const incomeReductionFactor = (100 - incomeAllocationPct) / 100;
+          savingsAmountWithIncome *= incomeReductionFactor;
+          investmentsAmountWithIncome *= incomeReductionFactor;
+          speculationAmountWithIncome *= incomeReductionFactor;
+          btcWithIncome =
+            savingsAmountWithIncome +
+            investmentsAmountWithIncome +
+            speculationAmountWithIncome;
+        }
+
+        // Important: btcWithoutIncome should NOT be affected by income allocation
+        // It represents what the stack would be if no income allocation ever happened
+        // This ensures the "Minus income allocation" line shows the correct baseline
       }
 
       // Calculate income yields using dynamic rates
@@ -246,10 +321,40 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       );
       btcIncome.push(0);
 
-      // Apply BTC growth for next year
+      // Apply BTC growth for next year using selected strategy
       if (year < timeHorizon) {
-        btcWithIncome = calculateBtcGrowth(btcWithIncome, year);
-        btcWithoutIncome = calculateBtcGrowth(btcWithoutIncome, year);
+        if (enableAnnualReallocation) {
+          // Use reallocation method (old behavior)
+          btcWithoutIncome = calculateBtcGrowthReallocation(
+            btcWithoutIncome,
+            year,
+          );
+          btcWithIncome = calculateBtcGrowthReallocation(btcWithIncome, year);
+        } else {
+          // Use compound growth method (new default behavior)
+          const bucketsWithoutIncome = {
+            savings: savingsAmountWithoutIncome,
+            investments: investmentsAmountWithoutIncome,
+            speculation: speculationAmountWithoutIncome,
+          };
+          btcWithoutIncome = calculateBtcGrowthCompound(
+            year,
+            bucketsWithoutIncome,
+          );
+          savingsAmountWithoutIncome = bucketsWithoutIncome.savings;
+          investmentsAmountWithoutIncome = bucketsWithoutIncome.investments;
+          speculationAmountWithoutIncome = bucketsWithoutIncome.speculation;
+
+          const bucketsWithIncome = {
+            savings: savingsAmountWithIncome,
+            investments: investmentsAmountWithIncome,
+            speculation: speculationAmountWithIncome,
+          };
+          btcWithIncome = calculateBtcGrowthCompound(year, bucketsWithIncome);
+          savingsAmountWithIncome = bucketsWithIncome.savings;
+          investmentsAmountWithIncome = bucketsWithIncome.investments;
+          speculationAmountWithIncome = bucketsWithIncome.speculation;
+        }
       }
     }
 

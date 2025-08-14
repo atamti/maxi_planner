@@ -43,7 +43,34 @@ export const PortfolioSetupSection: React.FC = () => {
 
       {/* Asset allocation section integrated here */}
       <div className="col-span-2 mt-4 pt-4 border-t border-gray-200">
-        <h4 className="font-semibold mb-3">Asset Allocation Strategy</h4>
+        <h4 className="font-semibold mb-3">Initial Asset Allocation</h4>
+
+        {/* Annual Reallocation Toggle */}
+        <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.enableAnnualReallocation}
+                  onChange={(e) =>
+                    updateFormData({
+                      enableAnnualReallocation: e.target.checked,
+                    })
+                  }
+                  className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <span className="font-medium">Enable Annual Reallocation</span>
+              </label>
+              <p className="text-sm text-gray-600 mt-1 ml-6">
+                {formData.enableAnnualReallocation
+                  ? "Rebalances to target percentages yearly (traditional portfolio management - default)"
+                  : "Each allocation bucket grows independently with compound returns (advanced strategy)"}
+              </p>
+            </div>
+          </div>
+        </div>
+
         <AllocationSliders />
       </div>
     </CollapsibleSection>
