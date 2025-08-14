@@ -54,6 +54,7 @@ describe("Calculation Service - Systematic Edge Case Testing", () => {
     incomeCustomRates: [],
     startingExpenses: 50000,
     incomeAllocationPct: 20,
+    enableAnnualReallocation: false,
     ...overrides,
   });
 

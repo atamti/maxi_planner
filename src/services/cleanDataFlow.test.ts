@@ -78,6 +78,7 @@ const mockState = {
     incomePreset: "moderate" as ScenarioKey,
     incomeCustomRates: [],
     incomeManualMode: false,
+    enableAnnualReallocation: false,
   } as FormData,
   calculationResults: {
     finalPortfolioValue: 2000000,

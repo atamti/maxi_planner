@@ -43,6 +43,7 @@ describe("LoanDetailsCard", () => {
     investmentsPct: 30,
     btcStack: 2.5,
     incomeAllocationPct: 80,
+    enableAnnualReallocation: false,
   };
 
   const mockGetBtcPriceAtYear = vi.fn(

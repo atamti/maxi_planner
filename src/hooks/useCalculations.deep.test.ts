@@ -86,6 +86,7 @@ describe("useCalculations - Mathematical Precision", () => {
     incomePreset: "tight",
     incomeCustomRates: [0, 0, 0, 0], // Zero income yield
     incomeManualMode: false,
+    enableAnnualReallocation: false,
 
     ...overrides,
   });
@@ -203,14 +204,14 @@ describe("useCalculations - Mathematical Precision", () => {
       // Year 0: 1 BTC
       expect(result.current.results[0].btcWithIncome).toBe(1);
 
-      // Year 1: 0.5 BTC (savings) + 0.5 BTC × 1.1 (investments) = 1.05 BTC
+      // Year 1: 0.5 BTC (savings) + 0.5 BTC × 1.1 (investments) = 0.5 + 0.55 = 1.05 BTC
       expect(result.current.results[1].btcWithIncome).toBeCloseTo(1.05, 10);
 
-      // Year 2: 0.525 BTC (savings from 1.05) + 0.525 × 1.1 (investments) = 1.1025 BTC
-      expect(result.current.results[2].btcWithIncome).toBeCloseTo(1.1025, 10);
+      // Year 2: 0.5 BTC (savings) + 0.55 × 1.1 (investments) = 0.5 + 0.605 = 1.105 BTC
+      expect(result.current.results[2].btcWithIncome).toBeCloseTo(1.105, 10);
 
-      // Year 3: 0.55125 BTC (savings) + 0.55125 × 1.1 (investments) = 1.157625 BTC
-      expect(result.current.results[3].btcWithIncome).toBeCloseTo(1.157625, 10);
+      // Year 3: 0.5 BTC (savings) + 0.605 × 1.1 (investments) = 0.5 + 0.6655 = 1.1655 BTC
+      expect(result.current.results[3].btcWithIncome).toBeCloseTo(1.1655, 10);
     });
 
     it("should handle price crash calculations precisely", () => {

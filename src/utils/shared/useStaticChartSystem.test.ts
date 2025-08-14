@@ -70,6 +70,7 @@ const mockFormData: FormData = {
   incomePreset: "tight",
   incomeCustomRates: [5, 6, 7],
   incomeManualMode: false,
+  enableAnnualReallocation: false,
 };
 
 const mockCalculationResults: CalculationResults = {
@@ -120,8 +121,10 @@ describe("useStaticChartSystem", () => {
       expect(resultChartData).toHaveProperty("datasets");
       expect(resultChartData.labels).toEqual([0, 1, 2]);
       expect(resultChartData.datasets).toHaveLength(2);
-      expect(resultChartData.datasets[0].label).toBe("Pure growth (no income)");
-      expect(resultChartData.datasets[1].label).toBe("Minus income allocation");
+      expect(resultChartData.datasets[0].label).toBe("BTC Stack (full amount)");
+      expect(resultChartData.datasets[1].label).toBe(
+        "BTC Stack (after income allocation)",
+      );
     });
 
     it("should generate income chart data", () => {

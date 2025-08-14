@@ -44,6 +44,7 @@ const createMockFormData = (
   investmentsPct: 25,
   btcStack: 5,
   incomeAllocationPct: 10,
+  enableAnnualReallocation: false,
   ...overrides,
 });
 

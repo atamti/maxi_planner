@@ -30,6 +30,7 @@ describe("ValidationService Deep Edge Case Tests", () => {
     investmentsPct: 10,
     btcStack: 1,
     incomeAllocationPct: 0,
+    enableAnnualReallocation: false,
   });
 
   describe("Allocation Edge Cases", () => {

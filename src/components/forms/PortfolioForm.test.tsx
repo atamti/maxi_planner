@@ -152,7 +152,7 @@ describe("PortfolioForm", () => {
     );
 
     expect(screen.getByTestId("allocation-sliders-v2")).toBeInTheDocument();
-    expect(screen.getByText("Asset Allocation Strategy")).toBeInTheDocument();
+    expect(screen.getByText("Initial Asset Allocation")).toBeInTheDocument();
   });
 
   it("should render economic scenarios section", () => {

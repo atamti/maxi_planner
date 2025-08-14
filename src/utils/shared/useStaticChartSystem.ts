@@ -40,7 +40,7 @@ export const useStaticChartSystem = ({
       labels: calculationResults.results.map((r) => r.year),
       datasets: [
         {
-          label: "Pure growth (no income)",
+          label: "BTC Stack (full amount)",
           data: calculationResults.results.map((r) => r.btcWithoutIncome),
           borderColor: "#10B981",
           backgroundColor: "rgba(16, 185, 129, 0.2)",
@@ -48,7 +48,7 @@ export const useStaticChartSystem = ({
           tension: 0.1,
         },
         {
-          label: "Minus income allocation",
+          label: "BTC Stack (after income allocation)",
           data: calculationResults.results.map((r) => r.btcWithIncome),
           borderColor: "#1A73E8",
           backgroundColor: "rgba(26, 115, 232, 0.2)",

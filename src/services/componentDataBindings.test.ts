@@ -70,6 +70,7 @@ const mockFormData: FormData = {
   incomePreset: "moderate" as ScenarioKey,
   incomeCustomRates: [50000, 55000, 60000],
   incomeManualMode: false,
+  enableAnnualReallocation: true,
 };
 
 const mockCalculationResults: CalculationResults = {

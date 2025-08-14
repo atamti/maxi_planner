@@ -66,6 +66,7 @@ const mockFormData: FormData = {
   incomePreset: "tight" as const,
   incomeCustomRates: [50000, 55000, 60000],
   incomeManualMode: false,
+  enableAnnualReallocation: false,
 };
 
 const mockCalculationResults: CalculationResults = {

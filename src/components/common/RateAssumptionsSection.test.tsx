@@ -76,6 +76,7 @@ const mockFormData: FormData = {
   incomePreset: "debasement",
   incomeCustomRates: Array(30).fill(8),
   incomeManualMode: false,
+  enableAnnualReallocation: false,
 };
 
 const mockInflationConfig = {

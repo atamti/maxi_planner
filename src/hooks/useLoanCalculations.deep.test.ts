@@ -69,6 +69,7 @@ describe("useLoanCalculations - Deep Edge Case Validation", () => {
     incomePreset: "tight",
     incomeCustomRates: [],
     incomeManualMode: false,
+    enableAnnualReallocation: false,
   };
 
   const mockGetBtcPriceAtYear = (year: number) => {

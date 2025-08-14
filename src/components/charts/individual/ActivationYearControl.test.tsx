@@ -71,6 +71,9 @@ describe("ActivationYearControl", () => {
     incomePreset: "tight",
     incomeCustomRates: [],
     incomeManualMode: false,
+
+    // Allocation strategy
+    enableAnnualReallocation: false,
   };
 
   const mockOnUpdateFormData = vi.fn();

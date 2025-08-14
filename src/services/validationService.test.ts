@@ -28,6 +28,7 @@ describe("ValidationService", () => {
     inflationCustomRates: [2, 3, 4],
     incomeCustomRates: [50000, 55000, 60000],
     incomeAllocationPct: 80,
+    enableAnnualReallocation: false,
   };
 
   describe("validateFormData", () => {

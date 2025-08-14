@@ -28,6 +28,7 @@ describe("FinalYearCard", () => {
     savingsPct: DEFAULT_FORM_DATA.savingsPct,
     investmentsPct: DEFAULT_FORM_DATA.investmentsPct,
     incomeAllocationPct: DEFAULT_FORM_DATA.incomeAllocationPct,
+    enableAnnualReallocation: false,
   };
 
   const mockResults: CalculationResults = {

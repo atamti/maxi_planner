@@ -87,6 +87,7 @@ const createMockFormData = (overrides: Partial<FormData> = {}): FormData => ({
   speculationStartYield: 25,
   speculationEndYield: 12,
   incomeYield: 8,
+  enableAnnualReallocation: false,
   ...overrides,
 });
 
