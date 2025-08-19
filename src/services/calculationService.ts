@@ -196,7 +196,7 @@ export const createCalculationService = (): CalculationService => {
     if (validRates.length === 0) return 0;
 
     // Use timeHorizon to limit the calculation if provided
-    const ratesToUse = timeHorizon 
+    const ratesToUse = timeHorizon
       ? validRates.slice(0, timeHorizon)
       : validRates;
 

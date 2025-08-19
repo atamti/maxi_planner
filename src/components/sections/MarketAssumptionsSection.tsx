@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import economicScenarios from "../../config/economicScenarios";
+import { createCalculationService } from "../../services/calculationService";
 import { usePortfolioCompat } from "../../store";
 import { useGeneralRateSystem } from "../../utils/shared/useGeneralRateSystem";
-import { createCalculationService } from "../../services/calculationService";
 import { YieldChart } from "../charts/YieldChart";
 import { CollapsibleSection } from "../common/CollapsibleSection";
 import { ScenarioRestoreMessage } from "../common/ScenarioRestoreMessage";
