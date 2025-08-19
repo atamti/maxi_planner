@@ -353,10 +353,11 @@ describe("useRateCalculationEngine", () => {
     it("should calculate correct average for positive numbers", () => {
       const { calculateAverageRate } = getHook();
 
-      const rates = [2, 4, 6, 8];
+      const rates = [2, 4, 6, 8]; // Year 0, 1, 2, 3  
       const result = calculateAverageRate(rates);
 
-      expect(result).toBe(5);
+      // Should exclude year 0, so calculate average of [4, 6, 8] = 18/3 = 6
+      expect(result).toBe(6);
     });
 
     it("should handle empty array", () => {
@@ -386,56 +387,61 @@ describe("useRateCalculationEngine", () => {
     it("should handle negative numbers", () => {
       const { calculateAverageRate } = getHook();
 
-      const rates = [-2, -4, -6];
+      const rates = [-2, -4, -6]; // Year 0, 1, 2
       const result = calculateAverageRate(rates);
 
-      expect(result).toBe(-4);
+      // Should exclude year 0, so calculate average of [-4, -6] = -10/2 = -5
+      expect(result).toBe(-5);
     });
 
     it("should handle mixed positive and negative numbers", () => {
       const { calculateAverageRate } = getHook();
 
-      const rates = [-10, 0, 10];
+      const rates = [-10, 0, 10]; // Year 0, 1, 2
       const result = calculateAverageRate(rates);
 
-      expect(result).toBe(0);
+      // Should exclude year 0, so calculate average of [0, 10] = 10/2 = 5  
+      expect(result).toBe(5);
     });
 
     it("should handle decimal numbers", () => {
       const { calculateAverageRate } = getHook();
 
-      const rates = [1.5, 2.5, 3.5];
+      const rates = [1.5, 2.5, 3.5]; // Year 0, 1, 2
       const result = calculateAverageRate(rates);
 
-      expect(result).toBeCloseTo(2.5, 10);
+      // Should exclude year 0, so calculate average of [2.5, 3.5] = 6/2 = 3
+      expect(result).toBeCloseTo(3, 10);
     });
 
     it("should handle single element array", () => {
       const { calculateAverageRate } = getHook();
 
-      const rates = [42.7];
+      const rates = [42.7]; // Only year 0
       const result = calculateAverageRate(rates);
 
-      expect(result).toBe(42.7);
+      // Should exclude year 0, so no data left - should return 0
+      expect(result).toBe(0);
     });
 
     it("should handle very large numbers", () => {
       const { calculateAverageRate } = getHook();
 
-      const rates = [1000000, 2000000, 3000000];
+      const rates = [1000000, 2000000, 3000000]; // Year 0, 1, 2
       const result = calculateAverageRate(rates);
 
-      expect(result).toBe(2000000);
+      // Should exclude year 0, so calculate average of [2000000, 3000000] = 5000000/2 = 2500000
+      expect(result).toBe(2500000);
     });
 
     it("should handle precision with many decimal places", () => {
       const { calculateAverageRate } = getHook();
 
-      const rates = [1.123456789, 2.987654321, 4.444444444];
+      const rates = [1.123456789, 2.987654321, 4.444444444]; // Year 0, 1, 2
       const result = calculateAverageRate(rates);
 
-      // With .toFixed(1) precision: (1.123456789 + 2.987654321 + 4.444444444) / 3 = 2.851851851 → 2.9
-      expect(result).toBe(2.9);
+      // Should exclude year 0, so calculate average of [2.987654321, 4.444444444] = 7.432098765 / 2 = 3.7164... → 3.7 with .toFixed(1)
+      expect(result).toBe(3.7);
     });
 
     it("should handle timeHorizon parameter correctly", () => {
@@ -468,8 +474,8 @@ describe("useRateCalculationEngine", () => {
 
       expect(normalized).toHaveLength(8);
       // linear = [0, 2.5, 5, 7.5, 10] → normalized = [0, 2.5, 5, 7.5, 10, 10, 10, 10]
-      // average excludes year 0, so uses [2.5, 5, 7.5, 10, 10, 10, 10] = 65 / 7 = 9.285... → 9.3 with .toFixed(1)
-      expect(average).toBe(9.3);
+      // average excludes year 0, so uses [2.5, 5, 7.5, 10, 10, 10, 10] = 55 / 7 = 7.857... → 7.9 with .toFixed(1)
+      expect(average).toBe(7.9);
     });
 
     it("should handle scenario generation with normalization", () => {

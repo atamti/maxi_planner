@@ -81,7 +81,7 @@ describe("EconomicScenariosSection", () => {
     // Check the title contains the default scenario info
     expect(screen.getByText(/Managed debasement/)).toBeInTheDocument();
     expect(screen.getByText(/10% USD/)).toBeInTheDocument();
-    expect(screen.getByText(/45% BTC/)).toBeInTheDocument();
+    expect(screen.getByText(/46% BTC/)).toBeInTheDocument(); // Updated to reflect correct CAGR calculation
   });
 
   it("should apply correct styling to scenario cards", async () => {

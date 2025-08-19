@@ -99,8 +99,9 @@ describe("Shared Hook Utilities", () => {
     it("should calculate average rate", () => {
       const { result } = renderHook(() => useRateCalculationEngine());
 
+      // [10, 20, 30] excludes year 0, so [20, 30] avg = 50/2 = 25
       const average = result.current.calculateAverageRate([10, 20, 30]);
-      expect(average).toBe(20);
+      expect(average).toBe(25);
     });
 
     it("should normalize rate arrays", () => {
