@@ -77,8 +77,8 @@ describe("useBtcRateGeneration", () => {
       );
 
       // Sum: 25+30+35+40+45+50+55+60+65+70 = 475
-      // Average: 475/10 = 47.5, rounded = 48
-      expect(result.current.calculateAverageBtcAppreciation).toBe(48);
+      // Average: 475/10 = 47.5, using .toFixed(1) then parseFloat = 47.5
+      expect(result.current.calculateAverageBtcAppreciation).toBe(47.5);
     });
 
     it("should return 0 when no custom rates exist", () => {

@@ -23,6 +23,7 @@ describe("usePortfolioAnalysis", () => {
     expensesAtActivationYears: [40000, 42000, 44000, 46000, 48000, 50000],
     loanPrincipal: 200000,
     loanInterest: 14000,
+    btcAppreciationAverage: 45.7,
   };
 
   const mockFormData = {

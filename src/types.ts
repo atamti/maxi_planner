@@ -160,4 +160,5 @@ export interface CalculationResults {
   expensesAtActivationYears: number[];
   loanPrincipal: number;
   loanInterest: number;
+  btcAppreciationAverage: number; // Centralized BTC appreciation average (CAGR)
 }
