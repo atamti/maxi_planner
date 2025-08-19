@@ -11,11 +11,13 @@ export const useBtcRateSystem = (
   formData: FormData,
   updateFormData: (updates: Partial<FormData>) => void,
 ) => {
-  const [showLockedMessage, setShowLockedMessage] = useState(false);
-  const { generateFlat, generateLinear, normalizeRatesArray } =
-    useRateCalculationEngine();
+  // Get rate calculation engine functions
+  const { generateFlat, generateLinear } = useRateCalculationEngine();
 
-  // Get preset scenarios for BTC
+  // State for exchange rate locked message
+  const [showLockedMessage, setShowLockedMessage] = useState(false);
+
+  // Get preset scenarios
   const presetScenarios = useMemo(() => {
     const presets: Record<string, any> = {};
     Object.entries(economicScenarios).forEach(([key, scenario]) => {
@@ -35,15 +37,6 @@ export const useBtcRateSystem = (
     return presets;
   }, []);
 
-  // Calculate average BTC appreciation rate
-  const calculateAverageBtcAppreciation = useMemo((): number => {
-    if (formData.btcPriceCustomRates.length === 0) return 0;
-    const sum = formData.btcPriceCustomRates
-      .slice(0, formData.timeHorizon)
-      .reduce((acc, val) => acc + val, 0);
-    return Math.round(sum / formData.timeHorizon);
-  }, [formData.btcPriceCustomRates, formData.timeHorizon]);
-
   // Generate BTC rates based on input type
   const generateBtcRates = useCallback(
     (
@@ -54,68 +47,66 @@ export const useBtcRateSystem = (
         | "saylor"
         | "manual" = formData.btcPriceInputType,
     ): number[] => {
+      const rates = [];
       const isManualRateSelected = formData.btcPricePreset === "custom";
 
-      switch (inputType) {
-        case "flat":
-          return generateFlat(formData.btcPriceFlat, formData.timeHorizon - 1);
+      if (inputType === "flat") {
+        for (let i = 0; i < formData.timeHorizon; i++) {
+          rates.push(formData.btcPriceFlat);
+        }
+      } else if (inputType === "linear") {
+        for (let i = 0; i < formData.timeHorizon; i++) {
+          const progress = i / Math.max(1, formData.timeHorizon - 1);
+          const rate =
+            formData.btcPriceStart +
+            (formData.btcPriceEnd - formData.btcPriceStart) * progress;
+          rates.push(Math.round(rate));
+        }
+      } else if (inputType === "saylor") {
+        // Saylor projection: 37% -> 21% over 21-year curve, mapped to current timeHorizon
+        for (let i = 0; i < formData.timeHorizon; i++) {
+          // Map current year to the 21-year Saylor curve
+          const saylorProgress = i / Math.max(1, formData.timeHorizon - 1);
+          // Apply the 21-year curve: 37% declining to 21%
+          const rate = 37 - (37 - 21) * saylorProgress;
+          rates.push(Math.round(rate));
+        }
+      } else if (inputType === "preset") {
+        // Only access preset scenarios if we're not in custom mode
+        if (
+          !isManualRateSelected &&
+          presetScenarios[formData.btcPricePreset as ScenarioKey]
+        ) {
+          const scenario =
+            presetScenarios[formData.btcPricePreset as ScenarioKey];
 
-        case "linear":
-          return generateLinear(
-            formData.btcPriceStart,
-            formData.btcPriceEnd,
-            formData.timeHorizon - 1,
-          ).map((rate) => Math.round(rate));
-
-        case "saylor":
-          // Saylor projection: 37% -> 21% over timeHorizon
-          return generateLinear(37, 21, formData.timeHorizon - 1).map((rate) =>
-            Math.round(rate),
-          );
-
-        case "preset":
-          // Only access preset scenarios if we're not in custom mode
-          if (
-            !isManualRateSelected &&
-            presetScenarios[formData.btcPricePreset as ScenarioKey]
-          ) {
-            const scenario =
-              presetScenarios[formData.btcPricePreset as ScenarioKey];
-            const rates = [];
-
-            for (let i = 0; i < formData.timeHorizon; i++) {
-              const progress =
-                formData.timeHorizon === 1 ? 0 : i / (formData.timeHorizon - 1);
-              // Use exponential curve for upward acceleration
-              const curvedProgress = Math.pow(progress, 1.5);
-              const rate =
-                scenario.startRate +
-                (scenario.endRate - scenario.startRate) * curvedProgress;
-              rates.push(Math.round(rate / 2) * 2); // Round to nearest even number
-            }
-            return rates;
-          } else {
-            // Fallback to flat rate if we're in custom mode
-            return generateFlat(
-              formData.btcPriceFlat,
-              formData.timeHorizon - 1,
-            );
+          for (let i = 0; i < formData.timeHorizon; i++) {
+            const progress = i / Math.max(1, formData.timeHorizon - 1);
+            // Use exponential curve for upward acceleration
+            const curvedProgress = Math.pow(progress, 1.5);
+            const rate =
+              scenario.startRate +
+              (scenario.endRate - scenario.startRate) * curvedProgress;
+            rates.push(Math.round(rate / 2) * 2);
           }
-
-        default:
-          return [];
+        } else {
+          // Fallback to flat rate if we're in custom mode
+          for (let i = 0; i < formData.timeHorizon; i++) {
+            rates.push(formData.btcPriceFlat);
+          }
+        }
       }
+
+      return rates;
     },
     [
       formData.btcPriceInputType,
+      formData.btcPricePreset,
+      formData.timeHorizon,
       formData.btcPriceFlat,
       formData.btcPriceStart,
       formData.btcPriceEnd,
-      formData.btcPricePreset,
-      formData.timeHorizon,
       presetScenarios,
-      generateFlat,
-      generateLinear,
     ],
   );
 
@@ -131,16 +122,14 @@ export const useBtcRateSystem = (
     ) => {
       const rates = generateBtcRates(inputType);
       const newRates = [...formData.btcPriceCustomRates];
-
       rates.forEach((rate, index) => {
         if (index < newRates.length) {
           newRates[index] = rate;
         }
       });
-
       updateFormData({ btcPriceCustomRates: newRates });
     },
-    [formData.btcPriceCustomRates, generateBtcRates, updateFormData],
+    [generateBtcRates, updateFormData],
   );
 
   // Get chart maximum value
@@ -191,7 +180,6 @@ export const useBtcRateSystem = (
     // BTC rate generation
     presetScenarios,
     dropdownPresets,
-    calculateAverageBtcAppreciation,
     generateBtcRates,
     applyToChart,
     getChartMaxValue,

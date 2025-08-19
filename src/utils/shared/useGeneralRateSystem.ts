@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import { logCalculation, logError } from "../../utils/logger";
 import { useRateCalculationEngine } from "./useRateCalculationEngine";
 
 export interface GeneralRateParams {
@@ -40,11 +39,6 @@ export const useGeneralRateSystem = () => {
         presetScenarios,
       } = params;
 
-      logCalculation("useGeneralRateSystem", "generateRates", params, {
-        timeHorizon,
-        type,
-      });
-
       try {
         let rates: number[] = [];
 
@@ -71,16 +65,6 @@ export const useGeneralRateSystem = () => {
               const scenario = presetScenarios[preset];
 
               if (scenario) {
-                logCalculation(
-                  "useGeneralRateSystem",
-                  "presetScenario",
-                  { preset },
-                  {
-                    startRate: scenario.startRate,
-                    endRate: scenario.endRate,
-                  },
-                );
-
                 // Generate curved progression for preset scenarios
                 for (let i = 0; i <= timeHorizon; i++) {
                   const progress = timeHorizon === 0 ? 0 : i / timeHorizon;
@@ -91,59 +75,22 @@ export const useGeneralRateSystem = () => {
                   rates.push(Math.round(rate / 2) * 2); // Round to nearest even number
                 }
               } else {
-                logError(
-                  "useGeneralRateSystem",
-                  "presetScenarioNotFound",
-                  new Error("Scenario not found"),
-                  {
-                    preset,
-                    availableScenarios: Object.keys(presetScenarios || {}),
-                  },
-                );
                 // Fallback to flat 8% rate
                 rates = generateFlat(8, timeHorizon);
               }
             } else {
-              logCalculation(
-                "useGeneralRateSystem",
-                "defaultCase",
-                { type, preset },
-                {
-                  hasPresetScenarios: !!presetScenarios,
-                  isCustom: preset === "custom",
-                },
-              );
               // For custom or no preset scenarios, return empty array
               rates = [];
             }
             break;
 
           default:
-            logCalculation(
-              "useGeneralRateSystem",
-              "unknownType",
-              { type },
-              { fallbackToFlat: true },
-            );
             rates = generateFlat(8, timeHorizon); // Default fallback
             break;
         }
 
-        logCalculation(
-          "useGeneralRateSystem",
-          "generateRatesComplete",
-          { type },
-          {
-            generatedRatesCount: rates.length,
-            sampleRates: rates.slice(0, 5),
-          },
-        );
-
         return rates;
       } catch (error) {
-        logError("useGeneralRateSystem", "generateRates", error as Error, {
-          params,
-        });
         throw error;
       }
     },
@@ -160,54 +107,20 @@ export const useGeneralRateSystem = () => {
       timeHorizon: number,
       fallbackRate: number = 8,
     ): number[] => {
-      logCalculation(
-        "useGeneralRateSystem",
-        "applyRatesToArray",
-        {
-          currentRatesCount: currentRates.length,
-          newRatesCount: newRates.length,
-          timeHorizon,
-        },
-        { fallbackRate },
-      );
-
       // Start with current rates
       const updatedRates = [...currentRates];
 
       // Ensure the array is at least as long as timeHorizon + 1
-      let addedRates = 0;
       while (updatedRates.length <= timeHorizon) {
         updatedRates.push(fallbackRate);
-        addedRates++;
-      }
-
-      if (addedRates > 0) {
-        logCalculation(
-          "useGeneralRateSystem",
-          "addFallbackRates",
-          { addedCount: addedRates, fallbackRate },
-          { newLength: updatedRates.length },
-        );
       }
 
       // Apply the generated rates
-      let appliedRates = 0;
       newRates.forEach((rate, index) => {
         if (index <= timeHorizon) {
           updatedRates[index] = rate;
-          appliedRates++;
         }
       });
-
-      logCalculation(
-        "useGeneralRateSystem",
-        "applyRatesComplete",
-        { appliedCount: appliedRates },
-        {
-          finalLength: updatedRates.length,
-          sampleRates: updatedRates.slice(0, 5),
-        },
-      );
 
       // Normalize to appropriate length (timeHorizon + 1, with reasonable buffer)
       return normalizeRatesArray(updatedRates, Math.max(timeHorizon + 1, 30));
@@ -225,13 +138,6 @@ export const useGeneralRateSystem = () => {
       const relevantRates = rates.slice(0, timeHorizon);
       const sum = relevantRates.reduce((acc, val) => acc + val, 0);
       const average = Math.round(sum / timeHorizon);
-
-      logCalculation(
-        "useGeneralRateSystem",
-        "calculateAverageRate",
-        { ratesCount: rates.length, timeHorizon, sum },
-        { average },
-      );
 
       return average;
     },

@@ -184,10 +184,38 @@ export const createCalculationService = (): CalculationService => {
     return { formatted, isPositive };
   };
 
+  // Calculate CAGR (Compound Annual Growth Rate) from annual rates
+  const calculateCAGR = (
+    annualRates: number[],
+    timeHorizon: number,
+  ): number => {
+    if (!annualRates || annualRates.length === 0 || timeHorizon <= 0) return 0;
+
+    // Use rates from Year 0 to Year timeHorizon-1 (full planning period)
+    const ratesToUse = annualRates.slice(0, timeHorizon);
+
+    if (ratesToUse.length === 0) return 0;
+
+    // Convert percentage rates to growth multipliers and compound them
+    // Example: 30% rate becomes 1.30, 50% becomes 1.50
+    const compoundedGrowth = ratesToUse.reduce((compound, rate) => {
+      return compound * (1 + rate / 100);
+    }, 1);
+
+    // Calculate CAGR: (Final Value / Initial Value)^(1/years) - 1
+    // Since we start with 1 (100%), Initial Value = 1, Final Value = compoundedGrowth
+    const years = ratesToUse.length;
+    const cagr = (Math.pow(compoundedGrowth, 1 / years) - 1) * 100;
+    const result = parseFloat(cagr.toFixed(1));
+
+    return result;
+  };
+
   return {
     calculatePortfolioGrowth,
     calculateCashflows,
     calculatePortfolioMix,
     formatCurrency,
+    calculateCAGR,
   };
 };

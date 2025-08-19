@@ -137,13 +137,27 @@ export const useRateCalculationEngine = () => {
   );
 
   /**
-   * Calculate average rate from an array
+   * Calculate average rate from an array with optional timeHorizon limit
    */
-  const calculateAverageRate = useCallback((rates: number[]): number => {
-    if (!rates || rates.length === 0) return 0;
-    const sum = rates.reduce((acc, rate) => acc + rate, 0);
-    return sum / rates.length;
-  }, []);
+  const calculateAverageRate = useCallback(
+    (rates: number[], timeHorizon?: number): number => {
+      if (!rates || rates.length === 0) return 0;
+
+      // If timeHorizon is provided, slice the array to include years 1-timeHorizon (excluding year 0)
+      const relevantRates = timeHorizon
+        ? rates.slice(1, timeHorizon + 1)
+        : rates.slice(1); // Always exclude year 0 if no timeHorizon specified
+
+      if (relevantRates.length === 0) return 0;
+
+      const sum = relevantRates.reduce((acc, rate) => acc + rate, 0);
+      const average = sum / relevantRates.length;
+
+      // Apply consistent precision formatting like MarketAssumptionsSection
+      return parseFloat(average.toFixed(1));
+    },
+    [],
+  );
 
   return {
     generateFlat,

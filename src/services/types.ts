@@ -66,6 +66,8 @@ export interface CalculationService {
   };
 
   formatCurrency: (value: number) => { formatted: string; isPositive: boolean };
+
+  calculateCAGR: (annualRates: number[], timeHorizon: number) => number;
 }
 
 export interface LoanService {
