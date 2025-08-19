@@ -20,7 +20,6 @@ export const BtcPriceSection: React.FC<Props> = ({
   const {
     presetScenarios,
     dropdownPresets,
-    calculateAverageBtcAppreciation,
     generateBtcRates,
     applyToChart,
     getChartMaxValue,

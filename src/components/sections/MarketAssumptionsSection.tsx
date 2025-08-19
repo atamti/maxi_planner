@@ -9,7 +9,8 @@ import { BtcPriceSection } from "./BtcPriceSection";
 import { InflationSection } from "./InflationSection";
 
 export const MarketAssumptionsSection: React.FC = () => {
-  const { formData, updateFormData } = usePortfolioCompat();
+  const { formData, updateFormData, calculationResults } = usePortfolioCompat();
+
   const { generateRates, applyRatesToArray } = useGeneralRateSystem();
   const [showRestoreMessage, setShowRestoreMessage] = useState(false);
 
@@ -17,11 +18,13 @@ export const MarketAssumptionsSection: React.FC = () => {
   useEffect(() => {
     let updatedData: Partial<typeof formData> = {};
 
-    // Initialize inflation rates if using preset
+    // Initialize inflation rates if using preset AND rates are completely missing
     if (
       formData.inflationInputType === "preset" &&
       formData.inflationPreset &&
-      formData.inflationPreset !== "custom"
+      formData.inflationPreset !== "custom" &&
+      (!formData.inflationCustomRates ||
+        formData.inflationCustomRates.length === 0)
     ) {
       // Transform economic scenarios to the format expected by generateRates (inflation-specific)
       const inflationPresetScenarios: Record<string, any> = {};
@@ -47,13 +50,16 @@ export const MarketAssumptionsSection: React.FC = () => {
       );
 
       updatedData.inflationCustomRates = newInflationRates;
+    } else {
     }
 
-    // Initialize BTC rates if using preset
+    // Initialize BTC rates if using preset AND rates are completely missing
     if (
       formData.btcPriceInputType === "preset" &&
       formData.btcPricePreset &&
-      formData.btcPricePreset !== "custom"
+      formData.btcPricePreset !== "custom" &&
+      (!formData.btcPriceCustomRates ||
+        formData.btcPriceCustomRates.length === 0)
     ) {
       // Transform economic scenarios to the format expected by generateRates (BTC-specific)
       const btcPresetScenarios: Record<string, any> = {};
@@ -79,6 +85,8 @@ export const MarketAssumptionsSection: React.FC = () => {
       );
 
       updatedData.btcPriceCustomRates = newBtcRates;
+    } else {
+      // BTC rate initialization not needed
     }
 
     // Update form data if we have any changes
@@ -115,17 +123,10 @@ export const MarketAssumptionsSection: React.FC = () => {
         ).toFixed(1)
       : "0";
 
-  const avgBtcGrowth =
-    formData.btcPriceCustomRates && formData.btcPriceCustomRates.length > 0
-      ? (
-          formData.btcPriceCustomRates
-            .filter((rate) => !isNaN(rate) && isFinite(rate))
-            .reduce((sum, rate) => sum + rate, 0) /
-          formData.btcPriceCustomRates.filter(
-            (rate) => !isNaN(rate) && isFinite(rate),
-          ).length
-        ).toFixed(1)
-      : "0";
+  // Use centralized BTC appreciation calculation (CAGR)
+  const avgBtcGrowth = (calculationResults.btcAppreciationAverage ?? 0).toFixed(
+    1,
+  );
 
   // Helper function to get inflation description
   const getInflationDescription = () => {
@@ -199,7 +200,7 @@ export const MarketAssumptionsSection: React.FC = () => {
 
   // Create descriptive title with current settings
   const getSectionTitle = () => {
-    return `3. 📊 Market Assumptions: ${avgInflation}% avg inflation, ${avgBtcGrowth}% avg BTC growth, ${formData.investmentsStartYield}-${formData.investmentsEndYield}% investment yields`;
+    return `3. 📊 Market Assumptions: ${avgInflation}% avg inflation, ${avgBtcGrowth}% BTC CAGR, ${formData.investmentsStartYield}-${formData.investmentsEndYield}% investment yields`;
   };
 
   // Check if we should show the scenario restore message
@@ -273,7 +274,7 @@ export const MarketAssumptionsSection: React.FC = () => {
 
         {/* Subsection 3b: BTC Price Appreciation */}
         <CollapsibleSection
-          title={`3b. ₿ BTC Price Appreciation: ${avgBtcGrowth}% average (${getBtcDescription()})`}
+          title={`3b. ₿ BTC Price Appreciation: ${avgBtcGrowth}% CAGR (${getBtcDescription()})`}
           defaultExpanded={false}
           noGrid={true}
         >

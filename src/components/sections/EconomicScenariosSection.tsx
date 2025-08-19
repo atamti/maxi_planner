@@ -6,7 +6,8 @@ import { CollapsibleSection } from "../common/CollapsibleSection";
 import { ScenarioRestoreMessage } from "../common/ScenarioRestoreMessage";
 
 export const EconomicScenariosSection: React.FC = () => {
-  const { formData, updateFormData } = usePortfolioCompat();
+  const { formData, updateFormData, calculationResults } = usePortfolioCompat();
+
   const { generateRates, calculateAverageRate } = useGeneralRateSystem();
   const [showRestoreMessage, setShowRestoreMessage] = useState(false);
 
@@ -36,17 +37,8 @@ export const EconomicScenariosSection: React.FC = () => {
             )
           : scenario.inflation.startRate; // Fallback to scenario default
 
-      const btcAvg =
-        formData.btcPriceCustomRates && formData.btcPriceCustomRates.length > 0
-          ? Math.round(
-              formData.btcPriceCustomRates
-                .filter((rate) => !isNaN(rate) && isFinite(rate))
-                .reduce((sum, rate) => sum + rate, 0) /
-                formData.btcPriceCustomRates.filter(
-                  (rate) => !isNaN(rate) && isFinite(rate),
-                ).length,
-            )
-          : scenario.btcPrice.startRate; // Fallback to scenario default
+      // Use centralized BTC appreciation calculation (CAGR)
+      const btcAvg = Math.round(calculationResults.btcAppreciationAverage ?? 0);
 
       const incomeAvg =
         formData.incomeCustomRates && formData.incomeCustomRates.length > 0
@@ -94,7 +86,12 @@ export const EconomicScenariosSection: React.FC = () => {
         timeHorizon: formData.timeHorizon,
         presetScenarios: { [scenarioKey]: scenario.btcPrice },
       });
-      const btcAvg = calculateAverageRate(btcRates, formData.timeHorizon);
+      // Use centralized BTC appreciation calculation instead of local calculateAverageRate
+      const btcAvg = Math.round(calculationResults.btcAppreciationAverage ?? 0);
+
+      console.log(
+        `� EconomicScenariosSection (NON-CUSTOM path) CENTRALIZED BTC Display: ${btcAvg}% | Raw: ${calculationResults.btcAppreciationAverage}`,
+      );
 
       // Calculate income average
       const incomeRates = generateRates({
@@ -227,6 +224,10 @@ export const EconomicScenariosSection: React.FC = () => {
         });
 
         btcPriceCustomRates = btcRates.slice(0, formData.timeHorizon);
+        console.log(
+          `🔴 EconomicScenariosSection REGENERATING BTC rates from scenario "${currentScenario}":`,
+          btcRates.slice(0, formData.timeHorizon),
+        );
 
         // Fix 2: Generate income rates from current scenario
         const incomePresetScenarios: Record<string, any> = {};
@@ -266,6 +267,9 @@ export const EconomicScenariosSection: React.FC = () => {
         btcPriceCustomRates,
         incomeCustomRates, // Fix 2: Include income rates
       });
+      console.log(
+        `🔴 EconomicScenariosSection calling updateFormData with regenerated rates for scenario "${currentScenario}"`,
+      );
       return;
     }
 

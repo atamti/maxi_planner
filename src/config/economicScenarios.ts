@@ -44,9 +44,9 @@ const economicScenarios: Record<ScenarioKey, ScenarioConfiguration> = {
     },
     incomeYield: {
       name: "Tight monetary policy - Stable income",
-      startRate: 5,
-      endRate: 5,
-      maxAxis: 10,
+      startRate: 10,
+      endRate: 10,
+      maxAxis: 15,
     },
   },
   debasement: {
@@ -69,9 +69,9 @@ const economicScenarios: Record<ScenarioKey, ScenarioConfiguration> = {
     },
     incomeYield: {
       name: "Managed debasement - Growing income",
-      startRate: 8,
-      endRate: 10,
-      maxAxis: 15,
+      startRate: 12,
+      endRate: 15,
+      maxAxis: 20,
     },
   },
   crisis: {
@@ -119,9 +119,9 @@ const economicScenarios: Record<ScenarioKey, ScenarioConfiguration> = {
     },
     incomeYield: {
       name: "Hyperinflationary spiral",
-      startRate: 20,
-      endRate: 2,
-      maxAxis: 25,
+      startRate: 80,
+      endRate: 200,
+      maxAxis: 250,
     },
   },
   custom: {
@@ -144,8 +144,8 @@ const economicScenarios: Record<ScenarioKey, ScenarioConfiguration> = {
     },
     incomeYield: {
       name: "Custom Income",
-      startRate: 5, // Changed from 8 to 5 to be less intrusive
-      endRate: 5, // Changed from 8 to 5 to be less intrusive
+      startRate: 15, 
+      endRate: 15,
       maxAxis: 100,
     },
   },

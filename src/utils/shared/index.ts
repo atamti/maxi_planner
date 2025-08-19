@@ -1,4 +1,5 @@
 // Shared utility hooks for common patterns across the application
+export { useBtcRateSystem } from "./useBtcRateSystem";
 export { useFormState } from "./useFormState";
 export { useInteractionEffects } from "./useInteractionEffects";
 export { useInteractiveChartSystem } from "./useInteractiveChartSystem";

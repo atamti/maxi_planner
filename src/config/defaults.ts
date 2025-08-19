@@ -1,3 +1,8 @@
+import {
+  generateBtcRatesFromScenario,
+  generateIncomeRatesFromScenario,
+  generateInflationRatesFromScenario,
+} from "../hooks/useFormReset";
 import { FormData } from "../types";
 
 export const DEFAULT_FORM_DATA: FormData = {
@@ -32,7 +37,7 @@ export const DEFAULT_FORM_DATA: FormData = {
   inflationStart: 5,
   inflationEnd: 15,
   inflationPreset: "debasement", // This should match economicScenario
-  inflationCustomRates: Array(30).fill(8), // Will be updated by scenario
+  inflationCustomRates: generateInflationRatesFromScenario("debasement", 20), // Will be updated by scenario
   inflationManualMode: false,
 
   // BTC Price Appreciation - Also fix this to match
@@ -47,7 +52,7 @@ export const DEFAULT_FORM_DATA: FormData = {
   btcPriceStart: 30,
   btcPriceEnd: 70,
   btcPricePreset: "debasement", // This should match economicScenario
-  btcPriceCustomRates: Array(30).fill(50), // Will be updated by scenario
+  btcPriceCustomRates: generateBtcRatesFromScenario("debasement", 20), // Will be updated by scenario
   btcPriceManualMode: false,
 
   // Income section - Fix to match economic scenario
@@ -64,6 +69,6 @@ export const DEFAULT_FORM_DATA: FormData = {
   incomeStart: 8,
   incomeEnd: 8,
   incomePreset: "debasement", // This should match economicScenario
-  incomeCustomRates: Array(30).fill(8), // Will be updated by scenario
+  incomeCustomRates: generateIncomeRatesFromScenario("debasement", 20), // Will be updated by scenario
   incomeManualMode: false,
 };
