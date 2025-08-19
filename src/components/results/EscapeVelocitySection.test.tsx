@@ -16,6 +16,7 @@ const createMockResults = (
   expensesAtActivationYears: [],
   loanPrincipal: 0,
   loanInterest: 0,
+  btcAppreciationAverage: 0,
   ...overrides,
 });
 

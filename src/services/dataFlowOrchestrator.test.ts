@@ -83,6 +83,7 @@ const mockCalculationResults: CalculationResults = {
   expensesAtActivationYears: [6381],
   loanPrincipal: 99825,
   loanInterest: 8,
+  btcAppreciationAverage: 45.7,
 };
 
 const mockState = {

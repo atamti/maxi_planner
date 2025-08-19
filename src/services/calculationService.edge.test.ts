@@ -25,6 +25,7 @@ describe("Calculation Service - Systematic Edge Case Testing", () => {
     expensesAtActivationYears: [50000, 52000, 54000],
     loanPrincipal: 100000,
     loanInterest: 6000,
+    btcAppreciationAverage: 45.7,
     ...overrides,
   });
 

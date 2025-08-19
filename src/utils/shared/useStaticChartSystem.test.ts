@@ -88,6 +88,7 @@ const mockCalculationResults: CalculationResults = {
   expensesAtActivationYears: [100000],
   loanPrincipal: 250000,
   loanInterest: 75000,
+  btcAppreciationAverage: 45.7,
 };
 
 describe("useStaticChartSystem", () => {
@@ -262,6 +263,7 @@ describe("useStaticChartSystem", () => {
         expensesAtActivationYears: [],
         loanPrincipal: 0,
         loanInterest: 0,
+        btcAppreciationAverage: 0,
       };
 
       const { result } = renderHook(() =>

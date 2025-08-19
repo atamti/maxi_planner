@@ -50,6 +50,7 @@ describe("FinalYearCard", () => {
     expensesAtActivationYears: [],
     loanPrincipal: 100000,
     loanInterest: 7000,
+    btcAppreciationAverage: 45.7,
   };
 
   it("should render final year analysis title", () => {
@@ -128,6 +129,7 @@ describe("FinalYearCard", () => {
       expensesAtActivationYears: [],
       loanPrincipal: 0,
       loanInterest: 0,
+      btcAppreciationAverage: 0,
     };
 
     const customFormData = { ...mockFormData, timeHorizon: 1 };

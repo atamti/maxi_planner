@@ -88,6 +88,7 @@ const mockCalculationResults: CalculationResults = {
   expensesAtActivationYears: [40000, 42000, 44000],
   loanPrincipal: 150000,
   loanInterest: 12000,
+  btcAppreciationAverage: 45.7,
 };
 
 const mockUpdateFormData = vi.fn();
