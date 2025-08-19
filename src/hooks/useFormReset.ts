@@ -64,6 +64,36 @@ export const generateInflationRatesFromScenario = (
 };
 
 /**
+ * Helper function to generate income rates based on a scenario
+ */
+export const generateIncomeRatesFromScenario = (
+  scenarioKey: string,
+  timeHorizon: number,
+): number[] => {
+  const incomeScenario =
+    economicScenarios[scenarioKey as ScenarioKey]?.incomeYield;
+  if (!incomeScenario) return Array(30).fill(8);
+
+  const rates = [];
+  for (let i = 0; i < timeHorizon; i++) {
+    const progress = i / Math.max(1, timeHorizon - 1);
+    const curvedProgress = Math.pow(progress, 1.5); // Use 1.5 curve like other income calculations
+    const rate =
+      incomeScenario.startRate +
+      (incomeScenario.endRate - incomeScenario.startRate) * curvedProgress;
+    rates.push(Math.round(rate));
+  }
+
+  // Fill the rest of the array
+  const fullArray = [...rates];
+  while (fullArray.length < 30) {
+    fullArray.push(rates[rates.length - 1] || 8);
+  }
+
+  return fullArray;
+};
+
+/**
  * Hook for managing form reset functionality
  */
 export const useFormReset = (

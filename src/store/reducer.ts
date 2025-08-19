@@ -45,6 +45,7 @@ export const initialState: AppState = {
     expensesAtActivationYears: [],
     loanPrincipal: 0,
     loanInterest: 0,
+    btcAppreciationAverage: 0,
   },
   ui: initialUIState,
   scenarios: initialScenarioState,
