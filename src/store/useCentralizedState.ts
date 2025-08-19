@@ -47,12 +47,15 @@ export const useCentralizedState = (): CentralizedState => {
   }, [calculationResults]);
 
   // Core actions
-  const updateFormData = useCallback((updates: Partial<FormData>) => {
-    dispatch({
-      type: "UPDATE_FORM_DATA",
-      payload: updates,
-    });
-  }, []);
+  const updateFormData = useCallback(
+    (updates: Partial<FormData>) => {
+      dispatch({
+        type: "UPDATE_FORM_DATA",
+        payload: updates,
+      });
+    },
+    [],
+  );
 
   const resetForm = useCallback(() => {
     dispatch({ type: "RESET_FORM_DATA" });

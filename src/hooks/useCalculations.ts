@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import economicScenarios, { ScenarioKey } from "../config/economicScenarios";
+import { createCalculationService } from "../services/calculationService";
 import { CalculationResults, FormData, Result } from "../types";
 
 export const useCalculations = (formData: FormData): CalculationResults => {
@@ -426,6 +427,13 @@ export const useCalculations = (formData: FormData): CalculationResults => {
     );
     const displayLoanInterest = displayLoanPrincipal * (loanRate / 100);
 
+    // Centralized BTC appreciation average calculation (CAGR)
+    const calculationService = createCalculationService();
+    const btcAppreciationAverage = calculationService.calculateCAGR(
+      btcPriceCustomRates,
+      timeHorizon,
+    );
+
     return {
       results,
       usdIncome,
@@ -437,6 +445,7 @@ export const useCalculations = (formData: FormData): CalculationResults => {
       expensesAtActivationYears,
       loanPrincipal: displayLoanPrincipal,
       loanInterest: displayLoanInterest,
+      btcAppreciationAverage, // Add centralized BTC appreciation average
     };
   }, [formData]);
 };

@@ -37,6 +37,15 @@ export const PortfolioProvider: React.FC<PortfolioProviderProps> = ({
 
   const updateFormData = (updates: Partial<FormData>) => {
     const updatedFields = Object.keys(updates);
+
+    // 🔍 DEBUG: Track btcPriceCustomRates changes
+    if (updates.btcPriceCustomRates) {
+      console.log("🔴 PortfolioContext: btcPriceCustomRates being updated!");
+      console.log("🔴 Previous rates:", formData.btcPriceCustomRates);
+      console.log("🔴 New rates:", updates.btcPriceCustomRates);
+      console.log("🔴 Call stack:", new Error().stack);
+    }
+
     logFormUpdate(
       "PortfolioContext",
       `fields: ${updatedFields.join(", ")}`,

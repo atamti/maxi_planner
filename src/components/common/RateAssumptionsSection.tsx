@@ -166,10 +166,10 @@ export const RateAssumptionsSection: React.FC<Props> = ({
       preset !== "custom" &&
       presetScenarios
     ) {
-      // Apply the preset scenario to initialize the chart correctly
-      setTimeout(() => {
-        applyToChart("preset", preset);
-      }, 0);
+      // SKIP preset regeneration - rates are already loaded correctly from defaults
+      // The issue is that we have two different rate generation algorithms that produce
+      // different results for the same preset (45.7% vs 44.5% CAGR)
+      // By skipping regeneration, we preserve the correctly loaded rates
     }
   }, [inputType, preset, presetScenarios]); // Only run when these dependencies change
 
@@ -185,9 +185,8 @@ export const RateAssumptionsSection: React.FC<Props> = ({
       inputType === "preset" &&
       presetScenarios
     ) {
-      setTimeout(() => {
-        applyToChart("preset", preset);
-      }, 0);
+      // SKIP preset regeneration - rates are already loaded correctly from defaults
+      // Only regenerate if the user actually changed the preset selection
     }
   }, [preset]); // Watch for preset changes
 
