@@ -15,7 +15,6 @@ import React, { useEffect } from "react";
 import { PortfolioForm } from "./components/forms/PortfolioForm";
 import { SaveLoadSection } from "./components/forms/SaveLoadSection";
 import { ResultsSection } from "./components/sections/ResultsSection";
-import { PortfolioProvider } from "./context/PortfolioContext";
 import { CentralizedStateProvider, usePortfolioCompat } from "./store";
 import { FormData } from "./types";
 import { logError, logUserAction } from "./utils/logger";
@@ -75,9 +74,7 @@ const App: React.FC = () => {
 
   return (
     <CentralizedStateProvider>
-      <PortfolioProvider>
-        <AppContent />
-      </PortfolioProvider>
+      <AppContent />
     </CentralizedStateProvider>
   );
 };

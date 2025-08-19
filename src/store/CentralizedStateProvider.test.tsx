@@ -26,7 +26,7 @@ const TestComponent = () => {
   );
 };
 
-describe("PortfolioContext", () => {
+describe("CentralizedStateProvider", () => {
   it("should provide default form data", () => {
     render(
       <CentralizedStateProvider>

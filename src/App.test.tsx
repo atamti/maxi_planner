@@ -42,12 +42,7 @@ vi.mock("./components/sections/ResultsSection", () => ({
   ),
 }));
 
-// Mock the context and store
-vi.mock("./context/PortfolioContext", () => ({
-  PortfolioProvider: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="portfolio-provider">{children}</div>
-  ),
-}));
+// Mock the centralized store
 
 vi.mock("./store", () => ({
   CentralizedStateProvider: ({ children }: { children: React.ReactNode }) => (
@@ -80,7 +75,6 @@ describe("App", () => {
     expect(
       screen.getByTestId("centralized-state-provider"),
     ).toBeInTheDocument();
-    expect(screen.getByTestId("portfolio-provider")).toBeInTheDocument();
   });
 
   it("should render main application components", () => {
@@ -92,19 +86,16 @@ describe("App", () => {
     expect(screen.getByTestId("results-section")).toBeInTheDocument();
   });
 
-  it("should have proper provider hierarchy", () => {
+  it("should render centralized state provider only", () => {
     render(<App />);
 
     const centralizedProvider = screen.getByTestId(
       "centralized-state-provider",
     );
-    const portfolioProvider = screen.getByTestId("portfolio-provider");
 
     expect(centralizedProvider).toBeInTheDocument();
-    expect(portfolioProvider).toBeInTheDocument();
-
-    // Portfolio provider should be inside centralized provider
-    expect(centralizedProvider).toContainElement(portfolioProvider);
+    // Should not have legacy portfolio provider anymore
+    expect(() => screen.getByTestId("portfolio-provider")).toThrow();
   });
 
   it("should have Chart.js available for chart components", async () => {
