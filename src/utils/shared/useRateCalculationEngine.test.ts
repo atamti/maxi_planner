@@ -353,7 +353,7 @@ describe("useRateCalculationEngine", () => {
     it("should calculate correct average for positive numbers", () => {
       const { calculateAverageRate } = getHook();
 
-      const rates = [2, 4, 6, 8]; // Year 0, 1, 2, 3  
+      const rates = [2, 4, 6, 8]; // Year 0, 1, 2, 3
       const result = calculateAverageRate(rates);
 
       // Should exclude year 0, so calculate average of [4, 6, 8] = 18/3 = 6
@@ -400,7 +400,7 @@ describe("useRateCalculationEngine", () => {
       const rates = [-10, 0, 10]; // Year 0, 1, 2
       const result = calculateAverageRate(rates);
 
-      // Should exclude year 0, so calculate average of [0, 10] = 10/2 = 5  
+      // Should exclude year 0, so calculate average of [0, 10] = 10/2 = 5
       expect(result).toBe(5);
     });
 
