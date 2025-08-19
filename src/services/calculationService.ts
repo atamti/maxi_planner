@@ -184,6 +184,30 @@ export const createCalculationService = (): CalculationService => {
     return { formatted, isPositive };
   };
 
+  // Calculate simple arithmetic average for display purposes
+  const calculateSimpleAverage = (
+    rates: number[],
+    timeHorizon?: number,
+  ): number => {
+    if (!rates || rates.length === 0) return 0;
+
+    // Filter out invalid rates (NaN, Infinity)
+    const validRates = rates.filter((rate) => !isNaN(rate) && isFinite(rate));
+    if (validRates.length === 0) return 0;
+
+    // Use timeHorizon to limit the calculation if provided
+    const ratesToUse = timeHorizon 
+      ? validRates.slice(0, timeHorizon)
+      : validRates;
+
+    if (ratesToUse.length === 0) return 0;
+
+    const sum = ratesToUse.reduce((acc, rate) => acc + rate, 0);
+    const average = sum / ratesToUse.length;
+
+    return parseFloat(average.toFixed(1));
+  };
+
   // Calculate CAGR (Compound Annual Growth Rate) from annual rates
   const calculateCAGR = (
     annualRates: number[],
@@ -217,5 +241,6 @@ export const createCalculationService = (): CalculationService => {
     calculatePortfolioMix,
     formatCurrency,
     calculateCAGR,
+    calculateSimpleAverage,
   };
 };

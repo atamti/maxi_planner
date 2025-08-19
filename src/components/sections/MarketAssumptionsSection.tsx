@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import economicScenarios from "../../config/economicScenarios";
 import { usePortfolioCompat } from "../../store";
 import { useGeneralRateSystem } from "../../utils/shared/useGeneralRateSystem";
+import { createCalculationService } from "../../services/calculationService";
 import { YieldChart } from "../charts/YieldChart";
 import { CollapsibleSection } from "../common/CollapsibleSection";
 import { ScenarioRestoreMessage } from "../common/ScenarioRestoreMessage";
@@ -10,6 +11,7 @@ import { InflationSection } from "./InflationSection";
 
 export const MarketAssumptionsSection: React.FC = () => {
   const { formData, updateFormData, calculationResults } = usePortfolioCompat();
+  const calculationService = createCalculationService();
 
   const { generateRates, applyRatesToArray } = useGeneralRateSystem();
   const [showRestoreMessage, setShowRestoreMessage] = useState(false);
@@ -113,14 +115,12 @@ export const MarketAssumptionsSection: React.FC = () => {
   // Calculate averages for use in titles with safety checks
   const avgInflation =
     formData.inflationCustomRates && formData.inflationCustomRates.length > 0
-      ? (
-          formData.inflationCustomRates
-            .filter((rate) => !isNaN(rate) && isFinite(rate))
-            .reduce((sum, rate) => sum + rate, 0) /
-          formData.inflationCustomRates.filter(
-            (rate) => !isNaN(rate) && isFinite(rate),
-          ).length
-        ).toFixed(1)
+      ? calculationService
+          .calculateSimpleAverage(
+            formData.inflationCustomRates,
+            formData.timeHorizon,
+          )
+          .toFixed(1)
       : "0";
 
   // Use centralized BTC appreciation calculation (CAGR)

@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import economicScenarios, { ScenarioKey } from "../../config/economicScenarios";
 import { usePortfolioCompat } from "../../store";
 import { useGeneralRateSystem } from "../../utils/shared/useGeneralRateSystem";
+import { createCalculationService } from "../../services/calculationService";
 import { CollapsibleSection } from "../common/CollapsibleSection";
 import { ScenarioRestoreMessage } from "../common/ScenarioRestoreMessage";
 
 export const EconomicScenariosSection: React.FC = () => {
   const { formData, updateFormData, calculationResults } = usePortfolioCompat();
+  const calculationService = createCalculationService();
 
   const { generateRates, calculateAverageRate } = useGeneralRateSystem();
   const [showRestoreMessage, setShowRestoreMessage] = useState(false);
@@ -28,12 +30,10 @@ export const EconomicScenariosSection: React.FC = () => {
         formData.inflationCustomRates &&
         formData.inflationCustomRates.length > 0
           ? Math.round(
-              formData.inflationCustomRates
-                .filter((rate) => !isNaN(rate) && isFinite(rate))
-                .reduce((sum, rate) => sum + rate, 0) /
-                formData.inflationCustomRates.filter(
-                  (rate) => !isNaN(rate) && isFinite(rate),
-                ).length,
+              calculationService.calculateSimpleAverage(
+                formData.inflationCustomRates,
+                formData.timeHorizon,
+              ),
             )
           : scenario.inflation.startRate; // Fallback to scenario default
 
@@ -43,12 +43,10 @@ export const EconomicScenariosSection: React.FC = () => {
       const incomeAvg =
         formData.incomeCustomRates && formData.incomeCustomRates.length > 0
           ? Math.round(
-              formData.incomeCustomRates
-                .filter((rate) => !isNaN(rate) && isFinite(rate))
-                .reduce((sum, rate) => sum + rate, 0) /
-                formData.incomeCustomRates.filter(
-                  (rate) => !isNaN(rate) && isFinite(rate),
-                ).length,
+              calculationService.calculateSimpleAverage(
+                formData.incomeCustomRates,
+                formData.timeHorizon,
+              ),
             )
           : scenario.incomeYield.startRate; // Fallback to scenario default
 

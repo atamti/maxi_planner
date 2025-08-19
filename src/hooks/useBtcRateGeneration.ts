@@ -26,16 +26,6 @@ export const useBtcRateGeneration = (
     return presets;
   }, []);
 
-  // Calculate average BTC appreciation rate
-  const calculateAverageBtcAppreciation = useMemo((): number => {
-    if (formData.btcPriceCustomRates.length === 0) return 0;
-    const sum = formData.btcPriceCustomRates
-      .slice(0, formData.timeHorizon)
-      .reduce((acc, val) => acc + val, 0);
-    // Use same precision as MarketAssumptionsSection (1 decimal place, then parse back to number)
-    return parseFloat((sum / formData.timeHorizon).toFixed(1));
-  }, [formData.btcPriceCustomRates, formData.timeHorizon]);
-
   // Generate BTC rates based on input type
   const generateBtcRates = useMemo(() => {
     return (
@@ -139,7 +129,6 @@ export const useBtcRateGeneration = (
   return {
     presetScenarios,
     dropdownPresets,
-    calculateAverageBtcAppreciation,
     generateBtcRates,
     applyToChart,
     getChartMaxValue,

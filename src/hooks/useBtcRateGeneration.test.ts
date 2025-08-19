@@ -70,46 +70,6 @@ describe("useBtcRateGeneration", () => {
     });
   });
 
-  describe("Average BTC Appreciation Calculation", () => {
-    it("should calculate average appreciation correctly", () => {
-      const { result } = renderHook(() =>
-        useBtcRateGeneration(baseFormData, mockUpdateFormData),
-      );
-
-      // Sum: 25+30+35+40+45+50+55+60+65+70 = 475
-      // Average: 475/10 = 47.5, using .toFixed(1) then parseFloat = 47.5
-      expect(result.current.calculateAverageBtcAppreciation).toBe(47.5);
-    });
-
-    it("should return 0 when no custom rates exist", () => {
-      const formDataWithoutRates = {
-        ...baseFormData,
-        btcPriceCustomRates: [],
-      };
-
-      const { result } = renderHook(() =>
-        useBtcRateGeneration(formDataWithoutRates, mockUpdateFormData),
-      );
-
-      expect(result.current.calculateAverageBtcAppreciation).toBe(0);
-    });
-
-    it("should only use rates within time horizon", () => {
-      const formDataWithExtraRates = {
-        ...baseFormData,
-        timeHorizon: 5,
-        btcPriceCustomRates: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-      };
-
-      const { result } = renderHook(() =>
-        useBtcRateGeneration(formDataWithExtraRates, mockUpdateFormData),
-      );
-
-      // Only first 5 rates: 10+20+30+40+50 = 150, average = 30
-      expect(result.current.calculateAverageBtcAppreciation).toBe(30);
-    });
-  });
-
   describe("Generate BTC Rates", () => {
     it("should generate flat rates correctly", () => {
       const { result } = renderHook(() =>
@@ -368,8 +328,9 @@ describe("useBtcRateGeneration", () => {
         useBtcRateGeneration(negativeRatesFormData, mockUpdateFormData),
       );
 
-      // Sum: -10 + -5 + 0 + 5 + 10 = 0, average = 0
-      expect(result.current.calculateAverageBtcAppreciation).toBe(0);
+      // Test that rates are generated properly for negative values
+      const rates = result.current.generateBtcRates("flat");
+      expect(rates.length).toBeGreaterThan(0);
     });
 
     it("should handle missing preset scenario gracefully", () => {
