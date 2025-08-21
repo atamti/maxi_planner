@@ -68,15 +68,19 @@ export const DraggableRateChart: React.FC<Props> = ({
   return (
     <div
       ref={containerRef}
-      className={`w-full ${readOnly ? "cursor-not-allowed" : "cursor-pointer"}`}
+      className={`w-full border border-themed bg-surface rounded-none ${readOnly ? "cursor-not-allowed" : "cursor-pointer"}`}
     >
-      {title && <h4 className="font-semibold mb-2">{title}</h4>}
+      {title && (
+        <h4 className="font-semibold mb-2 p-3 bg-surface-alt text-primary font-mono uppercase tracking-wide">
+          {title}
+        </h4>
+      )}
       <svg
         ref={svgRef}
         width="100%"
         height={height}
         viewBox={`0 0 ${containerWidth} ${height}`}
-        className="border border-gray-300 rounded"
+        className="w-full"
         onMouseDown={readOnly ? undefined : handleMouseDown}
         onMouseMove={readOnly ? undefined : handleMouseMove}
         onMouseUp={readOnly ? undefined : handleMouseUp}

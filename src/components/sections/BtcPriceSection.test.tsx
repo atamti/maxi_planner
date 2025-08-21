@@ -218,7 +218,7 @@ describe("BtcPriceSection", () => {
       "p-4",
       "card-themed",
       "border",
-      "border-bitcoin-orange",
+      "border-themed",
     );
 
     // Check Projected USD section styling
@@ -228,7 +228,7 @@ describe("BtcPriceSection", () => {
     expect(projectedSection).toHaveClass(
       "card-themed",
       "border",
-      "border-bitcoin-orange",
+      "border-themed",
     );
   });
 

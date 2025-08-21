@@ -17,22 +17,24 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
 
   return (
     <div
-      className="fixed z-50 bg-gray-800 text-white text-sm rounded-lg px-3 py-2 shadow-lg pointer-events-none transform -translate-x-1/2 -translate-y-full"
+      className="fixed z-50 bg-gray-900 text-white text-sm rounded-none border border-bitcoin-orange px-3 py-2 shadow-lg pointer-events-none transform -translate-x-1/2 -translate-y-full font-mono"
       style={{
-        left: position.x,
-        top: position.y - 10,
+        left: Math.max(60, Math.min(position.x, window.innerWidth - 60)), // Keep tooltip within viewport
+        top: position.y - 15, // Better vertical positioning
       }}
     >
-      <div className="font-medium">Year {yearIndex + 1}</div>
+      <div className="font-medium text-bitcoin-orange uppercase tracking-wide">
+        Year {yearIndex + 1}
+      </div>
       <div className="text-gray-200">
-        {value.toFixed(0)}% {yAxisLabel}
+        {value.toFixed(1)}% {yAxisLabel}
       </div>
       <div
         className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full w-0 h-0"
         style={{
           borderLeft: "6px solid transparent",
           borderRight: "6px solid transparent",
-          borderTop: "6px solid #1f2937",
+          borderTop: "6px solid #1a1a1a",
         }}
       />
     </div>

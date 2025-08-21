@@ -589,7 +589,7 @@ describe("DraggableRateChart", () => {
     it("should have correct SVG attributes", () => {
       const { container } = render(<DraggableRateChart {...defaultProps} />);
       const svg = getSvg(container);
-      expect(svg).toHaveClass("border", "border-gray-300", "rounded");
+      expect(svg).toHaveClass("w-full");
       expect(svg).toHaveAttribute("preserveAspectRatio", "none");
     });
   });

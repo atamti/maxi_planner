@@ -31,7 +31,7 @@ export const LeverageSection: React.FC = () => {
         />
         <div className="flex justify-between mt-2">
           <span className="text-xs text-secondary font-mono">0%</span>
-          <span className="text-sm font-bold text-bitcoin-orange font-inter">
+          <span className="text-sm font-bold text-primary font-inter">
             {formData.collateralPct}% USED AS COLLATERAL
           </span>
           <span className="text-xs text-secondary font-mono">100%</span>
@@ -51,7 +51,7 @@ export const LeverageSection: React.FC = () => {
         />
         <div className="flex justify-between mt-2">
           <span className="text-xs text-secondary font-mono">0%</span>
-          <span className="text-sm font-bold text-bitcoin-orange font-inter">
+          <span className="text-sm font-bold text-primary font-inter">
             {formData.ltvRatio}% LTV (BORROW {formData.ltvRatio}% OF COLLATERAL
             VALUE)
           </span>
@@ -86,7 +86,7 @@ export const LeverageSection: React.FC = () => {
         />
         <div className="flex justify-between mt-2">
           <span className="text-xs text-secondary font-mono">1 yr</span>
-          <span className="text-sm font-bold text-bitcoin-orange font-inter">
+          <span className="text-sm font-bold text-primary font-inter">
             {formData.loanTermYears} YEARS
           </span>
           <span className="text-xs text-secondary font-mono">30 yrs</span>
@@ -111,7 +111,7 @@ export const LeverageSection: React.FC = () => {
 
       {/* Live Loan Calculations */}
       {formData.collateralPct > 0 && (
-        <div className="col-span-2 mt-4 p-3 card-themed border border-bitcoin-orange">
+        <div className="col-span-2 mt-4 p-3 card-themed border border-themed">
           <h4 className="font-semibold text-bitcoin-orange mb-2 font-heading tracking-wide uppercase">
             💰 LOAN DETAILS
           </h4>

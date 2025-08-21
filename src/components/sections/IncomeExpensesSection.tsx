@@ -124,7 +124,7 @@ export const IncomeExpensesSection: React.FC<Props> = ({
             />
             <div className="flex justify-between mt-2">
               <span className="text-xs text-secondary font-mono">0%</span>
-              <span className="text-sm font-bold text-bitcoin-orange font-inter">
+              <span className="text-sm font-bold text-primary font-inter">
                 {formData.incomeReinvestmentPct}% REINVESTED,{" "}
                 {100 - formData.incomeReinvestmentPct}% AVAILABLE
               </span>
@@ -147,7 +147,7 @@ export const IncomeExpensesSection: React.FC<Props> = ({
             />
             <div className="flex justify-between mt-2">
               <span className="text-xs text-secondary font-mono">0</span>
-              <span className="text-sm font-bold text-bitcoin-orange font-inter">
+              <span className="text-sm font-bold text-primary font-inter">
                 YEAR {formData.activationYear} - WHEN INCOME STARTS
               </span>
               <span className="text-xs text-secondary font-mono">

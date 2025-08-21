@@ -228,7 +228,7 @@ export const RateAssumptionsSection: React.FC<Props> = ({
         }
       />
 
-      {/* Header */}
+      {/* Header - Consistent with other sections */}
       <div
         className={`p-6 rounded-none mb-6 ${colorClass.background} border-l-4 ${colorClass.border}`}
       >
@@ -254,7 +254,10 @@ export const RateAssumptionsSection: React.FC<Props> = ({
               onChange={handleScenarioToggle}
               id={`${dataKey}-follow-scenario-toggle`}
               label="Follow scenario"
-              colorClass={{ on: "bg-green-400", off: "bg-gray-300" }}
+              colorClass={{
+                on: "bg-success",
+                off: "bg-gray-600 dark:bg-gray-300",
+              }}
               description={{
                 on: `Following scenario with ${avgRate}${unit} average rate. Settings are controlled by the selected scenario.`,
                 off: `Independent configuration. Average rate: ${avgRate}${unit}. Enable to sync with the selected economic scenario.`,
@@ -266,7 +269,7 @@ export const RateAssumptionsSection: React.FC<Props> = ({
         {/* Unified Scenario Selection */}
         {(!followScenario || formData.economicScenario === "custom") && (
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-primary mb-2 font-mono uppercase tracking-wide">
               Rate Configuration
             </label>
             <select
@@ -297,7 +300,7 @@ export const RateAssumptionsSection: React.FC<Props> = ({
                   }
                 }
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-themed bg-surface text-primary rounded-none shadow-sm focus:outline-none focus:ring-2 focus:ring-bitcoin-orange focus:border-bitcoin-orange font-mono"
               disabled={manualMode}
             >
               <optgroup label="Preset Scenarios">
@@ -356,11 +359,11 @@ export const RateAssumptionsSection: React.FC<Props> = ({
         {/* Saylor explanation */}
         {(!followScenario || formData.economicScenario === "custom") &&
           inputType === "saylor" && (
-            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-              <h4 className="text-sm font-semibold text-blue-800 mb-2">
+            <div className="mb-4 p-4 bg-surface-alt border border-themed rounded-none border-l-4 border-bitcoin-orange">
+              <h4 className="text-sm font-semibold text-bitcoin-orange mb-2 font-mono uppercase tracking-wide">
                 Michael Saylor's BTC Forecast
               </h4>
-              <p className="text-xs text-blue-700">
+              <p className="text-xs text-secondary font-mono">
                 Based on Saylor's public statements about Bitcoin's long-term
                 price trajectory:
                 <br />• Starts at 37% annual appreciation in year 0
@@ -419,7 +422,10 @@ export const RateAssumptionsSection: React.FC<Props> = ({
             }
             id={`${dataKey}-manual-mode-toggle`}
             label="Direct edit chart"
-            colorClass={{ on: "bg-yellow-400", off: "bg-gray-300" }}
+            colorClass={{
+              on: "bg-warning",
+              off: "bg-gray-600 dark:bg-gray-300",
+            }}
             description={{
               on: "🔓 Chart unlocked. Click and drag points to customize your forecast.",
               off: "🔒 Chart locked. Enable to directly edit by dragging points on the chart.",

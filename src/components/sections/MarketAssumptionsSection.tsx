@@ -254,7 +254,7 @@ export const MarketAssumptionsSection: React.FC = () => {
               />
               <div className="flex justify-between mt-2">
                 <span className="text-xs text-secondary font-mono">0%</span>
-                <span className="text-sm font-bold text-bitcoin-orange font-inter">
+                <span className="text-sm font-bold text-primary font-inter">
                   {formData.investmentsStartYield}% INITIAL YIELD
                 </span>
                 <span className="text-xs text-secondary font-mono">100%</span>
@@ -280,7 +280,7 @@ export const MarketAssumptionsSection: React.FC = () => {
               />
               <div className="flex justify-between mt-2">
                 <span className="text-xs text-secondary font-mono">0%</span>
-                <span className="text-sm font-bold text-bitcoin-orange font-inter">
+                <span className="text-sm font-bold text-primary font-inter">
                   {formData.investmentsEndYield}% FINAL YIELD
                 </span>
                 <span className="text-xs text-secondary font-mono">50%</span>
@@ -306,7 +306,7 @@ export const MarketAssumptionsSection: React.FC = () => {
               />
               <div className="flex justify-between mt-2">
                 <span className="text-xs text-secondary font-mono">0%</span>
-                <span className="text-sm font-bold text-bitcoin-orange font-inter">
+                <span className="text-sm font-bold text-primary font-inter">
                   {formData.speculationStartYield}% INITIAL YIELD
                 </span>
                 <span className="text-xs text-secondary font-mono">100%</span>
@@ -332,7 +332,7 @@ export const MarketAssumptionsSection: React.FC = () => {
               />
               <div className="flex justify-between mt-2">
                 <span className="text-xs text-secondary font-mono">0%</span>
-                <span className="text-sm font-bold text-bitcoin-orange font-inter">
+                <span className="text-sm font-bold text-primary font-inter">
                   {formData.speculationEndYield}% FINAL YIELD
                 </span>
                 <span className="text-xs text-secondary font-mono">50%</span>

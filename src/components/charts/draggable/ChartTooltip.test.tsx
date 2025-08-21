@@ -33,7 +33,7 @@ describe("ChartTooltip", () => {
     const { container } = render(<ChartTooltip {...defaultProps} />);
 
     const tooltip = container.firstChild as HTMLElement;
-    expect(tooltip).toHaveStyle({ left: "150px", top: "90px" }); // top: position.y - 10
+    expect(tooltip).toHaveStyle({ left: "150px", top: "85px" }); // top: position.y - 15
   });
 
   it("should apply correct CSS classes and styling", () => {
@@ -43,10 +43,12 @@ describe("ChartTooltip", () => {
     expect(tooltip).toHaveClass(
       "fixed",
       "z-50",
-      "bg-gray-800",
+      "bg-gray-900",
       "text-white",
       "text-sm",
-      "rounded-lg",
+      "rounded-none",
+      "border",
+      "border-bitcoin-orange",
       "px-3",
       "py-2",
       "shadow-lg",
@@ -54,6 +56,7 @@ describe("ChartTooltip", () => {
       "transform",
       "-translate-x-1/2",
       "-translate-y-full",
+      "font-mono",
     );
   });
 
@@ -61,7 +64,7 @@ describe("ChartTooltip", () => {
     const { getByText } = render(<ChartTooltip {...defaultProps} />);
 
     expect(getByText("Year 5")).toBeInTheDocument(); // yearIndex + 1
-    expect(getByText("76% Portfolio Value")).toBeInTheDocument(); // value.toFixed(0)
+    expect(getByText("75.5% Portfolio Value")).toBeInTheDocument(); // value.toFixed(1)
   });
 
   it("should handle integer values", () => {
@@ -72,10 +75,10 @@ describe("ChartTooltip", () => {
 
     const { getByText } = render(<ChartTooltip {...integerProps} />);
 
-    expect(getByText("50% Portfolio Value")).toBeInTheDocument();
+    expect(getByText("50.0% Portfolio Value")).toBeInTheDocument();
   });
 
-  it("should round decimal values to nearest integer", () => {
+  it("should round decimal values to one decimal place", () => {
     const decimalProps = {
       ...defaultProps,
       value: 33.9,
@@ -83,7 +86,7 @@ describe("ChartTooltip", () => {
 
     const { getByText } = render(<ChartTooltip {...decimalProps} />);
 
-    expect(getByText("34% Portfolio Value")).toBeInTheDocument();
+    expect(getByText("33.9% Portfolio Value")).toBeInTheDocument();
   });
 
   it("should handle zero values", () => {
@@ -96,7 +99,7 @@ describe("ChartTooltip", () => {
     const { getByText } = render(<ChartTooltip {...zeroProps} />);
 
     expect(getByText("Year 1")).toBeInTheDocument(); // yearIndex + 1
-    expect(getByText("0% Portfolio Value")).toBeInTheDocument();
+    expect(getByText("0.0% Portfolio Value")).toBeInTheDocument();
   });
 
   it("should handle large values", () => {
@@ -109,7 +112,7 @@ describe("ChartTooltip", () => {
     const { getByText } = render(<ChartTooltip {...largeProps} />);
 
     expect(getByText("Year 25")).toBeInTheDocument();
-    expect(getByText("251% Portfolio Value")).toBeInTheDocument(); // Rounded
+    expect(getByText("250.8% Portfolio Value")).toBeInTheDocument(); // 250.75 rounded to 1 decimal
   });
 
   it("should handle negative coordinates", () => {
@@ -121,7 +124,7 @@ describe("ChartTooltip", () => {
     const { container } = render(<ChartTooltip {...negativeProps} />);
 
     const tooltip = container.firstChild as HTMLElement;
-    expect(tooltip).toHaveStyle({ left: "-50px", top: "-110px" });
+    expect(tooltip).toHaveStyle({ left: "60px", top: "-115px" }); // Clamped to minimum 60px
   });
 
   it("should handle missing yAxisLabel", () => {
@@ -132,7 +135,7 @@ describe("ChartTooltip", () => {
 
     const { getByText } = render(<ChartTooltip {...noLabelProps} />);
 
-    expect(getByText("76%")).toBeInTheDocument(); // Should just show percentage without label
+    expect(getByText("75.5%")).toBeInTheDocument(); // Should just show percentage without label
   });
 
   it("should handle empty yAxisLabel", () => {
@@ -143,7 +146,7 @@ describe("ChartTooltip", () => {
 
     const { getByText } = render(<ChartTooltip {...emptyLabelProps} />);
 
-    expect(getByText("76%")).toBeInTheDocument();
+    expect(getByText("75.5%")).toBeInTheDocument();
   });
 
   it("should handle custom yAxisLabel", () => {
@@ -154,7 +157,7 @@ describe("ChartTooltip", () => {
 
     const { getByText } = render(<ChartTooltip {...customProps} />);
 
-    expect(getByText("76% Bitcoin Price")).toBeInTheDocument();
+    expect(getByText("75.5% Bitcoin Price")).toBeInTheDocument();
   });
 
   it("should handle edge case with very small values", () => {
@@ -165,7 +168,7 @@ describe("ChartTooltip", () => {
 
     const { getByText } = render(<ChartTooltip {...smallProps} />);
 
-    expect(getByText("0% Portfolio Value")).toBeInTheDocument(); // Rounds down
+    expect(getByText("0.4% Portfolio Value")).toBeInTheDocument(); // Shows to 1 decimal place
   });
 
   it("should handle very large coordinates", () => {
@@ -177,7 +180,12 @@ describe("ChartTooltip", () => {
     const { container } = render(<ChartTooltip {...largeCoordProps} />);
 
     const tooltip = container.firstChild as HTMLElement;
-    expect(tooltip).toHaveStyle({ left: "5000px", top: "2990px" });
+    // Mock window.innerWidth for the test
+    Object.defineProperty(window, "innerWidth", {
+      value: 1024,
+      configurable: true,
+    });
+    expect(tooltip).toHaveStyle({ left: "964px", top: "2985px" }); // Clamped to max width - 60px
   });
 
   it("should maintain consistent structure", () => {
@@ -188,7 +196,12 @@ describe("ChartTooltip", () => {
     const children = tooltip.children;
 
     expect(children).toHaveLength(3);
-    expect(children[0]).toHaveClass("font-medium");
+    expect(children[0]).toHaveClass(
+      "font-medium",
+      "text-bitcoin-orange",
+      "uppercase",
+      "tracking-wide",
+    );
     expect(children[1]).toHaveClass("text-gray-200");
     expect(children[2]).toHaveClass("absolute"); // Arrow element
   });
@@ -197,7 +210,7 @@ describe("ChartTooltip", () => {
     const { container, rerender } = render(<ChartTooltip {...defaultProps} />);
 
     let tooltip = container.firstChild as HTMLElement;
-    expect(tooltip).toHaveStyle({ left: "150px", top: "90px" });
+    expect(tooltip).toHaveStyle({ left: "150px", top: "85px" });
 
     const newProps = {
       ...defaultProps,
@@ -207,7 +220,7 @@ describe("ChartTooltip", () => {
     rerender(<ChartTooltip {...newProps} />);
 
     tooltip = container.firstChild as HTMLElement;
-    expect(tooltip).toHaveStyle({ left: "300px", top: "190px" });
+    expect(tooltip).toHaveStyle({ left: "300px", top: "185px" });
   });
 
   it("should handle visibility toggle by position", () => {

@@ -13,7 +13,7 @@ export const ExchangeRateInput: React.FC<ExchangeRateInputProps> = ({
   handleExchangeRateChange,
 }) => {
   return (
-    <div className="p-4 card-themed border border-bitcoin-orange">
+    <div className="p-4 card-themed border border-themed">
       <h4 className="font-semibold text-bitcoin-orange mb-3 font-heading tracking-wide uppercase">
         💰 CURRENT BTC PRICE
       </h4>

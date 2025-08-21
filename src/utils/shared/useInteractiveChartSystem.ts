@@ -236,7 +236,7 @@ export const useInteractiveChartSystem = ({
 
   const handleMouseHover = useCallback(
     (event: React.MouseEvent) => {
-      if (readOnly || !svgRef.current) return;
+      if (!svgRef.current) return;
 
       const rect = svgRef.current.getBoundingClientRect();
       const x = event.clientX - rect.left;
@@ -244,9 +244,13 @@ export const useInteractiveChartSystem = ({
 
       const index = getNearestIndex(x);
       setHoverIndex(index);
-      setHoverPosition({ x, y });
+
+      // Convert SVG coordinates to screen coordinates for tooltip
+      const screenX = event.clientX;
+      const screenY = event.clientY;
+      setHoverPosition({ x: screenX, y: screenY });
     },
-    [readOnly, svgRef, getNearestIndex],
+    [svgRef, getNearestIndex],
   );
 
   const handleMouseLeave = useCallback(() => {

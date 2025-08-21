@@ -82,6 +82,11 @@ input[type="number"]::-webkit-inner-spin-button:hover {
   .text-brand-orange { color: var(--color-accent); }
   .text-brand-gray { color: var(--color-text-secondary); }
   .border-themed { border-color: var(--color-border); }
+  
+  /* Bitcoin orange utility classes */
+  .text-bitcoin-orange { color: var(--color-accent); }
+  .bg-bitcoin-orange { background-color: var(--color-accent); }
+  .border-bitcoin-orange { border-color: var(--color-accent); }
 }
 
 @layer components {

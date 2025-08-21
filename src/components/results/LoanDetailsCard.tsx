@@ -28,13 +28,13 @@ export const LoanDetailsCard: React.FC<Props> = ({
   }
 
   return (
-    <div className="card-themed rounded-none p-4 border-2 border-bitcoin-orange bg-bitcoin-orange/10">
+    <div className="card-themed rounded-none p-4 border border-themed bg-surface">
       <h3 className="font-poppins text-lg font-bold text-bitcoin-orange mb-4 uppercase tracking-wide">
         🏦 LOAN DETAILS (YEAR {formData.activationYear})
       </h3>
       <div className="space-y-4">
         <div className="p-3 bg-surface-alt rounded-none border border-themed">
-          <p className="font-inter text-sm font-bold text-bitcoin-orange mb-2 uppercase tracking-wide">
+          <p className="font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
             PRINCIPAL:
           </p>
           <p className="text-primary font-mono text-lg font-bold">
@@ -43,7 +43,7 @@ export const LoanDetailsCard: React.FC<Props> = ({
         </div>
 
         <div className="p-3 bg-surface-alt rounded-none border border-themed">
-          <p className="font-inter text-sm font-bold text-bitcoin-orange mb-2 uppercase tracking-wide">
+          <p className="font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
             ANNUAL INTEREST:
           </p>
           <p className="text-primary font-mono">
@@ -55,7 +55,7 @@ export const LoanDetailsCard: React.FC<Props> = ({
         </div>
 
         <div className="p-3 bg-surface-alt rounded-none border border-themed">
-          <p className="font-inter text-sm font-bold text-bitcoin-orange mb-2 uppercase tracking-wide">
+          <p className="font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
             ANNUAL PAYMENTS:
           </p>
           <p className="text-primary font-mono">
@@ -69,7 +69,7 @@ export const LoanDetailsCard: React.FC<Props> = ({
         </div>
 
         <div className="p-3 bg-surface-alt rounded-none border border-themed">
-          <p className="font-inter text-sm font-bold text-bitcoin-orange mb-2 uppercase tracking-wide">
+          <p className="font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
             LTV RATIO:
           </p>
           <p className="text-primary font-mono text-lg font-bold">
