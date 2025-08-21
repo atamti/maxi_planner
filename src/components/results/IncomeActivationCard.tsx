@@ -43,7 +43,7 @@ export const IncomeActivationCard: React.FC<Props> = ({
   const cashflows = calculateCashflows();
 
   return (
-    <div className="card-themed rounded-none p-6 border-2 border-navy-900 bg-navy-900/5">
+    <div className="card-themed rounded-none p-4 border-2 border-navy-900 bg-navy-900/5">
       <h3 className="font-poppins text-lg font-bold text-navy-900 mb-4 uppercase tracking-wide">
         🚀 INCOME ACTIVATION YEAR ({formData.activationYear})
       </h3>

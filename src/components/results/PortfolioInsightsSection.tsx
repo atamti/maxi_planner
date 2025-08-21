@@ -63,11 +63,11 @@ export const PortfolioInsightsSection: React.FC<Props> = ({
   ].filter(Boolean);
 
   return (
-    <div className="card-themed rounded-none p-6 border-2 border-navy-900 mb-8">
-      <h3 className="font-poppins text-xl font-bold text-navy-900 mb-6 uppercase tracking-wide">
+    <div className="card-themed rounded-none p-4 border-2 border-navy-900 mb-6">
+      <h3 className="font-poppins text-xl font-bold text-navy-900 mb-4 uppercase tracking-wide">
         🧠 PORTFOLIO INSIGHTS
       </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {insights.slice(0, 6)}
       </div>
     </div>

@@ -405,16 +405,18 @@ export const EconomicScenariosSection: React.FC = () => {
           <div
             key={key}
             onClick={() => handleScenarioChange(key as ScenarioKey)}
-            className={`p-3 rounded-none border-2 cursor-pointer transition-all duration-200 
+            className={`p-4 rounded-none border-2 cursor-pointer transition-all duration-200 min-h-[100px] flex flex-col justify-between
               ${
                 formData.economicScenario === key
                   ? "btn-gradient-orange text-white border-brand-orange shadow-glow-orange"
                   : "bg-surface hover:bg-surface-alt border-[var(--color-border)] hover:border-[var(--color-accent)] text-primary shadow-sm"
               }`}
           >
-            <h4 className="font-medium">{scenario.name}</h4>
+            <h4 className="font-medium text-sm leading-tight line-clamp-2 mb-2">
+              {scenario.name}
+            </h4>
             <p
-              className={`text-xs mt-1 ${formData.economicScenario === key ? "text-white/80" : "text-secondary"}`}
+              className={`text-xs leading-relaxed line-clamp-3 ${formData.economicScenario === key ? "text-white/80" : "text-secondary"}`}
             >
               {scenario.description}
             </p>

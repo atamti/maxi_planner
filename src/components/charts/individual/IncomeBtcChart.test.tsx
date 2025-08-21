@@ -221,7 +221,9 @@ describe("IncomeBtcChart", () => {
     render(<IncomeBtcChart data={mockData} config={mockConfig} />);
 
     // Verify emoji and text content
-    expect(screen.getByText(/₿/)).toBeInTheDocument();
+    expect(
+      screen.getByText("₿ USD INCOME IN BTC TERMS (PURCHASING POWER)"),
+    ).toBeInTheDocument();
     expect(screen.getByText(/USD INCOME IN BTC TERMS/)).toBeInTheDocument();
     expect(screen.getByText(/\(PURCHASING POWER\)/)).toBeInTheDocument();
     expect(screen.getByText(/📉/)).toBeInTheDocument();

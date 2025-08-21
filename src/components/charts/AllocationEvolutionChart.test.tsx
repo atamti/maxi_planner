@@ -72,14 +72,12 @@ describe("AllocationEvolutionChart", () => {
     render(<AllocationEvolutionChart formData={formData} />);
 
     expect(screen.getByTestId("chart-datasets-count")).toHaveTextContent("3");
-    expect(screen.getByTestId("dataset-0-label")).toHaveTextContent(
-      "Savings (₿)",
-    );
+    expect(screen.getByTestId("dataset-0-label")).toHaveTextContent("Savings");
     expect(screen.getByTestId("dataset-1-label")).toHaveTextContent(
-      "Investments (₿)",
+      "Investments",
     );
     expect(screen.getByTestId("dataset-2-label")).toHaveTextContent(
-      "Speculation (₿)",
+      "Speculation",
     );
   });
 

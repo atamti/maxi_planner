@@ -184,10 +184,10 @@ describe("UsdPurchasingPowerChart", () => {
       expect(chartOptions.responsive).toBe(true);
       expect(chartOptions.scales.y.beginAtZero).toBe(true);
       expect(chartOptions.scales.y.max).toBe(100);
-      expect(chartOptions.scales.y.title.display).toBe(true);
-      expect(chartOptions.scales.y.title.text).toBe("Purchasing Power (%)");
-      expect(chartOptions.scales.x.title.display).toBe(true);
-      expect(chartOptions.scales.x.title.text).toBe("Years");
+      expect(chartOptions.scales.y.title.display).toBe(false);
+      expect(chartOptions.scales.y.title.text).toBeUndefined();
+      expect(chartOptions.scales.x.title.display).toBe(false);
+      expect(chartOptions.scales.x.title.text).toBeUndefined();
     });
 
     it("should configure plugins correctly", () => {
@@ -196,10 +196,8 @@ describe("UsdPurchasingPowerChart", () => {
       const chartOptionsElement = screen.getByTestId("chart-options");
       const chartOptions = JSON.parse(chartOptionsElement.textContent || "{}");
 
-      expect(chartOptions.plugins.title.display).toBe(true);
-      expect(chartOptions.plugins.title.text).toBe(
-        "USD PURCHASING POWER DECAY OVER TIME",
-      );
+      expect(chartOptions.plugins.title.display).toBe(false);
+      expect(chartOptions.plugins.title.text).toBeUndefined();
       expect(chartOptions.plugins.legend.position).toBe("bottom");
     });
 

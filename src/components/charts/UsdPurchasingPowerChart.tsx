@@ -57,45 +57,41 @@ export const UsdPurchasingPowerChart: React.FC<Props> = ({ formData }) => {
             beginAtZero: true,
             max: 100,
             title: {
-              display: true,
-              text: "Purchasing Power (%)",
-              color: colors.textSecondary,
-              font: { weight: "bold" },
+              display: false, // Remove redundant axis title
             },
             ticks: {
               color: colors.textSecondary,
               callback: function (value) {
-                return formatPurchasingPower(Number(value));
+                return `${Math.round(Number(value))}%`; // Simplify format, remove decimals
               },
+              maxTicksLimit: 6,
             },
             grid: {
               color: colors.border,
+              lineWidth: 0.5,
             },
           },
           x: {
             title: {
-              display: true,
-              text: "Years",
-              color: colors.textSecondary,
-              font: { weight: "bold" },
+              display: false, // Remove redundant "Years" title
             },
             ticks: {
               color: colors.textSecondary,
+              callback: function (value: any, index: number, values: any[]) {
+                if (values.length <= 6) return `Y${value}`;
+                if (index === 0 || index === values.length - 1)
+                  return `Y${value}`;
+                return index % 2 === 0 ? `Y${value}` : "";
+              },
             },
             grid: {
-              color: colors.border,
+              display: false, // Remove vertical grid lines
             },
           },
         },
         plugins: {
           title: {
-            display: true,
-            text: "USD PURCHASING POWER DECAY OVER TIME",
-            color: colors.textPrimary,
-            font: {
-              weight: "bold",
-              size: 14,
-            },
+            display: false, // Remove redundant chart title (already in component header)
           },
           legend: {
             position: "bottom",

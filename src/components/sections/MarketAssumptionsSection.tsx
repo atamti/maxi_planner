@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import economicScenarios from "../../config/economicScenarios";
 import { createCalculationService } from "../../services/calculationService";
 import { usePortfolioCompat } from "../../store";
 import { useGeneralRateSystem } from "../../utils/shared/useGeneralRateSystem";
 import { YieldChart } from "../charts/YieldChart";
 import { CollapsibleSection } from "../common/CollapsibleSection";
-import { ScenarioRestoreMessage } from "../common/ScenarioRestoreMessage";
 import { BtcPriceSection } from "./BtcPriceSection";
 import { InflationSection } from "./InflationSection";
 
@@ -14,7 +13,6 @@ export const MarketAssumptionsSection: React.FC = () => {
   const calculationService = createCalculationService();
 
   const { generateRates, applyRatesToArray } = useGeneralRateSystem();
-  const [showRestoreMessage, setShowRestoreMessage] = useState(false);
 
   // Initialize rates on component mount to ensure headers show correct averages
   useEffect(() => {
@@ -203,63 +201,9 @@ export const MarketAssumptionsSection: React.FC = () => {
     return `3. 📊 Market Assumptions: ${avgInflation}% avg inflation, ${avgBtcGrowth}% BTC CAGR, ${formData.investmentsStartYield}-${formData.investmentsEndYield}% investment yields`;
   };
 
-  // Check if we should show the scenario restore message
-  const sectionsInManualMode = [];
-  if (formData.economicScenario !== "custom") {
-    if (!formData.followEconomicScenarioInflation) {
-      sectionsInManualMode.push("USD Inflation");
-    }
-    if (!formData.followEconomicScenarioBtc) {
-      sectionsInManualMode.push("BTC Price Appreciation");
-    }
-  }
-
-  const shouldShowRestoreMessage =
-    sectionsInManualMode.length > 0 && showRestoreMessage;
-
-  // Show restore message when scenario changes from custom to non-custom
-  useEffect(() => {
-    if (
-      formData.economicScenario !== "custom" &&
-      sectionsInManualMode.length > 0
-    ) {
-      setShowRestoreMessage(true);
-    } else {
-      setShowRestoreMessage(false);
-    }
-  }, [
-    formData.economicScenario,
-    formData.followEconomicScenarioInflation,
-    formData.followEconomicScenarioBtc,
-  ]);
-
-  // Handler to restore all sections to follow scenario
-  const handleRestoreAllToScenario = () => {
-    updateFormData({
-      followEconomicScenarioInflation: true,
-      followEconomicScenarioBtc: true,
-      inflationPreset: formData.economicScenario,
-      btcPricePreset: formData.economicScenario,
-    });
-    setShowRestoreMessage(false);
-  };
-
-  // Handler to dismiss the restore message
-  const handleDismissRestoreMessage = () => {
-    setShowRestoreMessage(false);
-  };
-
   return (
     <CollapsibleSection title={getSectionTitle()} noGrid={true}>
       <div className="space-y-4">
-        {/* Scenario Restore Message */}
-        <ScenarioRestoreMessage
-          show={shouldShowRestoreMessage}
-          onRestoreAll={handleRestoreAllToScenario}
-          onDismiss={handleDismissRestoreMessage}
-          sectionCount={sectionsInManualMode.length}
-        />
-
         {/* Subsection 3a: USD Inflation */}
         <CollapsibleSection
           title={`3a. 💵 USD Inflation: ${avgInflation}% average (${getInflationDescription()})`}
@@ -292,7 +236,9 @@ export const MarketAssumptionsSection: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
-                INVESTMENTS START YIELD (BTC %):
+                INVESTMENTS
+                <br />
+                START YIELD (BTC %):
               </label>
               <input
                 type="range"
@@ -316,31 +262,9 @@ export const MarketAssumptionsSection: React.FC = () => {
             </div>
             <div>
               <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
-                SPECULATION START YIELD (BTC %):
-              </label>
-              <input
-                type="range"
-                value={formData.speculationStartYield}
-                onChange={(e) =>
-                  updateFormData({
-                    speculationStartYield: Number(e.target.value),
-                  })
-                }
-                className="w-full h-2 bg-surface border border-themed rounded-none appearance-none slider-bitcoin focus-ring-themed"
-                min="0"
-                max="100"
-              />
-              <div className="flex justify-between mt-2">
-                <span className="text-xs text-secondary font-mono">0%</span>
-                <span className="text-sm font-bold text-bitcoin-orange font-inter">
-                  {formData.speculationStartYield}% INITIAL YIELD
-                </span>
-                <span className="text-xs text-secondary font-mono">100%</span>
-              </div>
-            </div>
-            <div>
-              <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
-                INVESTMENTS END YIELD (BTC %):
+                INVESTMENTS
+                <br />
+                END YIELD (BTC %):
               </label>
               <input
                 type="range"
@@ -364,7 +288,35 @@ export const MarketAssumptionsSection: React.FC = () => {
             </div>
             <div>
               <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
-                SPECULATION END YIELD (BTC %):
+                SPECULATION
+                <br />
+                START YIELD (BTC %):
+              </label>
+              <input
+                type="range"
+                value={formData.speculationStartYield}
+                onChange={(e) =>
+                  updateFormData({
+                    speculationStartYield: Number(e.target.value),
+                  })
+                }
+                className="w-full h-2 bg-surface border border-themed rounded-none appearance-none slider-bitcoin focus-ring-themed"
+                min="0"
+                max="100"
+              />
+              <div className="flex justify-between mt-2">
+                <span className="text-xs text-secondary font-mono">0%</span>
+                <span className="text-sm font-bold text-bitcoin-orange font-inter">
+                  {formData.speculationStartYield}% INITIAL YIELD
+                </span>
+                <span className="text-xs text-secondary font-mono">100%</span>
+              </div>
+            </div>
+            <div>
+              <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+                SPECULATION
+                <br />
+                END YIELD (BTC %):
               </label>
               <input
                 type="range"
@@ -390,10 +342,13 @@ export const MarketAssumptionsSection: React.FC = () => {
 
           {/* Yield Projection Chart */}
           <div className="mt-6 p-4 bg-surface-alt rounded-none border-2 border-navy-900/50">
-            <h4 className="font-poppins text-lg font-bold text-navy-900 mb-4 uppercase tracking-wide">
+            <h4 className="font-poppins text-lg font-bold text-navy-900 mb-1 uppercase tracking-wide">
               📈 YIELD PROJECTION CHART
             </h4>
-            <div style={{ height: "300px" }}>
+            <p className="text-sm text-secondary mb-4 font-mono">
+              ₿ Yield %/Year
+            </p>
+            <div style={{ height: "250px" }}>
               <YieldChart formData={formData} />
             </div>
           </div>

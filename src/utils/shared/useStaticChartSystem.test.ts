@@ -122,10 +122,8 @@ describe("useStaticChartSystem", () => {
       expect(resultChartData).toHaveProperty("datasets");
       expect(resultChartData.labels).toEqual([0, 1, 2]);
       expect(resultChartData.datasets).toHaveLength(2);
-      expect(resultChartData.datasets[0].label).toBe("BTC Stack (full amount)");
-      expect(resultChartData.datasets[1].label).toBe(
-        "BTC Stack (after income allocation)",
-      );
+      expect(resultChartData.datasets[0].label).toBe("Full Stack");
+      expect(resultChartData.datasets[1].label).toBe("After Income");
     });
 
     it("should generate income chart data", () => {
@@ -218,8 +216,8 @@ describe("useStaticChartSystem", () => {
       const { btcGrowthChartConfig } = result.current;
 
       expect(btcGrowthChartConfig.scales?.y?.beginAtZero).toBe(true);
-      expect(btcGrowthChartConfig.scales?.y?.title?.text).toBe("BTC");
-      expect(btcGrowthChartConfig.scales?.x?.title?.text).toBe("Years");
+      expect(btcGrowthChartConfig.scales?.y?.title?.display).toBe(false);
+      expect(btcGrowthChartConfig.scales?.x?.title?.display).toBe(false);
     });
   });
 

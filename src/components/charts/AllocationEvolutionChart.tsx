@@ -129,7 +129,7 @@ export const AllocationEvolutionChart: React.FC<Props> = ({
       labels: years.map((year) => `Year ${year}`),
       datasets: [
         {
-          label: "Savings (₿)",
+          label: "Savings",
           data: savingsData,
           backgroundColor: datasetColors.success, // Use solid color instead of transparent
           borderColor: datasetColors.success,
@@ -137,7 +137,7 @@ export const AllocationEvolutionChart: React.FC<Props> = ({
           barThickness: "flex" as const,
         },
         {
-          label: "Investments (₿)",
+          label: "Investments",
           data: investmentsData,
           backgroundColor: datasetColors.info, // Use solid color instead of transparent
           borderColor: datasetColors.info,
@@ -145,7 +145,7 @@ export const AllocationEvolutionChart: React.FC<Props> = ({
           barThickness: "flex" as const,
         },
         {
-          label: "Speculation (₿)",
+          label: "Speculation",
           data: speculationData,
           backgroundColor: datasetColors.error, // Use solid color instead of transparent
           borderColor: datasetColors.error,
@@ -200,7 +200,7 @@ export const AllocationEvolutionChart: React.FC<Props> = ({
                 (sum, dataset) => sum + dataset.data[year],
                 0,
               );
-              return `Total: ${total.toFixed(3)} ₿`;
+              return `Total: ${Math.round(total)}₿`; // Remove decimals
             },
           },
         },
@@ -209,32 +209,29 @@ export const AllocationEvolutionChart: React.FC<Props> = ({
         x: {
           stacked: true,
           title: {
-            display: true,
-            text: "Time",
-            color: themeColors.textPrimary,
-            font: {
-              family: "Inter, system-ui, sans-serif",
-            },
+            display: false, // Remove redundant "Time" label
           },
           ticks: {
             color: themeColors.textSecondary,
             font: {
               family: "JetBrains Mono, monospace",
             },
+            callback: function (value: any, index: number) {
+              // Show only every 2nd or 3rd year to reduce clutter
+              const totalTicks = chartData.labels?.length || 0;
+              if (totalTicks <= 6) return `Y${value}`;
+              if (index === 0 || index === totalTicks - 1) return `Y${value}`;
+              return index % 2 === 0 ? `Y${value}` : "";
+            },
           },
           grid: {
-            color: themeColors.border,
+            display: false, // Remove vertical grid lines
           },
         },
         y: {
           stacked: true,
           title: {
-            display: true,
-            text: "BTC Amount",
-            color: themeColors.textPrimary,
-            font: {
-              family: "Inter, system-ui, sans-serif",
-            },
+            display: false, // Remove redundant "BTC Amount" label
           },
           ticks: {
             color: themeColors.textSecondary,
@@ -242,11 +239,23 @@ export const AllocationEvolutionChart: React.FC<Props> = ({
               family: "JetBrains Mono, monospace",
             },
             callback: function (value: any) {
-              return `${value.toFixed(2)} ₿`;
+              // Smart formatting based on scale to handle small BTC amounts
+              if (value >= 1000) {
+                return Math.round(value).toLocaleString();
+              } else if (value >= 10) {
+                return Math.round(value);
+              } else if (value >= 1) {
+                return Math.round(value * 10) / 10;
+              } else if (value > 0) {
+                return Math.round(value * 100) / 100;
+              } else {
+                return 0;
+              }
             },
           },
           grid: {
             color: themeColors.border,
+            lineWidth: 0.5, // Thinner grid lines
           },
         },
       },
@@ -261,9 +270,10 @@ export const AllocationEvolutionChart: React.FC<Props> = ({
     <div
       className={`card-themed p-4 border border-bitcoin-orange shadow ${className}`}
     >
-      <h3 className="font-heading text-lg font-bold text-bitcoin-orange mb-4 uppercase tracking-wide">
+      <h3 className="font-heading text-lg font-bold text-bitcoin-orange mb-1 uppercase tracking-wide">
         📊 BTC ALLOCATION EVOLUTION OVER TIME
       </h3>
+      <p className="text-sm text-secondary mb-4 font-mono">₿</p>
       <div style={{ height: "400px" }}>
         <Bar key={theme} data={chartData} options={options} />
       </div>

@@ -205,10 +205,10 @@ describe("ExpensesInflationChart", () => {
       expect(chartOptions.maintainAspectRatio).toBe(false);
       expect(chartOptions.responsive).toBe(true);
       expect(chartOptions.scales.y.beginAtZero).toBe(true);
-      expect(chartOptions.scales.y.title.display).toBe(true);
-      expect(chartOptions.scales.y.title.text).toBe("Annual Expenses (USD)");
-      expect(chartOptions.scales.x.title.display).toBe(true);
-      expect(chartOptions.scales.x.title.text).toBe("Years");
+      expect(chartOptions.scales.y.title.display).toBe(false);
+      expect(chartOptions.scales.y.title.text).toBeUndefined();
+      expect(chartOptions.scales.x.title.display).toBe(false);
+      expect(chartOptions.scales.x.title.text).toBeUndefined();
     });
 
     it("should configure plugins correctly", () => {
@@ -217,10 +217,8 @@ describe("ExpensesInflationChart", () => {
       const chartOptionsElement = screen.getByTestId("chart-options");
       const chartOptions = JSON.parse(chartOptionsElement.textContent || "{}");
 
-      expect(chartOptions.plugins.title.display).toBe(true);
-      expect(chartOptions.plugins.title.text).toBe(
-        "PROJECTED ANNUAL EXPENSES GROWTH",
-      );
+      expect(chartOptions.plugins.title.display).toBe(false);
+      expect(chartOptions.plugins.title.text).toBeUndefined();
       expect(chartOptions.plugins.legend.position).toBe("bottom");
     });
   });

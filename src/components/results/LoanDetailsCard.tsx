@@ -28,7 +28,7 @@ export const LoanDetailsCard: React.FC<Props> = ({
   }
 
   return (
-    <div className="card-themed rounded-none p-6 border-2 border-bitcoin-orange bg-bitcoin-orange/10">
+    <div className="card-themed rounded-none p-4 border-2 border-bitcoin-orange bg-bitcoin-orange/10">
       <h3 className="font-poppins text-lg font-bold text-bitcoin-orange mb-4 uppercase tracking-wide">
         🏦 LOAN DETAILS (YEAR {formData.activationYear})
       </h3>

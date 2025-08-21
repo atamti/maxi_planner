@@ -104,9 +104,9 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-dvh bg-[var(--color-bg)] text-secondary transition-colors">
-      <div className="max-w-6xl mx-auto">
-        {/* Header Bar */}
-        <div className="bg-surface border-b-2 border-bitcoin-orange p-4">
+      {/* Header Bar - Full Width */}
+      <div className="bg-surface border-b-2 border-bitcoin-orange p-4">
+        <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="w-8 h-8 bg-bitcoin-orange rounded-none border border-bitcoin-orange flex items-center justify-center">
@@ -129,9 +129,11 @@ const AppContent: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="p-6 space-y-6">
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto">
+        <div className="p-4 space-y-4">
           <SaveLoadSection formData={formData} onLoad={handleLoadConfig} />
 
           <PortfolioForm />

@@ -71,45 +71,45 @@ export const ExpensesInflationChart: React.FC<Props> = ({ formData }) => {
           y: {
             beginAtZero: true,
             title: {
-              display: true,
-              text: "Annual Expenses (USD)",
-              color: colors.textSecondary,
-              font: { weight: "bold" },
+              display: false, // Remove redundant axis title
             },
             ticks: {
               color: colors.textSecondary,
               callback: function (value) {
-                return formatExpenses(Number(value));
+                // Simplify format, remove unnecessary decimals
+                const num = Number(value);
+                if (num >= 1000000) return `$${(num / 1000000).toFixed(0)}M`;
+                if (num >= 1000) return `$${(num / 1000).toFixed(0)}k`;
+                return `$${Math.round(num)}`;
               },
+              maxTicksLimit: 6,
             },
             grid: {
               color: colors.border,
+              lineWidth: 0.5,
             },
           },
           x: {
             title: {
-              display: true,
-              text: "Years",
-              color: colors.textSecondary,
-              font: { weight: "bold" },
+              display: false, // Remove redundant "Years" title
             },
             ticks: {
               color: colors.textSecondary,
+              callback: function (value: any, index: number, values: any[]) {
+                if (values.length <= 6) return `Y${value}`;
+                if (index === 0 || index === values.length - 1)
+                  return `Y${value}`;
+                return index % 2 === 0 ? `Y${value}` : "";
+              },
             },
             grid: {
-              color: colors.border,
+              display: false, // Remove vertical grid lines
             },
           },
         },
         plugins: {
           title: {
-            display: true,
-            text: "PROJECTED ANNUAL EXPENSES GROWTH",
-            color: colors.textPrimary,
-            font: {
-              weight: "bold",
-              size: 14,
-            },
+            display: false, // Remove redundant chart title (already in component header)
           },
           legend: {
             position: "bottom",

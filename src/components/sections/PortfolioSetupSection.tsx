@@ -2,6 +2,7 @@ import React from "react";
 import { usePortfolioCompat } from "../../store";
 import { CollapsibleSection } from "../common/CollapsibleSection";
 import { AllocationSliders } from "../forms/AllocationSliders";
+import { NumberInput } from "../ui/NumberInput";
 
 export const PortfolioSetupSection: React.FC = () => {
   const { formData, updateFormData } = usePortfolioCompat();
@@ -25,15 +26,12 @@ export const PortfolioSetupSection: React.FC = () => {
             <label className="block font-inter text-sm font-bold text-primary mb-3 uppercase tracking-wide">
               BTC STACK SIZE (₿):
             </label>
-            <input
-              type="number"
+            <NumberInput
               value={formData.btcStack}
-              onChange={(e) =>
-                updateFormData({ btcStack: Number(e.target.value) })
-              }
+              onChange={(value) => updateFormData({ btcStack: value })}
               className="w-full p-3 bg-surface border-2 border-themed rounded-none text-primary font-mono text-lg focus-ring-themed"
-              min="0"
-              step="0.1"
+              min={0}
+              step={0.1}
             />
           </div>
 

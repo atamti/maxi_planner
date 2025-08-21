@@ -208,7 +208,7 @@ describe("YieldChart", () => {
       const chartData = JSON.parse(chartDataElement.textContent || "{}");
 
       const investmentDataset = chartData.datasets[0];
-      expect(investmentDataset.label).toBe("Investments Yield (BTC %)");
+      expect(investmentDataset.label).toBe("Investments");
       expect(investmentDataset.borderColor).toBe("#F59E0B");
       expect(investmentDataset.backgroundColor).toBe("rgba(245, 158, 11, 0.2)");
       expect(investmentDataset.fill).toBe(false);
@@ -221,7 +221,7 @@ describe("YieldChart", () => {
       const chartData = JSON.parse(chartDataElement.textContent || "{}");
 
       const speculationDataset = chartData.datasets[1];
-      expect(speculationDataset.label).toBe("Speculation Yield (BTC %)");
+      expect(speculationDataset.label).toBe("Speculation");
       expect(speculationDataset.borderColor).toBe("#22C55E");
       expect(speculationDataset.backgroundColor).toBe("rgba(34, 197, 94, 0.2)");
       expect(speculationDataset.fill).toBe(false);
@@ -238,10 +238,10 @@ describe("YieldChart", () => {
       expect(chartOptions.maintainAspectRatio).toBe(false);
       expect(chartOptions.responsive).toBe(true);
       expect(chartOptions.scales.y.beginAtZero).toBe(true);
-      expect(chartOptions.scales.y.title.display).toBe(true);
-      expect(chartOptions.scales.y.title.text).toBe("Yield %");
-      expect(chartOptions.scales.x.title.display).toBe(true);
-      expect(chartOptions.scales.x.title.text).toBe("Years");
+      expect(chartOptions.scales.y.title.display).toBe(false);
+      expect(chartOptions.scales.y.title.text).toBeUndefined();
+      expect(chartOptions.scales.x.title.display).toBe(false);
+      expect(chartOptions.scales.x.title.text).toBeUndefined();
     });
 
     it("should configure plugins correctly", () => {
@@ -250,10 +250,8 @@ describe("YieldChart", () => {
       const chartOptionsElement = screen.getByTestId("chart-options");
       const chartOptions = JSON.parse(chartOptionsElement.textContent || "{}");
 
-      expect(chartOptions.plugins.title.display).toBe(true);
-      expect(chartOptions.plugins.title.text).toBe(
-        "Yield projections over time",
-      );
+      expect(chartOptions.plugins.title.display).toBe(false);
+      expect(chartOptions.plugins.title.text).toBeUndefined();
       expect(chartOptions.plugins.legend.position).toBe("bottom");
     });
   });
@@ -475,8 +473,8 @@ describe("YieldChart", () => {
 
       // Should render without errors
       expect(chartData.datasets).toHaveLength(2);
-      expect(chartData.datasets[0].label).toBe("Investments Yield (BTC %)");
-      expect(chartData.datasets[1].label).toBe("Speculation Yield (BTC %)");
+      expect(chartData.datasets[0].label).toBe("Investments");
+      expect(chartData.datasets[1].label).toBe("Speculation");
     });
   });
 });

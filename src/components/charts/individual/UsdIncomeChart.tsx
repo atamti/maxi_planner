@@ -15,9 +15,10 @@ export const UsdIncomeChart: React.FC<UsdIncomeChartProps> = ({
 
   return (
     <div className="card-themed rounded-none p-6">
-      <h3 className="font-poppins text-lg font-bold text-navy-900 mb-4 uppercase tracking-wide">
+      <h3 className="font-poppins text-lg font-bold text-navy-900 mb-1 uppercase tracking-wide">
         💵 USD INCOME STREAM
       </h3>
+      <p className="text-sm text-secondary mb-4 font-mono">$k/year</p>
       <Line key={theme} data={data} options={config} />
     </div>
   );

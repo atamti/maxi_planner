@@ -38,7 +38,7 @@ export const FinalYearCard: React.FC<Props> = ({ results, formData }) => {
   };
 
   return (
-    <div className="card-themed rounded-none p-6 border-2 border-navy-900 bg-navy-900/10">
+    <div className="card-themed rounded-none p-4 border-2 border-navy-900 bg-navy-900/10">
       <h3 className="font-poppins text-lg font-bold text-navy-900 mb-4 uppercase tracking-wide">
         🎯 YEAR {formData.timeHorizon} ANALYSIS
       </h3>

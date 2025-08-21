@@ -44,7 +44,7 @@ export const useStaticChartSystem = ({
       labels: calculationResults.results.map((r) => r.year),
       datasets: [
         {
-          label: "BTC Stack (full amount)",
+          label: "Full Stack",
           data: calculationResults.results.map((r) => r.btcWithoutIncome),
           borderColor: datasetColors.success,
           backgroundColor: datasetColors.successBg,
@@ -52,7 +52,7 @@ export const useStaticChartSystem = ({
           tension: 0.1,
         },
         {
-          label: "BTC Stack (after income allocation)",
+          label: "After Income",
           data: calculationResults.results.map((r) => r.btcWithIncome),
           borderColor: datasetColors.primary,
           backgroundColor: datasetColors.primaryBg,
@@ -66,7 +66,7 @@ export const useStaticChartSystem = ({
       labels: calculationResults.results.map((r) => r.year),
       datasets: [
         {
-          label: "BTC Stack",
+          label: "Stack",
           data: calculationResults.results.map((r) => r.btcWithIncome),
           borderColor: datasetColors.primary,
           backgroundColor: datasetColors.primaryBg,
@@ -80,7 +80,7 @@ export const useStaticChartSystem = ({
       labels: calculationResults.results.map((r) => r.year),
       datasets: [
         {
-          label: "USD Value of BTC Stack",
+          label: "USD Value",
           data: calculationResults.results.map(
             (r, index) => r.btcWithIncome * getBtcPriceAtYear(index),
           ),
@@ -96,7 +96,7 @@ export const useStaticChartSystem = ({
       labels: calculationResults.results.map((r) => r.year),
       datasets: [
         {
-          label: "Expenses (USD)",
+          label: "Expenses",
           data: calculationResults.annualExpenses,
           borderColor: datasetColors.error,
           backgroundColor: datasetColors.errorBg,
@@ -104,7 +104,7 @@ export const useStaticChartSystem = ({
           tension: 0.1,
         },
         {
-          label: "USD Purchasing Power",
+          label: "Purchasing Power",
           data: calculationResults.annualExpenses.map(
             (expense, index) => calculationResults.annualExpenses[0] / expense,
           ),
@@ -121,7 +121,7 @@ export const useStaticChartSystem = ({
       labels: calculationResults.results.map((r) => r.year),
       datasets: [
         {
-          label: "BTC Exchange Rate (USD)",
+          label: "Exchange Rate",
           data: calculationResults.results.map((_, index) =>
             getBtcPriceAtYear(index),
           ),
@@ -137,7 +137,7 @@ export const useStaticChartSystem = ({
       labels: calculationResults.results.map((r) => r.year),
       datasets: [
         {
-          label: "USD Income ($k/year)",
+          label: "Income",
           data: calculationResults.usdIncome.map((v) => v / 1000),
           borderColor: datasetColors.info,
           backgroundColor: datasetColors.infoBg,
@@ -145,7 +145,7 @@ export const useStaticChartSystem = ({
           tension: 0.1,
         },
         {
-          label: "Annual Expenses ($k/year)",
+          label: "Expenses",
           data: calculationResults.annualExpenses.map((v) => v / 1000),
           borderColor: datasetColors.error,
           backgroundColor: datasetColors.errorBg,
@@ -155,7 +155,7 @@ export const useStaticChartSystem = ({
         ...(formData.collateralPct > 0
           ? [
               {
-                label: "USD Income with Leverage ($k/year)",
+                label: "Income + Leverage",
                 data: calculationResults.usdIncomeWithLeverage.map(
                   (v) => v / 1000,
                 ),
@@ -173,7 +173,7 @@ export const useStaticChartSystem = ({
       labels: calculationResults.results.map((r) => r.year),
       datasets: [
         {
-          label: "Annual Income Potential ($k/year)",
+          label: "Income Potential",
           data: calculationResults.incomeAtActivationYears.map((v) => v / 1000),
           borderColor: datasetColors.info,
           backgroundColor: datasetColors.infoBg,
@@ -181,7 +181,7 @@ export const useStaticChartSystem = ({
           tension: 0.1,
         },
         {
-          label: "Annual Expenses at Activation ($k/year)",
+          label: "Expenses at Activation",
           data: calculationResults.expensesAtActivationYears.map(
             (v) => v / 1000,
           ),
@@ -193,7 +193,7 @@ export const useStaticChartSystem = ({
         ...(formData.collateralPct > 0
           ? [
               {
-                label: "Income Potential with Leverage ($k/year)",
+                label: "Income + Leverage",
                 data: calculationResults.incomeAtActivationYearsWithLeverage.map(
                   (v) => v / 1000,
                 ),
@@ -211,7 +211,7 @@ export const useStaticChartSystem = ({
       labels: calculationResults.results.map((r) => r.year),
       datasets: [
         {
-          label: "USD Income (BTC equivalent)",
+          label: "Income",
           data: calculationResults.usdIncome.map((income, index) => {
             if (income === 0) return 0;
             const btcPriceAtYear = getBtcPriceAtYear(index);
@@ -223,7 +223,7 @@ export const useStaticChartSystem = ({
           tension: 0.1,
         },
         {
-          label: "Annual Expenses (BTC equivalent)",
+          label: "Expenses",
           data: calculationResults.annualExpenses.map((expenses, index) => {
             const btcPriceAtYear = getBtcPriceAtYear(index);
             return expenses / btcPriceAtYear;
@@ -236,7 +236,7 @@ export const useStaticChartSystem = ({
         ...(formData.collateralPct > 0
           ? [
               {
-                label: "USD Income with Leverage (BTC equivalent)",
+                label: "Income + Leverage",
                 data: calculationResults.usdIncomeWithLeverage.map(
                   (income, index) => {
                     if (income === 0) return 0;
@@ -281,6 +281,32 @@ export const useStaticChartSystem = ({
             color: themeColors.textPrimary,
             font: {
               family: "Inter, system-ui, sans-serif",
+            },
+          },
+        },
+        tooltip: {
+          backgroundColor: themeColors.surfaceAlt,
+          titleColor: themeColors.textPrimary,
+          bodyColor: themeColors.textPrimary,
+          borderColor: themeColors.accent,
+          borderWidth: 1,
+          callbacks: {
+            label: function (context: any) {
+              const value = context.parsed.y;
+              let formattedValue;
+
+              // Format based on the scale of the number
+              if (value >= 1000) {
+                formattedValue = Math.round(value).toLocaleString();
+              } else if (value >= 10) {
+                formattedValue = Math.round(value);
+              } else if (value >= 1) {
+                formattedValue = Math.round(value * 10) / 10;
+              } else {
+                formattedValue = Math.round(value * 100) / 100;
+              }
+
+              return `${context.dataset.label}: ${formattedValue}`;
             },
           },
         },
@@ -332,24 +358,39 @@ export const useStaticChartSystem = ({
           beginAtZero: true,
           title: {
             ...commonOptions.scales.y.title,
-            display: true,
-            text: "BTC",
+            display: false, // Remove redundant y-axis title
+          },
+          ticks: {
+            ...commonOptions.scales.y.ticks,
+            callback: function (value: any) {
+              return Math.round(value); // Remove ₿ symbol, just show numbers
+            },
           },
         },
         x: {
           ...commonOptions.scales.x,
           title: {
             ...commonOptions.scales.x.title,
-            display: true,
-            text: "Years",
+            display: false, // Remove redundant x-axis title
+          },
+          ticks: {
+            ...commonOptions.scales.x.ticks,
+            callback: function (value: any, index: number, values: any[]) {
+              if (values.length <= 6) return `Y${value}`;
+              if (index === 0 || index === values.length - 1)
+                return `Y${value}`;
+              return index % 2 === 0 ? `Y${value}` : "";
+            },
+          },
+          grid: {
+            display: false, // Remove vertical grid lines
           },
         },
       },
       plugins: {
         ...commonOptions.plugins,
         title: {
-          display: true,
-          text: "Bitcoin stack size over time",
+          display: false, // Remove redundant chart title
         },
       },
     };
@@ -449,24 +490,39 @@ export const useStaticChartSystem = ({
           beginAtZero: true,
           title: {
             ...commonOptions.scales.y.title,
-            display: true,
-            text: "USD Income/Expenses (thousands)",
+            display: false, // Remove redundant y-axis title
+          },
+          ticks: {
+            ...commonOptions.scales.y.ticks,
+            callback: function (value: any) {
+              return Math.round(value); // Just show numbers without $k
+            },
           },
         },
         x: {
           ...commonOptions.scales.x,
           title: {
             ...commonOptions.scales.x.title,
-            display: true,
-            text: "Years",
+            display: false, // Remove redundant x-axis title
+          },
+          ticks: {
+            ...commonOptions.scales.x.ticks,
+            callback: function (value: any, index: number, values: any[]) {
+              if (values.length <= 6) return `Y${value}`;
+              if (index === 0 || index === values.length - 1)
+                return `Y${value}`;
+              return index % 2 === 0 ? `Y${value}` : "";
+            },
+          },
+          grid: {
+            display: false, // Remove vertical grid lines
           },
         },
       },
       plugins: {
         ...commonOptions.plugins,
         title: {
-          display: true,
-          text: "Annual USD income vs expenses",
+          display: false, // Remove redundant chart title
         },
         legend: {
           position: "bottom" as const,
@@ -483,24 +539,39 @@ export const useStaticChartSystem = ({
           beginAtZero: true,
           title: {
             ...commonOptions.scales.y.title,
-            display: true,
-            text: "BTC Equivalent",
+            display: false, // Remove redundant y-axis title
+          },
+          ticks: {
+            ...commonOptions.scales.y.ticks,
+            callback: function (value: any) {
+              return Math.round(value * 100) / 100; // Show clean decimal without ₿ symbol
+            },
           },
         },
         x: {
           ...commonOptions.scales.x,
           title: {
             ...commonOptions.scales.x.title,
-            display: true,
-            text: "Years",
+            display: false, // Remove redundant x-axis title
+          },
+          ticks: {
+            ...commonOptions.scales.x.ticks,
+            callback: function (value: any, index: number, values: any[]) {
+              if (values.length <= 6) return `Y${value}`;
+              if (index === 0 || index === values.length - 1)
+                return `Y${value}`;
+              return index % 2 === 0 ? `Y${value}` : "";
+            },
+          },
+          grid: {
+            display: false, // Remove vertical grid lines
           },
         },
       },
       plugins: {
         ...commonOptions.plugins,
         title: {
-          display: true,
-          text: "Income and expenses in BTC terms over time",
+          display: false, // Remove chart title (already handled by component)
         },
         legend: {
           position: "bottom" as const,
@@ -517,24 +588,39 @@ export const useStaticChartSystem = ({
           type: "logarithmic" as const,
           title: {
             ...commonOptions.scales.y.title,
-            display: true,
-            text: "USD Income/Expenses (thousands, log scale)",
+            display: false, // Remove redundant y-axis title
+          },
+          ticks: {
+            ...commonOptions.scales.y.ticks,
+            callback: function (value: any) {
+              return Math.round(value); // Just show numbers without $k
+            },
           },
         },
         x: {
           ...commonOptions.scales.x,
           title: {
             ...commonOptions.scales.x.title,
-            display: true,
-            text: "Activation Year",
+            display: false, // Remove redundant x-axis title
+          },
+          ticks: {
+            ...commonOptions.scales.x.ticks,
+            callback: function (value: any, index: number, values: any[]) {
+              if (values.length <= 6) return `Y${value}`;
+              if (index === 0 || index === values.length - 1)
+                return `Y${value}`;
+              return index % 2 === 0 ? `Y${value}` : "";
+            },
+          },
+          grid: {
+            display: false, // Remove vertical grid lines
           },
         },
       },
       plugins: {
         ...commonOptions.plugins,
         title: {
-          display: true,
-          text: "Annual income potential vs expenses if activated in each year",
+          display: false, // Remove redundant chart title
         },
         legend: {
           position: "bottom" as const,

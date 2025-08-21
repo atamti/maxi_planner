@@ -61,12 +61,7 @@ export const BtcExchangeChart: React.FC<Props> = ({ formData }) => {
           y: {
             beginAtZero: false,
             title: {
-              display: true,
-              text: "USD  /  BTC  ($Ms)",
-              color: colors.textPrimary,
-              font: {
-                family: "Inter, system-ui, sans-serif",
-              },
+              display: false, // Remove redundant axis title
             },
             ticks: {
               color: colors.textSecondary,
@@ -76,28 +71,32 @@ export const BtcExchangeChart: React.FC<Props> = ({ formData }) => {
               callback: function (value) {
                 return formatPriceWithCommas(Number(value));
               },
+              maxTicksLimit: 6, // Limit number of y-axis labels
             },
             grid: {
               color: colors.border,
+              lineWidth: 0.5, // Thinner grid lines
             },
           },
           x: {
             title: {
-              display: true,
-              text: "Years",
-              color: colors.textPrimary,
-              font: {
-                family: "Inter, system-ui, sans-serif",
-              },
+              display: false, // Remove redundant "Years" label
             },
             ticks: {
               color: colors.textSecondary,
               font: {
                 family: "JetBrains Mono, monospace",
               },
+              callback: function (value: any, index: number, values: any[]) {
+                // Show fewer x-axis labels
+                if (values.length <= 6) return `Y${value}`;
+                if (index === 0 || index === values.length - 1)
+                  return `Y${value}`;
+                return index % 2 === 0 ? `Y${value}` : "";
+              },
             },
             grid: {
-              color: colors.border,
+              display: false, // Remove vertical grid lines
             },
           },
         },

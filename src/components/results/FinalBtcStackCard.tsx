@@ -24,11 +24,11 @@ export const FinalBtcStackCard: React.FC<Props> = ({
   }
 
   return (
-    <div className="card-themed rounded-none p-6 border-2 border-bitcoin-orange bg-bitcoin-orange/5">
-      <h3 className="font-poppins text-lg font-bold text-bitcoin-orange mb-4 uppercase tracking-wide">
+    <div className="card-themed rounded-none p-4 border-2 border-bitcoin-orange bg-bitcoin-orange/5">
+      <h3 className="font-poppins text-lg font-bold text-bitcoin-orange mb-3 uppercase tracking-wide">
         ₿ FINAL BTC STACK (YEAR {timeHorizon})
       </h3>
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="metric-pulse p-3 bg-surface-alt rounded-none border border-themed">
           <p className="text-primary font-semibold text-sm uppercase tracking-wide">
             WITH INCOME STRATEGY:

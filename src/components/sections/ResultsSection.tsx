@@ -39,13 +39,13 @@ export const ResultsSection: React.FC<Props> = ({
   );
 
   return (
-    <div className="card-themed rounded-none p-6">
-      <h2 className="font-poppins text-2xl font-bold text-primary mb-6 uppercase tracking-wide">
+    <div className="card-themed rounded-none p-4">
+      <h2 className="font-poppins text-2xl font-bold text-primary mb-4 uppercase tracking-wide">
         RESULTS
       </h2>
 
       {/* Results Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
         {/* Section 1: Final BTC Stack */}
         <FinalBtcStackCard
           calculationResults={calculationResults}

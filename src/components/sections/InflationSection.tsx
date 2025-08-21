@@ -90,9 +90,10 @@ export const InflationSection: React.FC<Props> = ({
 
       {/* Section 2: USD Purchasing Power Decay Chart */}
       <div className="p-6 bg-surface-alt rounded-none border-l-4 border-loss">
-        <h4 className="font-poppins text-lg font-bold text-loss mb-4 uppercase tracking-wide">
+        <h4 className="font-poppins text-lg font-bold text-loss mb-1 uppercase tracking-wide">
           📉 USD PURCHASING POWER DECAY
         </h4>
+        <p className="text-sm text-secondary mb-4 font-mono">%</p>
         <div style={{ height: "400px" }}>
           <UsdPurchasingPowerChart formData={formData} />
         </div>

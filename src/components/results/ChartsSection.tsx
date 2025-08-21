@@ -56,7 +56,7 @@ export const ChartsSection: React.FC<Props> = ({
       />
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
         <BtcGrowthChart
           key={`btc-growth-${theme}`}
           data={resultChartData}
@@ -70,7 +70,7 @@ export const ChartsSection: React.FC<Props> = ({
       </div>
 
       {/* Income Analysis Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
         <IncomeBtcChart
           key={`income-btc-${theme}`}
           data={incomeBtcChartData}
@@ -84,7 +84,7 @@ export const ChartsSection: React.FC<Props> = ({
       </div>
 
       {/* Allocation Evolution Chart */}
-      <div className="mt-6">
+      <div className="mt-4">
         <AllocationEvolutionChart formData={formData} />
       </div>
     </>

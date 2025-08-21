@@ -205,10 +205,10 @@ describe("BtcExchangeChart", () => {
       expect(chartOptions.maintainAspectRatio).toBe(false);
       expect(chartOptions.responsive).toBe(true);
       expect(chartOptions.scales.y.beginAtZero).toBe(false);
-      expect(chartOptions.scales.y.title.display).toBe(true);
-      expect(chartOptions.scales.y.title.text).toBe("USD  /  BTC  ($Ms)");
-      expect(chartOptions.scales.x.title.display).toBe(true);
-      expect(chartOptions.scales.x.title.text).toBe("Years");
+      expect(chartOptions.scales.y.title.display).toBe(false);
+      expect(chartOptions.scales.y.title.text).toBeUndefined();
+      expect(chartOptions.scales.x.title.display).toBe(false);
+      expect(chartOptions.scales.x.title.text).toBeUndefined();
     });
 
     it("should configure plugins correctly", () => {

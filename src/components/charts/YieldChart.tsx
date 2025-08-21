@@ -25,7 +25,7 @@ export const YieldChart: React.FC<Props> = ({ formData }) => {
     labels: Array.from({ length: timeHorizon + 1 }, (_, i) => i),
     datasets: [
       {
-        label: "Investments Yield (BTC %)",
+        label: "Investments",
         data: Array.from({ length: timeHorizon + 1 }, (_, i) =>
           (
             investmentsStartYield -
@@ -37,7 +37,7 @@ export const YieldChart: React.FC<Props> = ({ formData }) => {
         fill: false,
       },
       {
-        label: "Speculation Yield (BTC %)",
+        label: "Speculation",
         data: Array.from({ length: timeHorizon + 1 }, (_, i) =>
           (
             speculationStartYield -
@@ -62,40 +62,41 @@ export const YieldChart: React.FC<Props> = ({ formData }) => {
           y: {
             beginAtZero: true,
             title: {
-              display: true,
-              text: "Yield %",
-              color: colors.textSecondary,
+              display: false, // Remove redundant "Yield %" title
             },
             ticks: {
               color: colors.textSecondary,
+              callback: function (value: any) {
+                return `${Math.round(value)}%`; // Remove decimals from percentages
+              },
+              maxTicksLimit: 6,
             },
             grid: {
               color: colors.border,
+              lineWidth: 0.5,
             },
           },
           x: {
             title: {
-              display: true,
-              text: "Years",
-              color: colors.textSecondary,
+              display: false, // Remove redundant "Years" title
             },
             ticks: {
               color: colors.textSecondary,
+              callback: function (value: any, index: number, values: any[]) {
+                if (values.length <= 6) return `Y${value}`;
+                if (index === 0 || index === values.length - 1)
+                  return `Y${value}`;
+                return index % 2 === 0 ? `Y${value}` : "";
+              },
             },
             grid: {
-              color: colors.border,
+              display: false, // Remove vertical grid lines
             },
           },
         },
         plugins: {
           title: {
-            display: true,
-            text: "Yield projections over time",
-            color: colors.textPrimary,
-            font: {
-              weight: "bold",
-              size: 14,
-            },
+            display: false, // Remove redundant chart title (already in component header)
           },
           legend: {
             position: "bottom",
@@ -109,6 +110,15 @@ export const YieldChart: React.FC<Props> = ({ formData }) => {
             bodyColor: colors.textPrimary,
             borderColor: colors.accent,
             borderWidth: 1,
+            callbacks: {
+              label: function (context: any) {
+                const value = parseFloat(context.parsed.y);
+                return `${context.dataset.label}: ${value}%/year ₿`;
+              },
+              afterBody: function () {
+                return "Annual yield on bitcoin stack";
+              },
+            },
           },
         },
       }}
