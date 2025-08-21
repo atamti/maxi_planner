@@ -70,7 +70,7 @@ describe("IncomePotentialChart", () => {
     render(<IncomePotentialChart data={mockData} config={mockConfig} />);
 
     expect(
-      screen.getByText("📊 Income vs Expenses by Activation Year"),
+      screen.getByText("📊 INCOME VS EXPENSES BY ACTIVATION YEAR"),
     ).toBeInTheDocument();
   });
 
@@ -79,7 +79,7 @@ describe("IncomePotentialChart", () => {
 
     expect(
       screen.getByText(
-        "💡 Click on any point to set that year as your activation year",
+        "💡 CLICK ON ANY POINT TO SET THAT YEAR AS YOUR ACTIVATION YEAR",
       ),
     ).toBeInTheDocument();
   });
@@ -114,8 +114,8 @@ describe("IncomePotentialChart", () => {
     expect(mainDiv.tagName).toBe("DIV");
 
     // Check for title with proper styling
-    const title = screen.getByText("📊 Income vs Expenses by Activation Year");
-    expect(title).toHaveClass("text-lg", "font-semibold", "mb-2");
+    const title = screen.getByText("📊 INCOME VS EXPENSES BY ACTIVATION YEAR");
+    expect(title).toHaveClass("text-lg", "font-bold", "text-navy-900");
 
     // Check for help text styling
     const helpText = screen.getByText(
@@ -133,7 +133,7 @@ describe("IncomePotentialChart", () => {
     render(<IncomePotentialChart data={emptyData} config={mockConfig} />);
 
     expect(
-      screen.getByText("📊 Income vs Expenses by Activation Year"),
+      screen.getByText("📊 INCOME VS EXPENSES BY ACTIVATION YEAR"),
     ).toBeInTheDocument();
     expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
@@ -142,7 +142,7 @@ describe("IncomePotentialChart", () => {
     render(<IncomePotentialChart data={null} config={mockConfig} />);
 
     expect(
-      screen.getByText("📊 Income vs Expenses by Activation Year"),
+      screen.getByText("📊 INCOME VS EXPENSES BY ACTIVATION YEAR"),
     ).toBeInTheDocument();
     expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
@@ -151,7 +151,7 @@ describe("IncomePotentialChart", () => {
     render(<IncomePotentialChart data={mockData} config={null} />);
 
     expect(
-      screen.getByText("📊 Income vs Expenses by Activation Year"),
+      screen.getByText("📊 INCOME VS EXPENSES BY ACTIVATION YEAR"),
     ).toBeInTheDocument();
     expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
@@ -205,11 +205,11 @@ describe("IncomePotentialChart", () => {
     // Verify emoji and text content
     expect(screen.getByText(/📊/)).toBeInTheDocument();
     expect(
-      screen.getByText(/Income vs Expenses by Activation Year/),
+      screen.getByText(/INCOME VS EXPENSES BY ACTIVATION YEAR/),
     ).toBeInTheDocument();
     expect(screen.getByText(/💡/)).toBeInTheDocument();
     expect(
-      screen.getByText(/Click on any point to set that year/),
+      screen.getByText(/CLICK ON ANY POINT TO SET THAT YEAR/),
     ).toBeInTheDocument();
   });
 });

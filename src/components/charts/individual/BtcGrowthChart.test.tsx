@@ -58,7 +58,7 @@ describe("BtcGrowthChart", () => {
   it("should render the chart with title", () => {
     render(<BtcGrowthChart data={mockChartData} config={mockChartConfig} />);
 
-    expect(screen.getByText("📈 BTC Stack Growth")).toBeInTheDocument();
+    expect(screen.getByText("📈 BTC STACK GROWTH")).toBeInTheDocument();
     expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
 
@@ -86,7 +86,7 @@ describe("BtcGrowthChart", () => {
 
     render(<BtcGrowthChart data={emptyData} config={mockChartConfig} />);
 
-    expect(screen.getByText("📈 BTC Stack Growth")).toBeInTheDocument();
+    expect(screen.getByText("📈 BTC STACK GROWTH")).toBeInTheDocument();
     expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
 
@@ -105,7 +105,7 @@ describe("BtcGrowthChart", () => {
     render(<BtcGrowthChart data={mockChartData} config={mockChartConfig} />);
 
     // Check the container structure
-    const container = screen.getByText("📈 BTC Stack Growth").parentElement;
+    const container = screen.getByText("📈 BTC STACK GROWTH").parentElement;
     expect(container).toBeInTheDocument();
 
     // Chart should be present
@@ -139,7 +139,7 @@ describe("BtcGrowthChart", () => {
   it("should handle null or undefined props gracefully", () => {
     render(<BtcGrowthChart data={null} config={null} />);
 
-    expect(screen.getByText("📈 BTC Stack Growth")).toBeInTheDocument();
+    expect(screen.getByText("📈 BTC STACK GROWTH")).toBeInTheDocument();
     expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
 });

@@ -28,39 +28,63 @@ export const LoanDetailsCard: React.FC<Props> = ({
   }
 
   return (
-    <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-      <h3 className="text-lg font-semibold text-purple-800 mb-3">
-        🏦 Loan Details (Year {formData.activationYear})
+    <div className="card-themed rounded-none p-6 border-2 border-bitcoin-orange bg-bitcoin-orange/10">
+      <h3 className="font-poppins text-lg font-bold text-bitcoin-orange mb-4 uppercase tracking-wide">
+        🏦 LOAN DETAILS (YEAR {formData.activationYear})
       </h3>
-      <div className="space-y-3 text-sm">
-        <div>
-          <p className="font-medium text-purple-700">Principal:</p>
-          <p>{formatCurrency(loanDetails.loanPrincipal, 0)}</p>
+      <div className="space-y-4">
+        <div className="p-3 bg-surface-alt rounded-none border border-themed">
+          <p className="font-inter text-sm font-bold text-bitcoin-orange mb-2 uppercase tracking-wide">
+            PRINCIPAL:
+          </p>
+          <p className="text-primary font-mono text-lg font-bold">
+            {formatCurrency(loanDetails.loanPrincipal, 0)}
+          </p>
         </div>
-        <div>
-          <p className="font-medium text-purple-700">Annual Interest:</p>
-          <p>
+
+        <div className="p-3 bg-surface-alt rounded-none border border-themed">
+          <p className="font-inter text-sm font-bold text-bitcoin-orange mb-2 uppercase tracking-wide">
+            ANNUAL INTEREST:
+          </p>
+          <p className="text-primary font-mono">
             {formatCurrency(
               loanDetails.loanPrincipal * (formData.loanRate / 100),
               0,
             )}
           </p>
         </div>
-        <div>
-          <p className="font-medium text-purple-700">Annual Payments:</p>
-          <p>{formatCurrency(loanDetails.annualPayments, 0)}</p>
+
+        <div className="p-3 bg-surface-alt rounded-none border border-themed">
+          <p className="font-inter text-sm font-bold text-bitcoin-orange mb-2 uppercase tracking-wide">
+            ANNUAL PAYMENTS:
+          </p>
+          <p className="text-primary font-mono">
+            {formatCurrency(loanDetails.annualPayments, 0)}
+          </p>
           {formData.interestOnly && (
-            <p className="text-xs text-purple-600">(Interest only)</p>
+            <p className="text-xs text-secondary font-mono uppercase tracking-wide">
+              (Interest only)
+            </p>
           )}
         </div>
-        <div>
-          <p className="font-medium text-purple-700">LTV Ratio:</p>
-          <p>{formData.ltvRatio}%</p>
+
+        <div className="p-3 bg-surface-alt rounded-none border border-themed">
+          <p className="font-inter text-sm font-bold text-bitcoin-orange mb-2 uppercase tracking-wide">
+            LTV RATIO:
+          </p>
+          <p className="text-primary font-mono text-lg font-bold">
+            {formData.ltvRatio}%
+          </p>
         </div>
-        <div>
-          <p className="font-medium text-purple-700">Liquidation Risk:</p>
-          <p>{formatCurrency(loanDetails.liquidationPrice, 0)}</p>
-          <p className="text-xs text-purple-600">
+
+        <div className="p-3 bg-surface-alt rounded-none border-2 border-loss/50">
+          <p className="font-inter text-sm font-bold text-loss mb-2 uppercase tracking-wide">
+            ⚠️ LIQUIDATION RISK:
+          </p>
+          <p className="text-loss font-mono text-lg font-bold">
+            {formatCurrency(loanDetails.liquidationPrice, 0)}
+          </p>
+          <p className="text-xs text-secondary font-mono mt-1">
             (BTC @{" "}
             {formatCurrency(getBtcPriceAtYear(formData.activationYear), 0)} in
             Year {formData.activationYear})

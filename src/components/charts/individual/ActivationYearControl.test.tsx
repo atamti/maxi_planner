@@ -90,7 +90,8 @@ describe("ActivationYearControl", () => {
       />,
     );
 
-    expect(screen.getByText("📅 Activation Year: 5")).toBeInTheDocument();
+    expect(screen.getByText(/📅 ACTIVATION YEAR:/)).toBeInTheDocument();
+    expect(screen.getByText("5")).toBeInTheDocument();
   });
 
   it("should render the range input with correct properties", () => {
@@ -146,7 +147,8 @@ describe("ActivationYearControl", () => {
       />,
     );
 
-    expect(screen.getByText("📅 Activation Year: 0")).toBeInTheDocument();
+    expect(screen.getByText(/📅 ACTIVATION YEAR:/)).toBeInTheDocument();
+    expect(screen.getByText("0")).toBeInTheDocument();
     expect(screen.getByText("Year 0 - When income starts")).toBeInTheDocument();
 
     const rangeInput = screen.getByRole("slider");
@@ -163,7 +165,8 @@ describe("ActivationYearControl", () => {
       />,
     );
 
-    expect(screen.getByText("📅 Activation Year: 20")).toBeInTheDocument();
+    expect(screen.getByText(/📅 ACTIVATION YEAR:/)).toBeInTheDocument();
+    expect(screen.getByText("20")).toBeInTheDocument();
     expect(
       screen.getByText("Year 20 - When income starts"),
     ).toBeInTheDocument();
@@ -201,12 +204,12 @@ describe("ActivationYearControl", () => {
     expect(mainDiv).toHaveClass(
       "mb-6",
       "p-4",
-      "bg-gray-50",
-      "rounded-lg",
+      "card-themed",
       "border",
+      "border-bitcoin-orange",
     );
 
-    const label = screen.getByText("📅 Activation Year: 5");
+    const label = screen.getByText(/📅 ACTIVATION YEAR:/);
     expect(label).toHaveClass("block", "font-medium", "mb-2", "text-lg");
 
     const rangeInput = screen.getByRole("slider");
@@ -253,7 +256,8 @@ describe("ActivationYearControl", () => {
       />,
     );
 
-    expect(screen.getByText("📅 Activation Year: 25")).toBeInTheDocument();
+    expect(screen.getByText(/📅 ACTIVATION YEAR:/)).toBeInTheDocument();
+    expect(screen.getByText("25")).toBeInTheDocument();
     expect(screen.getByText("Year 50")).toBeInTheDocument();
 
     const rangeInput = screen.getByRole("slider");
@@ -293,8 +297,9 @@ describe("ActivationYearControl", () => {
       "flex",
       "justify-between",
       "text-sm",
-      "text-gray-600",
+      "text-secondary",
       "mt-2",
+      "font-mono",
     );
 
     const middleText = screen.getByText("Year 5 - When income starts");

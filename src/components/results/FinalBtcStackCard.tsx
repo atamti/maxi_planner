@@ -24,39 +24,44 @@ export const FinalBtcStackCard: React.FC<Props> = ({
   }
 
   return (
-    <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-      <h3 className="text-lg font-semibold text-orange-800 mb-3">
-        ₿ Final BTC Stack (Year {timeHorizon})
+    <div className="card-themed rounded-none p-6 border-2 border-bitcoin-orange bg-bitcoin-orange/5">
+      <h3 className="font-poppins text-lg font-bold text-bitcoin-orange mb-4 uppercase tracking-wide">
+        ₿ FINAL BTC STACK (YEAR {timeHorizon})
       </h3>
-      <div className="space-y-2">
-        <p>
-          <strong>With Income Strategy:</strong>
-          <br />
-          {formatNumber(finalResult.btcWithIncome)} BTC
-        </p>
+      <div className="space-y-4">
+        <div className="metric-pulse p-3 bg-surface-alt rounded-none border border-themed">
+          <p className="text-primary font-semibold text-sm uppercase tracking-wide">
+            WITH INCOME STRATEGY:
+          </p>
+          <p className="text-2xl font-bold text-bitcoin-orange font-inter">
+            {formatNumber(finalResult.btcWithIncome)} BTC
+          </p>
+        </div>
         {showUSD && (
-          <p className="text-sm text-gray-600">
-            (
+          <p className="text-sm text-secondary">
+            ≈{" "}
             {formatCurrency(
               finalResult.btcWithIncome * getBtcPriceAtYear(timeHorizon),
               0,
             )}
-            )
           </p>
         )}
-        <p>
-          <strong>Pure Growth (No Income):</strong>
-          <br />
-          {formatNumber(finalResult.btcWithoutIncome)} BTC
-        </p>
+
+        <div className="p-3 bg-surface-alt rounded-none border border-themed">
+          <p className="text-primary font-semibold text-sm uppercase tracking-wide">
+            PURE GROWTH (NO INCOME):
+          </p>
+          <p className="text-xl font-bold text-primary font-inter">
+            {formatNumber(finalResult.btcWithoutIncome)} BTC
+          </p>
+        </div>
         {showUSD && (
-          <p className="text-sm text-gray-600">
-            (
+          <p className="text-sm text-secondary">
+            ≈{" "}
             {formatCurrency(
               finalResult.btcWithoutIncome * getBtcPriceAtYear(timeHorizon),
               0,
             )}
-            )
           </p>
         )}
       </div>

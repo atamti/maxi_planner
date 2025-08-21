@@ -19,8 +19,9 @@ export const ChartLabels: React.FC<ChartLabelsProps> = ({
         y={height - 10}
         textAnchor="middle"
         fontSize="14"
-        fill="#333"
+        fill="var(--color-text-secondary)"
         fontWeight="bold"
+        opacity="0.9"
       >
         Years
       </text>
@@ -31,8 +32,9 @@ export const ChartLabels: React.FC<ChartLabelsProps> = ({
         y={height / 2}
         textAnchor="middle"
         fontSize="14"
-        fill="#333"
+        fill="var(--color-text-secondary)"
         fontWeight="bold"
+        opacity="0.9"
         transform={`rotate(-90, 30, ${height / 2})`}
       >
         {yAxisLabel}

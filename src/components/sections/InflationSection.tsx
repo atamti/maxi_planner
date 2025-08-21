@@ -67,9 +67,9 @@ export const InflationSection: React.FC<Props> = ({
           title: "Inflation Rate Assumptions",
           emoji: "💵",
           colorClass: {
-            background: "bg-gray-50",
-            border: "border-gray-400",
-            text: "text-gray-800",
+            background: "bg-surface-alt",
+            border: "border-themed",
+            text: "text-primary",
           },
           dataKey: "inflationCustomRates",
           flatRateKey: "inflationFlat",
@@ -89,9 +89,9 @@ export const InflationSection: React.FC<Props> = ({
       />
 
       {/* Section 2: USD Purchasing Power Decay Chart */}
-      <div className="p-4 bg-red-50 rounded-lg border-l-4 border-red-400">
-        <h4 className="font-semibold text-red-800 mb-3">
-          📉 USD Purchasing Power Decay
+      <div className="p-6 bg-surface-alt rounded-none border-l-4 border-loss">
+        <h4 className="font-poppins text-lg font-bold text-loss mb-4 uppercase tracking-wide">
+          📉 USD PURCHASING POWER DECAY
         </h4>
         <div style={{ height: "400px" }}>
           <UsdPurchasingPowerChart formData={formData} />

@@ -1,12 +1,15 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
+import { useTheme } from "../../contexts/ThemeContext";
 import { FormData } from "../../types";
+import { getAllChartColors } from "../../utils/chartTheme";
 
 interface Props {
   formData: FormData;
 }
 
 export const YieldChart: React.FC<Props> = ({ formData }) => {
+  const { theme } = useTheme();
   const {
     timeHorizon,
     investmentsStartYield,
@@ -14,6 +17,9 @@ export const YieldChart: React.FC<Props> = ({ formData }) => {
     speculationStartYield,
     speculationEndYield,
   } = formData;
+
+  const colors = getAllChartColors(theme).theme;
+  const datasetColors = getAllChartColors(theme).datasets;
 
   const yieldChartData = {
     labels: Array.from({ length: timeHorizon + 1 }, (_, i) => i),
@@ -26,8 +32,8 @@ export const YieldChart: React.FC<Props> = ({ formData }) => {
             (investmentsStartYield - investmentsEndYield) * (i / timeHorizon)
           ).toFixed(1),
         ),
-        borderColor: "#F7931A",
-        backgroundColor: "rgba(247, 147, 26, 0.2)",
+        borderColor: datasetColors.warning,
+        backgroundColor: datasetColors.warningBg,
         fill: false,
       },
       {
@@ -38,8 +44,8 @@ export const YieldChart: React.FC<Props> = ({ formData }) => {
             (speculationStartYield - speculationEndYield) * (i / timeHorizon)
           ).toFixed(1),
         ),
-        borderColor: "#666666",
-        backgroundColor: "rgba(102, 102, 102, 0.2)",
+        borderColor: datasetColors.secondary,
+        backgroundColor: datasetColors.secondaryBg,
         fill: false,
       },
     ],
@@ -47,6 +53,7 @@ export const YieldChart: React.FC<Props> = ({ formData }) => {
 
   return (
     <Line
+      key={theme} // Force re-render when theme changes
       data={yieldChartData}
       options={{
         maintainAspectRatio: false,
@@ -54,17 +61,54 @@ export const YieldChart: React.FC<Props> = ({ formData }) => {
         scales: {
           y: {
             beginAtZero: true,
-            title: { display: true, text: "Yield %" },
+            title: {
+              display: true,
+              text: "Yield %",
+              color: colors.textSecondary,
+            },
+            ticks: {
+              color: colors.textSecondary,
+            },
+            grid: {
+              color: colors.border,
+            },
           },
-          x: { title: { display: true, text: "Years" } },
+          x: {
+            title: {
+              display: true,
+              text: "Years",
+              color: colors.textSecondary,
+            },
+            ticks: {
+              color: colors.textSecondary,
+            },
+            grid: {
+              color: colors.border,
+            },
+          },
         },
         plugins: {
           title: {
             display: true,
             text: "Yield projections over time",
+            color: colors.textPrimary,
+            font: {
+              weight: "bold",
+              size: 14,
+            },
           },
           legend: {
             position: "bottom",
+            labels: {
+              color: colors.textSecondary,
+            },
+          },
+          tooltip: {
+            backgroundColor: colors.surfaceAlt,
+            titleColor: colors.textPrimary,
+            bodyColor: colors.textPrimary,
+            borderColor: colors.accent,
+            borderWidth: 1,
           },
         },
       }}

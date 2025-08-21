@@ -52,41 +52,43 @@ export const EscapeVelocitySection: React.FC<Props> = ({
   const escapeVelocity = calculateEscapeVelocity();
 
   return (
-    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-6">
-      <h3 className="text-lg font-semibold text-yellow-800 mb-3">
-        🚀 Escape Velocity Analysis
+    <div className="card-themed p-4 border border-bitcoin-orange mb-6">
+      <h3 className="text-lg font-semibold text-bitcoin-orange mb-3 font-heading tracking-wide">
+        🚀 ESCAPE VELOCITY ANALYSIS
       </h3>
-      <p className="text-sm text-yellow-700 mb-3">
+      <p className="text-sm text-secondary mb-3 font-ui">
         When income exceeds expenses by activation year:
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-3 rounded border">
-          <p className="font-medium text-yellow-800 mb-1">Base Scenario:</p>
+        <div className="bg-surface-alt p-3 border border-accent">
+          <p className="font-medium text-primary mb-1 font-ui">
+            Base Scenario:
+          </p>
           {escapeVelocity.escapeYearBase !== null ? (
-            <p className="text-lg font-bold text-green-600">
+            <p className="text-lg font-bold text-success">
               Year {escapeVelocity.escapeYearBase}
             </p>
           ) : (
-            <p className="text-lg font-bold text-red-600">Never reached</p>
+            <p className="text-lg font-bold text-error">Never reached</p>
           )}
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-secondary font-ui">
             When unleveraged income first exceeds expenses
           </p>
         </div>
 
         {formData.collateralPct > 0 && (
-          <div className="bg-white p-3 rounded border">
-            <p className="font-medium text-yellow-800 mb-1">
+          <div className="bg-surface-alt p-3 border border-accent">
+            <p className="font-medium text-primary mb-1 font-ui">
               Leveraged Scenario:
             </p>
             {escapeVelocity.escapeYearLeveraged !== null ? (
-              <p className="text-lg font-bold text-green-600">
+              <p className="text-lg font-bold text-success">
                 Year {escapeVelocity.escapeYearLeveraged}
               </p>
             ) : (
-              <p className="text-lg font-bold text-red-600">Never reached</p>
+              <p className="text-lg font-bold text-error">Never reached</p>
             )}
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-secondary font-ui">
               When leveraged income (after debt service) exceeds expenses
             </p>
           </div>
@@ -96,9 +98,9 @@ export const EscapeVelocitySection: React.FC<Props> = ({
       {escapeVelocity.escapeYearBase !== null &&
         escapeVelocity.escapeYearLeveraged !== null &&
         formData.collateralPct > 0 && (
-          <div className="mt-3 p-2 bg-blue-100 rounded border">
-            <p className="text-sm text-blue-800">
-              💡 <strong>Leverage advantage:</strong>{" "}
+          <div className="mt-3 p-2 bg-surface-alt border border-accent">
+            <p className="text-sm text-primary font-ui">
+              💡 <strong>LEVERAGE ADVANTAGE:</strong>{" "}
               {escapeVelocity.escapeYearBase -
                 escapeVelocity.escapeYearLeveraged >
               0

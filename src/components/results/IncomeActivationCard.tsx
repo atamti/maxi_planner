@@ -15,12 +15,14 @@ export const IncomeActivationCard: React.FC<Props> = ({
   const formatCashflow = (value: number): React.ReactElement => {
     if (value < 0) {
       return (
-        <span className="text-red-600">
+        <span className="text-loss font-bold">
           ({formatCurrency(Math.abs(value), 0)})
         </span>
       );
     }
-    return <span>{formatCurrency(value, 0)}</span>;
+    return (
+      <span className="text-gain font-bold">{formatCurrency(value, 0)}</span>
+    );
   };
 
   // Calculate USD cashflows (income minus expenses)
@@ -41,20 +43,22 @@ export const IncomeActivationCard: React.FC<Props> = ({
   const cashflows = calculateCashflows();
 
   return (
-    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-      <h3 className="text-lg font-semibold text-green-800 mb-3">
-        🚀 Income Activation Year Analysis (Year {formData.activationYear})
+    <div className="card-themed rounded-none p-6 border-2 border-navy-900 bg-navy-900/5">
+      <h3 className="font-poppins text-lg font-bold text-navy-900 mb-4 uppercase tracking-wide">
+        🚀 INCOME ACTIVATION YEAR ({formData.activationYear})
       </h3>
-      <div className="space-y-3">
-        <div>
-          <p className="text-sm font-medium text-green-700 mb-1">💰 Income:</p>
-          <p className="text-sm">
-            <strong>Base:</strong>{" "}
+      <div className="space-y-4">
+        <div className="p-3 bg-surface-alt rounded-none border border-themed">
+          <p className="font-inter text-sm font-bold text-navy-900 mb-2 uppercase tracking-wide">
+            💰 INCOME:
+          </p>
+          <p className="text-primary font-mono">
+            <span className="font-semibold">Base:</span>{" "}
             {formatCurrency(results.usdIncome[formData.activationYear] || 0, 0)}
           </p>
           {formData.collateralPct > 0 && (
-            <p className="text-sm">
-              <strong>Leveraged:</strong>{" "}
+            <p className="text-primary font-mono">
+              <span className="font-semibold">Leveraged:</span>{" "}
               {formatCurrency(
                 results.usdIncomeWithLeverage[formData.activationYear] || 0,
                 0,
@@ -63,11 +67,11 @@ export const IncomeActivationCard: React.FC<Props> = ({
           )}
         </div>
 
-        <div>
-          <p className="text-sm font-medium text-green-700 mb-1">
-            💸 Expenses:
+        <div className="p-3 bg-surface-alt rounded-none border border-themed">
+          <p className="font-inter text-sm font-bold text-navy-900 mb-2 uppercase tracking-wide">
+            💸 EXPENSES:
           </p>
-          <p className="text-sm">
+          <p className="text-primary font-mono">
             {formatCurrency(
               results.annualExpenses[formData.activationYear] || 0,
               0,
@@ -75,16 +79,17 @@ export const IncomeActivationCard: React.FC<Props> = ({
           </p>
         </div>
 
-        <div className="pt-2 border-t border-green-300">
-          <p className="text-sm font-medium text-green-700 mb-1">
-            📊 Net Cashflow:
+        <div className="p-3 bg-surface-alt rounded-none border-2 border-themed">
+          <p className="font-inter text-sm font-bold text-navy-900 mb-2 uppercase tracking-wide">
+            📊 NET CASHFLOW:
           </p>
-          <p className="text-sm">
-            <strong>Base:</strong> {formatCashflow(cashflows.withoutLeverage)}
+          <p className="font-mono">
+            <span className="font-semibold text-primary">Base:</span>{" "}
+            {formatCashflow(cashflows.withoutLeverage)}
           </p>
           {formData.collateralPct > 0 && (
-            <p className="text-sm">
-              <strong>Leveraged:</strong>{" "}
+            <p className="font-mono">
+              <span className="font-semibold text-primary">Leveraged:</span>{" "}
               {formatCashflow(cashflows.withLeverage)}
             </p>
           )}

@@ -16,16 +16,18 @@ export const CollapsibleSection: React.FC<Props> = ({
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   return (
-    <div className="mb-4 border border-gray-200 rounded-lg">
+    <div className="mb-4 border border-[var(--color-border)] rounded-none">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full p-3 text-left bg-gray-50 hover:bg-gray-100 flex justify-between items-center rounded-t-lg"
+        className="w-full p-3 text-left bg-surface-alt hover:bg-surface flex justify-between items-center rounded-none font-heading tracking-wide transition-colors"
       >
-        <h3 className="font-semibold text-gray-800">{title}</h3>
-        <span className="text-gray-600">{isExpanded ? "−" : "+"}</span>
+        <h3 className="font-semibold text-primary">{title.toUpperCase()}</h3>
+        <span className="text-[var(--color-accent)] font-bold">
+          {isExpanded ? "−" : "+"}
+        </span>
       </button>
       {isExpanded && (
-        <div className="p-4 bg-white rounded-b-lg">
+        <div className="p-4 bg-surface rounded-none">
           {noGrid ? (
             children
           ) : (

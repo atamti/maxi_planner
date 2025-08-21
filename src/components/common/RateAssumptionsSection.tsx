@@ -230,13 +230,17 @@ export const RateAssumptionsSection: React.FC<Props> = ({
 
       {/* Header */}
       <div
-        className={`p-4 rounded-lg mb-4 ${colorClass.background} ${colorClass.border}`}
+        className={`p-6 rounded-none mb-6 ${colorClass.background} border-l-4 ${colorClass.border}`}
       >
-        <h3 className={`text-lg font-semibold ${colorClass.text}`}>
-          {emoji} {title}
+        <h3
+          className={`font-poppins text-lg font-bold ${colorClass.text} uppercase tracking-wide`}
+        >
+          {emoji} {title.toUpperCase()}
         </h3>
-        <p className={`text-sm mt-1 ${colorClass.text}`}>
-          Configure your {title.toLowerCase()} forecast
+        <p
+          className={`text-sm mt-2 ${colorClass.text} font-mono uppercase tracking-wide opacity-80`}
+        >
+          CONFIGURE YOUR {title.toUpperCase()} FORECAST
         </p>
       </div>
 

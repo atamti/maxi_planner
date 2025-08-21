@@ -10,8 +10,10 @@ export const PortfolioForm: React.FC = () => {
   const { formData, updateFormData, resetForm } = usePortfolioCompat();
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow mb-4">
-      <h2 className="text-xl font-semibold mb-4">Portfolio Configuration</h2>
+    <div className="bg-surface border border-[var(--color-border)] p-4 mb-4 rounded-none shadow-inner-thin-orange">
+      <h2 className="text-lg font-heading font-bold tracking-wide text-primary mb-4">
+        PORTFOLIO CONFIGURATION
+      </h2>
 
       {/* Section 1: Portfolio Setup */}
       <PortfolioSetupSection />
@@ -32,9 +34,9 @@ export const PortfolioForm: React.FC = () => {
       <div className="flex justify-end mt-6">
         <button
           onClick={resetForm}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+          className="btn-secondary-navy dark:btn-gradient-orange px-5 py-2 text-xs font-heading tracking-wide"
         >
-          🔄 Reset to Defaults
+          🔄 RESET TO DEFAULTS
         </button>
       </div>
     </div>

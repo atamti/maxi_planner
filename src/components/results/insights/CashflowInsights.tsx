@@ -26,12 +26,15 @@ export const CashflowInsights: React.FC<Props> = ({
   // Base cashflow insights
   if (cashflows.activationYear.withoutLeverage > 0) {
     insights.push(
-      <div key="activation-base-pos" className="bg-white p-3 rounded border">
-        <p className="text-green-700 text-sm">
-          ✅ <strong>Early Success:</strong> Income covers expenses from year{" "}
+      <div
+        key="activation-base-pos"
+        className="card-themed p-3 border border-accent"
+      >
+        <p className="text-success text-sm font-ui">
+          ✅ <strong>EARLY SUCCESS:</strong> Income covers expenses from year{" "}
           {formData.activationYear}
           <br />
-          <span className="text-gray-600">
+          <span className="text-secondary">
             (Surplus: ~
             {formatCurrency(
               Math.round(cashflows.activationYear.withoutLeverage / 1000) *
@@ -45,9 +48,12 @@ export const CashflowInsights: React.FC<Props> = ({
     );
   } else {
     insights.push(
-      <div key="activation-base-neg" className="bg-white p-3 rounded border">
-        <p className="text-orange-700 text-sm">
-          ⚠️ <strong>Early Deficit:</strong> Income shortfall of ~
+      <div
+        key="activation-base-neg"
+        className="card-themed p-3 border border-accent"
+      >
+        <p className="text-warning text-sm font-ui">
+          ⚠️ <strong>EARLY DEFICIT:</strong> Income shortfall of ~
           {formatCurrency(
             Math.round(
               Math.abs(cashflows.activationYear.withoutLeverage) / 1000,
@@ -56,7 +62,7 @@ export const CashflowInsights: React.FC<Props> = ({
           )}{" "}
           in year {formData.activationYear}
           <br />
-          <span className="text-gray-600">
+          <span className="text-secondary">
             (Need ~
             {formatCurrency(
               Math.round(
@@ -84,10 +90,10 @@ export const CashflowInsights: React.FC<Props> = ({
         insights.push(
           <div
             key="activation-lev-saves"
-            className="bg-white p-3 rounded border"
+            className="card-themed p-3 border border-accent"
           >
-            <p className="text-blue-700 text-sm">
-              🚀 <strong>Leverage Advantage:</strong> Turns year{" "}
+            <p className="text-success text-sm font-ui">
+              🚀 <strong>LEVERAGE ADVANTAGE:</strong> Turns year{" "}
               {formData.activationYear} deficit into ~
               {formatCurrency(
                 Math.round(cashflows.activationYear.withLeverage / 1000) * 1000,
@@ -95,7 +101,7 @@ export const CashflowInsights: React.FC<Props> = ({
               )}{" "}
               surplus
               <br />
-              <span className="text-gray-600">
+              <span className="text-secondary">
                 (Leverage income: ~
                 {formatCurrency(
                   Math.round(
@@ -113,8 +119,11 @@ export const CashflowInsights: React.FC<Props> = ({
       }
     } else {
       insights.push(
-        <div key="activation-lev-neg" className="bg-white p-3 rounded border">
-          <p className="text-red-700 text-sm">
+        <div
+          key="activation-lev-neg"
+          className="card-themed p-3 border border-accent"
+        >
+          <p className="text-warning text-sm font-ui">
             ❌ <strong>Leverage Burden:</strong> Debt service creates ~
             {formatCurrency(
               Math.round(
@@ -124,7 +133,7 @@ export const CashflowInsights: React.FC<Props> = ({
             )}{" "}
             deficit in year {formData.activationYear}
             <br />
-            <span className="text-gray-600">
+            <span className="text-secondary">
               (Debt service: ~
               {formatCurrency(
                 Math.round((dynamicLoanValues?.annualPayments || 0) / 1000) *

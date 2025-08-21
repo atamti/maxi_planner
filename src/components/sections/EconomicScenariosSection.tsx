@@ -405,16 +405,16 @@ export const EconomicScenariosSection: React.FC = () => {
           <div
             key={key}
             onClick={() => handleScenarioChange(key as ScenarioKey)}
-            className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 
+            className={`p-3 rounded-none border-2 cursor-pointer transition-all duration-200 
               ${
                 formData.economicScenario === key
-                  ? "bg-blue-500 text-white border-blue-600 shadow-lg"
-                  : "bg-white hover:bg-blue-50 border-gray-200 hover:border-blue-300 shadow-sm"
+                  ? "btn-gradient-orange text-white border-brand-orange shadow-glow-orange"
+                  : "bg-surface hover:bg-surface-alt border-[var(--color-border)] hover:border-[var(--color-accent)] text-primary shadow-sm"
               }`}
           >
             <h4 className="font-medium">{scenario.name}</h4>
             <p
-              className={`text-xs mt-1 ${formData.economicScenario === key ? "text-blue-100" : "text-gray-500"}`}
+              className={`text-xs mt-1 ${formData.economicScenario === key ? "text-white/80" : "text-secondary"}`}
             >
               {scenario.description}
             </p>
@@ -430,41 +430,41 @@ export const EconomicScenariosSection: React.FC = () => {
           );
           return (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-3 bg-white rounded-md shadow-sm border">
-                <div className="text-sm text-gray-500">USD inflation</div>
-                <div className="text-xl font-bold text-amber-600">
+              <div className="p-3 bg-surface rounded-none shadow-sm border border-[var(--color-border)]">
+                <div className="text-sm text-secondary">USD inflation</div>
+                <div className="text-xl font-bold text-[var(--color-accent)]">
                   {calculatedAverages.inflationAvg}% avg
                 </div>
-                <div className="text-xs text-gray-400">
+                <div className="text-xs text-secondary opacity-70">
                   {currentScenario.inflation.startRate}% →{" "}
                   {currentScenario.inflation.endRate}%
                 </div>
               </div>
 
-              <div className="p-3 bg-white rounded-md shadow-sm border">
-                <div className="text-sm text-gray-500">
+              <div className="p-3 bg-surface rounded-none shadow-sm border border-[var(--color-border)]">
+                <div className="text-sm text-secondary">
                   BTC nominal appreciation
                 </div>
-                <div className="text-xl font-bold text-green-600">
+                <div className="text-xl font-bold text-gain">
                   {calculatedAverages.btcAppreciationAvg}% avg
                 </div>
-                <div className="text-xs text-gray-400">
+                <div className="text-xs text-secondary opacity-70">
                   {currentScenario.btcPrice.startRate}% →{" "}
                   {currentScenario.btcPrice.endRate}%
                 </div>
               </div>
 
-              <div className="p-3 bg-white rounded-md shadow-sm border">
-                <div className="text-sm text-gray-500">
+              <div className="p-3 bg-surface rounded-none shadow-sm border border-[var(--color-border)]">
+                <div className="text-sm text-secondary">
                   Income portfolio yield
                 </div>
                 <div
-                  className={`text-xl font-bold ${calculatedAverages.incomeGrowth >= 0 ? "text-blue-600" : "text-red-600"}`}
+                  className={`text-xl font-bold ${calculatedAverages.incomeGrowth >= 0 ? "text-gain" : "text-loss"}`}
                 >
                   {calculatedAverages.incomeGrowth >= 0 ? "+" : ""}
                   {calculatedAverages.incomeGrowth}% avg
                 </div>
-                <div className="text-xs text-gray-400">
+                <div className="text-xs text-secondary opacity-70">
                   {currentScenario.incomeYield.startRate}% →{" "}
                   {currentScenario.incomeYield.endRate}%
                 </div>

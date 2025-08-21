@@ -16,8 +16,8 @@ export const LeverageSection: React.FC = () => {
   return (
     <CollapsibleSection title={getSectionTitle()}>
       <div>
-        <label className="block font-medium mb-1">
-          Collateralized BTC (% of Savings):
+        <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+          COLLATERALIZED BTC (% OF SAVINGS):
         </label>
         <input
           type="range"
@@ -25,58 +25,72 @@ export const LeverageSection: React.FC = () => {
           onChange={(e) =>
             updateFormData({ collateralPct: Number(e.target.value) })
           }
-          className="w-full"
+          className="w-full h-2 bg-surface border border-themed rounded-none appearance-none slider-bitcoin focus-ring-themed"
           min="0"
           max="100"
         />
-        <span className="text-sm text-gray-600">
-          {formData.collateralPct}% used as collateral
-        </span>
+        <div className="flex justify-between mt-2">
+          <span className="text-xs text-secondary font-mono">0%</span>
+          <span className="text-sm font-bold text-bitcoin-orange font-inter">
+            {formData.collateralPct}% USED AS COLLATERAL
+          </span>
+          <span className="text-xs text-secondary font-mono">100%</span>
+        </div>
       </div>
       <div>
-        <label className="block font-medium mb-1">
-          Loan-to-Value Ratio (LTV %):
+        <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+          LOAN-TO-VALUE RATIO (LTV %):
         </label>
         <input
           type="range"
           value={formData.ltvRatio}
           onChange={(e) => updateFormData({ ltvRatio: Number(e.target.value) })}
-          className="w-full"
+          className="w-full h-2 bg-surface border border-themed rounded-none appearance-none slider-bitcoin focus-ring-themed"
           min="0"
           max="50"
         />
-        <span className="text-sm text-gray-600">
-          {formData.ltvRatio}% LTV (borrow {formData.ltvRatio}% of collateral
-          value)
-        </span>
+        <div className="flex justify-between mt-2">
+          <span className="text-xs text-secondary font-mono">0%</span>
+          <span className="text-sm font-bold text-bitcoin-orange font-inter">
+            {formData.ltvRatio}% LTV (BORROW {formData.ltvRatio}% OF COLLATERAL
+            VALUE)
+          </span>
+          <span className="text-xs text-secondary font-mono">50%</span>
+        </div>
       </div>
       <div>
-        <label className="block font-medium mb-1">
-          Loan Interest Rate (%):
+        <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+          LOAN INTEREST RATE (%):
         </label>
         <input
           type="number"
           value={formData.loanRate}
           onChange={(e) => updateFormData({ loanRate: Number(e.target.value) })}
-          className="w-full p-2 border rounded"
+          className="w-full p-3 bg-surface border-2 border-themed rounded-none text-primary font-mono text-lg focus-ring-themed"
           min="0"
         />
       </div>
       <div>
-        <label className="block font-medium mb-1">Loan Term (Years):</label>
+        <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+          LOAN TERM (YEARS):
+        </label>
         <input
           type="range"
           value={formData.loanTermYears}
           onChange={(e) =>
             updateFormData({ loanTermYears: Number(e.target.value) })
           }
-          className="w-full"
+          className="w-full h-2 bg-surface border border-themed rounded-none appearance-none slider-bitcoin focus-ring-themed"
           min="1"
           max="30"
         />
-        <span className="text-sm text-gray-600">
-          {formData.loanTermYears} years
-        </span>
+        <div className="flex justify-between mt-2">
+          <span className="text-xs text-secondary font-mono">1 yr</span>
+          <span className="text-sm font-bold text-bitcoin-orange font-inter">
+            {formData.loanTermYears} YEARS
+          </span>
+          <span className="text-xs text-secondary font-mono">30 yrs</span>
+        </div>
       </div>
       <div>
         <label className="flex items-center">
@@ -88,7 +102,7 @@ export const LeverageSection: React.FC = () => {
           />
           <span className="font-medium">Interest Only Payments</span>
         </label>
-        <p className="text-xs text-gray-600 mt-1">
+        <p className="text-xs text-secondary mt-1 font-ui">
           {formData.interestOnly
             ? "Pay only interest, principal remains unchanged"
             : `Amortized payments over ${formData.loanTermYears}-year term`}
@@ -97,8 +111,10 @@ export const LeverageSection: React.FC = () => {
 
       {/* Live Loan Calculations */}
       {formData.collateralPct > 0 && (
-        <div className="col-span-2 mt-4 p-3 bg-blue-50 rounded-lg border">
-          <h4 className="font-semibold text-blue-800 mb-2">💰 Loan Details</h4>
+        <div className="col-span-2 mt-4 p-3 card-themed border border-bitcoin-orange">
+          <h4 className="font-semibold text-bitcoin-orange mb-2 font-heading tracking-wide uppercase">
+            💰 LOAN DETAILS
+          </h4>
           {(() => {
             // Calculate BTC stack at activation year with growth
             let btcStackAtActivation = formData.btcStack;
@@ -163,36 +179,36 @@ export const LeverageSection: React.FC = () => {
 
             return (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                <div>
+                <div className="text-primary font-ui">
                   <strong>Collateral BTC:</strong>{" "}
                   {formatNumber(collateralBtc, 3)} BTC
                 </div>
-                <div>
+                <div className="text-primary font-ui">
                   <strong>BTC Price (Year {formData.activationYear}):</strong>{" "}
                   {formatCurrency(btcPriceAtActivation, 0)}
                 </div>
-                <div>
+                <div className="text-primary font-ui">
                   <strong>Collateral Value:</strong>{" "}
                   {formatCurrency(collateralBtc * btcPriceAtActivation, 0)}
                 </div>
-                <div>
+                <div className="text-primary font-ui">
                   <strong>LTV Ratio:</strong> {formData.ltvRatio}%
                 </div>
-                <div>
+                <div className="text-primary font-ui">
                   <strong>Loan Principal:</strong>{" "}
                   {formatCurrency(loanPrincipal, 0)}
                 </div>
-                <div>
+                <div className="text-primary font-ui">
                   <strong>Annual Payment:</strong>{" "}
                   {formatCurrency(annualPayment, 0)}
                 </div>
                 {formData.interestOnly && (
-                  <div className="col-span-2 text-orange-600 text-xs">
+                  <div className="col-span-2 text-warning text-xs font-mono">
                     ⚠️ Interest-only: Principal of{" "}
                     {formatCurrency(loanPrincipal, 0)} remains due
                   </div>
                 )}
-                <div className="col-span-2 text-blue-600 text-xs">
+                <div className="col-span-2 text-primary text-xs font-mono">
                   💡 Liquidation risk if BTC drops below{" "}
                   {formatCurrency(
                     btcPriceAtActivation * (formData.ltvRatio / 80),

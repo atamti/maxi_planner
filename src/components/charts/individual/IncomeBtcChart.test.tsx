@@ -65,7 +65,7 @@ describe("IncomeBtcChart", () => {
     render(<IncomeBtcChart data={mockData} config={mockConfig} />);
 
     expect(
-      screen.getByText("₿ USD Income in BTC Terms (Purchasing Power)"),
+      screen.getByText("₿ USD INCOME IN BTC TERMS (PURCHASING POWER)"),
     ).toBeInTheDocument();
   });
 
@@ -74,7 +74,7 @@ describe("IncomeBtcChart", () => {
 
     expect(
       screen.getByText(
-        "📉 Shows how USD income and expenses lose purchasing power as BTC appreciates",
+        "📉 SHOWS HOW USD INCOME AND EXPENSES LOSE PURCHASING POWER AS BTC APPRECIATES",
       ),
     ).toBeInTheDocument();
   });
@@ -110,9 +110,9 @@ describe("IncomeBtcChart", () => {
 
     // Check for title with proper styling
     const title = screen.getByText(
-      "₿ USD Income in BTC Terms (Purchasing Power)",
+      "₿ USD INCOME IN BTC TERMS (PURCHASING POWER)",
     );
-    expect(title).toHaveClass("text-lg", "font-semibold", "mb-2");
+    expect(title).toHaveClass("text-lg", "font-bold", "text-bitcoin-orange");
 
     // Check for explanatory text styling
     const explanatoryText = screen.getByText(
@@ -130,7 +130,7 @@ describe("IncomeBtcChart", () => {
     render(<IncomeBtcChart data={emptyData} config={mockConfig} />);
 
     expect(
-      screen.getByText("₿ USD Income in BTC Terms (Purchasing Power)"),
+      screen.getByText("₿ USD INCOME IN BTC TERMS (PURCHASING POWER)"),
     ).toBeInTheDocument();
     expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
@@ -139,7 +139,7 @@ describe("IncomeBtcChart", () => {
     render(<IncomeBtcChart data={null} config={mockConfig} />);
 
     expect(
-      screen.getByText("₿ USD Income in BTC Terms (Purchasing Power)"),
+      screen.getByText("₿ USD INCOME IN BTC TERMS (PURCHASING POWER)"),
     ).toBeInTheDocument();
     expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
@@ -148,7 +148,7 @@ describe("IncomeBtcChart", () => {
     render(<IncomeBtcChart data={mockData} config={null} />);
 
     expect(
-      screen.getByText("₿ USD Income in BTC Terms (Purchasing Power)"),
+      screen.getByText("₿ USD INCOME IN BTC TERMS (PURCHASING POWER)"),
     ).toBeInTheDocument();
     expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
@@ -215,11 +215,11 @@ describe("IncomeBtcChart", () => {
 
     // Verify emoji and text content
     expect(screen.getByText(/₿/)).toBeInTheDocument();
-    expect(screen.getByText(/USD Income in BTC Terms/)).toBeInTheDocument();
-    expect(screen.getByText(/Purchasing Power/)).toBeInTheDocument();
+    expect(screen.getByText(/USD INCOME IN BTC TERMS/)).toBeInTheDocument();
+    expect(screen.getByText(/\(PURCHASING POWER\)/)).toBeInTheDocument();
     expect(screen.getByText(/📉/)).toBeInTheDocument();
     expect(
-      screen.getByText(/lose purchasing power as BTC appreciates/),
+      screen.getByText(/LOSE PURCHASING POWER AS BTC APPRECIATES/),
     ).toBeInTheDocument();
   });
 

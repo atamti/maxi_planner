@@ -89,7 +89,9 @@ export const SliderInput: React.FC<SliderInputProps> = ({
 }) => {
   return (
     <div className={`mb-4 ${className}`}>
-      <label className="block font-medium mb-1">{label}</label>
+      <label className="block font-heading text-xs tracking-wide text-brand-gray mb-1">
+        {label.toUpperCase()}
+      </label>
       <input
         type="range"
         value={value}
@@ -98,18 +100,20 @@ export const SliderInput: React.FC<SliderInputProps> = ({
         max={max}
         step={step}
         disabled={disabled}
-        className={`w-full ${
+        className={`w-full h-2 rounded-none bg-brand-black/40 [accent-color:#F7931A] cursor-pointer transition-opacity ${
           error
-            ? "accent-red-500"
+            ? "[accent-color:#EF4444]"
             : warning
-              ? "accent-yellow-500"
-              : "accent-blue-500"
-        } ${disabled ? "opacity-50" : ""}`}
+              ? "[accent-color:#F59E0B]"
+              : "[accent-color:#F7931A]"
+        } ${disabled ? "opacity-40 cursor-not-allowed" : "hover:opacity-90"}`}
       />
-      <div className="flex justify-between text-sm text-gray-600">
-        <span>{displayValue || `${value}`}</span>
-        <span>
-          {min} - {max}
+      <div className="flex justify-between text-[10px] font-mono text-brand-gray mt-1">
+        <span className="text-brand-orange font-semibold">
+          {displayValue || value}
+        </span>
+        <span className="opacity-70">
+          {min}-{max}
         </span>
       </div>
       {error && <p className="text-red-600 text-sm mt-1">{error}</p>}

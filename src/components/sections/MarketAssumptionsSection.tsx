@@ -289,10 +289,10 @@ export const MarketAssumptionsSection: React.FC = () => {
           title={`3c. 📈 BTC Yield Assumptions: ${formData.investmentsStartYield}-${formData.investmentsEndYield}% investments, ${formData.speculationStartYield}-${formData.speculationEndYield}% speculation`}
           defaultExpanded={false}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block font-medium mb-1">
-                Investments Start Yield (BTC %):
+              <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+                INVESTMENTS START YIELD (BTC %):
               </label>
               <input
                 type="range"
@@ -302,17 +302,21 @@ export const MarketAssumptionsSection: React.FC = () => {
                     investmentsStartYield: Number(e.target.value),
                   })
                 }
-                className="w-full"
+                className="w-full h-2 bg-surface border border-themed rounded-none appearance-none slider-bitcoin focus-ring-themed"
                 min="0"
                 max="100"
               />
-              <span className="text-sm text-gray-600">
-                {formData.investmentsStartYield}% initial yield
-              </span>
+              <div className="flex justify-between mt-2">
+                <span className="text-xs text-secondary font-mono">0%</span>
+                <span className="text-sm font-bold text-bitcoin-orange font-inter">
+                  {formData.investmentsStartYield}% INITIAL YIELD
+                </span>
+                <span className="text-xs text-secondary font-mono">100%</span>
+              </div>
             </div>
             <div>
-              <label className="block font-medium mb-1">
-                Speculation Start Yield (BTC %):
+              <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+                SPECULATION START YIELD (BTC %):
               </label>
               <input
                 type="range"
@@ -322,17 +326,21 @@ export const MarketAssumptionsSection: React.FC = () => {
                     speculationStartYield: Number(e.target.value),
                   })
                 }
-                className="w-full"
+                className="w-full h-2 bg-surface border border-themed rounded-none appearance-none slider-bitcoin focus-ring-themed"
                 min="0"
                 max="100"
               />
-              <span className="text-sm text-gray-600">
-                {formData.speculationStartYield}% initial yield
-              </span>
+              <div className="flex justify-between mt-2">
+                <span className="text-xs text-secondary font-mono">0%</span>
+                <span className="text-sm font-bold text-bitcoin-orange font-inter">
+                  {formData.speculationStartYield}% INITIAL YIELD
+                </span>
+                <span className="text-xs text-secondary font-mono">100%</span>
+              </div>
             </div>
             <div>
-              <label className="block font-medium mb-1">
-                Investments End Yield (BTC %):
+              <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+                INVESTMENTS END YIELD (BTC %):
               </label>
               <input
                 type="range"
@@ -342,17 +350,21 @@ export const MarketAssumptionsSection: React.FC = () => {
                     investmentsEndYield: Number(e.target.value),
                   })
                 }
-                className="w-full"
+                className="w-full h-2 bg-surface border border-themed rounded-none appearance-none slider-bitcoin focus-ring-themed"
                 min="0"
                 max="50"
               />
-              <span className="text-sm text-gray-600">
-                {formData.investmentsEndYield}% final yield
-              </span>
+              <div className="flex justify-between mt-2">
+                <span className="text-xs text-secondary font-mono">0%</span>
+                <span className="text-sm font-bold text-bitcoin-orange font-inter">
+                  {formData.investmentsEndYield}% FINAL YIELD
+                </span>
+                <span className="text-xs text-secondary font-mono">50%</span>
+              </div>
             </div>
             <div>
-              <label className="block font-medium mb-1">
-                Speculation End Yield (BTC %):
+              <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+                SPECULATION END YIELD (BTC %):
               </label>
               <input
                 type="range"
@@ -362,19 +374,25 @@ export const MarketAssumptionsSection: React.FC = () => {
                     speculationEndYield: Number(e.target.value),
                   })
                 }
-                className="w-full"
+                className="w-full h-2 bg-surface border border-themed rounded-none appearance-none slider-bitcoin focus-ring-themed"
                 min="0"
                 max="50"
               />
-              <span className="text-sm text-gray-600">
-                {formData.speculationEndYield}% final yield
-              </span>
+              <div className="flex justify-between mt-2">
+                <span className="text-xs text-secondary font-mono">0%</span>
+                <span className="text-sm font-bold text-bitcoin-orange font-inter">
+                  {formData.speculationEndYield}% FINAL YIELD
+                </span>
+                <span className="text-xs text-secondary font-mono">50%</span>
+              </div>
             </div>
           </div>
 
           {/* Yield Projection Chart */}
-          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-            <h4 className="font-semibold mb-2">📈 Yield Projection Chart</h4>
+          <div className="mt-6 p-4 bg-surface-alt rounded-none border-2 border-navy-900/50">
+            <h4 className="font-poppins text-lg font-bold text-navy-900 mb-4 uppercase tracking-wide">
+              📈 YIELD PROJECTION CHART
+            </h4>
             <div style={{ height: "300px" }}>
               <YieldChart formData={formData} />
             </div>

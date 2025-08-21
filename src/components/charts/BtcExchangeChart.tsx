@@ -1,12 +1,15 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
+import { useTheme } from "../../contexts/ThemeContext";
 import { FormData } from "../../types";
+import { getAllChartColors } from "../../utils/chartTheme";
 
 interface Props {
   formData: FormData;
 }
 
 export const BtcExchangeChart: React.FC<Props> = ({ formData }) => {
+  const { theme } = useTheme();
   const { timeHorizon, exchangeRate, btcPriceCustomRates } = formData;
 
   // Calculate BTC price for each year based on appreciation rates
@@ -20,19 +23,8 @@ export const BtcExchangeChart: React.FC<Props> = ({ formData }) => {
     btcPrices.push(currentPrice);
   }
 
-  const priceChartData = {
-    labels: Array.from({ length: timeHorizon + 1 }, (_, i) => `Year ${i}`),
-    datasets: [
-      {
-        label: "BTC / USD ($Ms)",
-        data: btcPrices,
-        borderColor: "#F7931A",
-        backgroundColor: "rgba(247, 147, 26, 0.1)",
-        fill: true,
-        tension: 0.4,
-      },
-    ],
-  };
+  const colors = getAllChartColors(theme).theme;
+  const datasetColors = getAllChartColors(theme).datasets;
 
   const formatPriceWithCommas = (value: number): string => {
     if (value >= 1000000) {
@@ -44,8 +36,23 @@ export const BtcExchangeChart: React.FC<Props> = ({ formData }) => {
     }
   };
 
+  const priceChartData = {
+    labels: Array.from({ length: timeHorizon + 1 }, (_, i) => `Year ${i}`),
+    datasets: [
+      {
+        label: "BTC / USD ($Ms)",
+        data: btcPrices,
+        borderColor: datasetColors.warning,
+        backgroundColor: datasetColors.warningBg,
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
+
   return (
     <Line
+      key={theme} // Force re-render when theme changes
       data={priceChartData}
       options={{
         maintainAspectRatio: false,
@@ -53,15 +60,45 @@ export const BtcExchangeChart: React.FC<Props> = ({ formData }) => {
         scales: {
           y: {
             beginAtZero: false,
-            title: { display: true, text: "USD  /  BTC  ($Ms)" },
+            title: {
+              display: true,
+              text: "USD  /  BTC  ($Ms)",
+              color: colors.textPrimary,
+              font: {
+                family: "Inter, system-ui, sans-serif",
+              },
+            },
             ticks: {
+              color: colors.textSecondary,
+              font: {
+                family: "JetBrains Mono, monospace",
+              },
               callback: function (value) {
                 return formatPriceWithCommas(Number(value));
               },
             },
+            grid: {
+              color: colors.border,
+            },
           },
           x: {
-            title: { display: true, text: "Years" },
+            title: {
+              display: true,
+              text: "Years",
+              color: colors.textPrimary,
+              font: {
+                family: "Inter, system-ui, sans-serif",
+              },
+            },
+            ticks: {
+              color: colors.textSecondary,
+              font: {
+                family: "JetBrains Mono, monospace",
+              },
+            },
+            grid: {
+              color: colors.border,
+            },
           },
         },
         plugins: {
@@ -74,6 +111,11 @@ export const BtcExchangeChart: React.FC<Props> = ({ formData }) => {
             position: "bottom",
           },
           tooltip: {
+            backgroundColor: colors.surfaceAlt,
+            titleColor: colors.textPrimary,
+            bodyColor: colors.textPrimary,
+            borderColor: colors.accent,
+            borderWidth: 1,
             callbacks: {
               label: function (context) {
                 return `USD / BTC: $${formatPriceWithCommas(context.parsed.y)}${

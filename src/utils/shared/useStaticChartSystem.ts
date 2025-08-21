@@ -1,10 +1,12 @@
 import { useCallback, useMemo } from "react";
 import { CalculationResults, FormData } from "../../types";
+import { getAllChartColors } from "../chartTheme";
 import { formatNumber } from "../formatNumber";
 
 interface UseStaticChartSystemProps {
   calculationResults: CalculationResults;
   formData: FormData;
+  theme?: "light" | "dark";
   onUpdateFormData?: (updates: Partial<FormData>) => void;
 }
 
@@ -15,6 +17,7 @@ interface UseStaticChartSystemProps {
 export const useStaticChartSystem = ({
   calculationResults,
   formData,
+  theme = "light",
   onUpdateFormData,
 }: UseStaticChartSystemProps) => {
   // Helper function to get BTC price at specific year
@@ -36,22 +39,23 @@ export const useStaticChartSystem = ({
 
   // Chart data generation
   const chartData = useMemo(() => {
+    const datasetColors = getAllChartColors(theme).datasets;
     const resultChartData = {
       labels: calculationResults.results.map((r) => r.year),
       datasets: [
         {
           label: "BTC Stack (full amount)",
           data: calculationResults.results.map((r) => r.btcWithoutIncome),
-          borderColor: "#10B981",
-          backgroundColor: "rgba(16, 185, 129, 0.2)",
+          borderColor: datasetColors.success,
+          backgroundColor: datasetColors.successBg,
           fill: false,
           tension: 0.1,
         },
         {
           label: "BTC Stack (after income allocation)",
           data: calculationResults.results.map((r) => r.btcWithIncome),
-          borderColor: "#1A73E8",
-          backgroundColor: "rgba(26, 115, 232, 0.2)",
+          borderColor: datasetColors.primary,
+          backgroundColor: datasetColors.primaryBg,
           fill: false,
           tension: 0.1,
         },
@@ -64,8 +68,8 @@ export const useStaticChartSystem = ({
         {
           label: "BTC Stack",
           data: calculationResults.results.map((r) => r.btcWithIncome),
-          borderColor: "#F59E0B",
-          backgroundColor: "rgba(245, 158, 11, 0.2)",
+          borderColor: datasetColors.primary,
+          backgroundColor: datasetColors.primaryBg,
           fill: false,
           tension: 0.1,
         },
@@ -80,8 +84,8 @@ export const useStaticChartSystem = ({
           data: calculationResults.results.map(
             (r, index) => r.btcWithIncome * getBtcPriceAtYear(index),
           ),
-          borderColor: "#059669",
-          backgroundColor: "rgba(5, 150, 105, 0.2)",
+          borderColor: datasetColors.success,
+          backgroundColor: datasetColors.successBg,
           fill: false,
           tension: 0.1,
         },
@@ -94,8 +98,8 @@ export const useStaticChartSystem = ({
         {
           label: "Expenses (USD)",
           data: calculationResults.annualExpenses,
-          borderColor: "#DC2626",
-          backgroundColor: "rgba(220, 38, 38, 0.2)",
+          borderColor: datasetColors.error,
+          backgroundColor: datasetColors.errorBg,
           fill: false,
           tension: 0.1,
         },
@@ -104,8 +108,8 @@ export const useStaticChartSystem = ({
           data: calculationResults.annualExpenses.map(
             (expense, index) => calculationResults.annualExpenses[0] / expense,
           ),
-          borderColor: "#7C3AED",
-          backgroundColor: "rgba(124, 58, 237, 0.2)",
+          borderColor: datasetColors.purple,
+          backgroundColor: datasetColors.purpleBg,
           fill: false,
           tension: 0.1,
           yAxisID: "y1",
@@ -121,8 +125,8 @@ export const useStaticChartSystem = ({
           data: calculationResults.results.map((_, index) =>
             getBtcPriceAtYear(index),
           ),
-          borderColor: "#F97316",
-          backgroundColor: "rgba(249, 115, 22, 0.2)",
+          borderColor: datasetColors.warning,
+          backgroundColor: datasetColors.warningBg,
           fill: false,
           tension: 0.1,
         },
@@ -135,16 +139,16 @@ export const useStaticChartSystem = ({
         {
           label: "USD Income ($k/year)",
           data: calculationResults.usdIncome.map((v) => v / 1000),
-          borderColor: "#1A73E8",
-          backgroundColor: "rgba(26, 115, 232, 0.2)",
+          borderColor: datasetColors.info,
+          backgroundColor: datasetColors.infoBg,
           fill: false,
           tension: 0.1,
         },
         {
           label: "Annual Expenses ($k/year)",
           data: calculationResults.annualExpenses.map((v) => v / 1000),
-          borderColor: "#DC2626",
-          backgroundColor: "rgba(220, 38, 38, 0.2)",
+          borderColor: datasetColors.error,
+          backgroundColor: datasetColors.errorBg,
           fill: false,
           tension: 0.1,
         },
@@ -155,8 +159,8 @@ export const useStaticChartSystem = ({
                 data: calculationResults.usdIncomeWithLeverage.map(
                   (v) => v / 1000,
                 ),
-                borderColor: "#8B5CF6",
-                backgroundColor: "rgba(139, 92, 246, 0.2)",
+                borderColor: datasetColors.purple,
+                backgroundColor: datasetColors.purpleBg,
                 fill: false,
                 tension: 0.1,
               },
@@ -171,8 +175,8 @@ export const useStaticChartSystem = ({
         {
           label: "Annual Income Potential ($k/year)",
           data: calculationResults.incomeAtActivationYears.map((v) => v / 1000),
-          borderColor: "#1A73E8",
-          backgroundColor: "rgba(26, 115, 232, 0.2)",
+          borderColor: datasetColors.info,
+          backgroundColor: datasetColors.infoBg,
           fill: false,
           tension: 0.1,
         },
@@ -181,8 +185,8 @@ export const useStaticChartSystem = ({
           data: calculationResults.expensesAtActivationYears.map(
             (v) => v / 1000,
           ),
-          borderColor: "#DC2626",
-          backgroundColor: "rgba(220, 38, 38, 0.2)",
+          borderColor: datasetColors.error,
+          backgroundColor: datasetColors.errorBg,
           fill: false,
           tension: 0.1,
         },
@@ -193,8 +197,8 @@ export const useStaticChartSystem = ({
                 data: calculationResults.incomeAtActivationYearsWithLeverage.map(
                   (v) => v / 1000,
                 ),
-                borderColor: "#8B5CF6",
-                backgroundColor: "rgba(139, 92, 246, 0.2)",
+                borderColor: datasetColors.purple,
+                backgroundColor: datasetColors.purpleBg,
                 fill: false,
                 tension: 0.1,
               },
@@ -213,8 +217,8 @@ export const useStaticChartSystem = ({
             const btcPriceAtYear = getBtcPriceAtYear(index);
             return income / btcPriceAtYear;
           }),
-          borderColor: "#1A73E8",
-          backgroundColor: "rgba(26, 115, 232, 0.2)",
+          borderColor: datasetColors.info,
+          backgroundColor: datasetColors.infoBg,
           fill: false,
           tension: 0.1,
         },
@@ -224,8 +228,8 @@ export const useStaticChartSystem = ({
             const btcPriceAtYear = getBtcPriceAtYear(index);
             return expenses / btcPriceAtYear;
           }),
-          borderColor: "#DC2626",
-          backgroundColor: "rgba(220, 38, 38, 0.2)",
+          borderColor: datasetColors.error,
+          backgroundColor: datasetColors.errorBg,
           fill: false,
           tension: 0.1,
         },
@@ -240,8 +244,8 @@ export const useStaticChartSystem = ({
                     return income / btcPriceAtYear;
                   },
                 ),
-                borderColor: "#8B5CF6",
-                backgroundColor: "rgba(139, 92, 246, 0.2)",
+                borderColor: datasetColors.purple,
+                backgroundColor: datasetColors.purpleBg,
                 fill: false,
                 tension: 0.1,
               },
@@ -260,26 +264,86 @@ export const useStaticChartSystem = ({
       inflationChartData,
       btcExchangeChartData,
     };
-  }, [calculationResults, getBtcPriceAtYear]);
+  }, [calculationResults, getBtcPriceAtYear, theme]);
 
   // Chart configurations
   const chartConfigs = useMemo(() => {
+    const { theme: themeColors } = getAllChartColors(theme);
     const commonOptions = {
       responsive: true,
       maintainAspectRatio: true,
       aspectRatio: 2, // Width to height ratio (2:1)
       interaction: { mode: "index" as const, intersect: false },
-      plugins: { legend: { position: "top" as const } },
+      plugins: {
+        legend: {
+          position: "top" as const,
+          labels: {
+            color: themeColors.textPrimary,
+            font: {
+              family: "Inter, system-ui, sans-serif",
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: themeColors.textSecondary,
+            font: {
+              family: "JetBrains Mono, monospace",
+            },
+          },
+          grid: {
+            color: themeColors.border,
+          },
+          title: {
+            color: themeColors.textPrimary,
+            font: {
+              family: "Inter, system-ui, sans-serif",
+            },
+          },
+        },
+        y: {
+          ticks: {
+            color: themeColors.textSecondary,
+            font: {
+              family: "JetBrains Mono, monospace",
+            },
+          },
+          grid: {
+            color: themeColors.border,
+          },
+          title: {
+            color: themeColors.textPrimary,
+            font: {
+              family: "Inter, system-ui, sans-serif",
+            },
+          },
+        },
+      },
     };
 
     const btcGrowthChartConfig = {
       ...commonOptions,
       scales: {
+        ...commonOptions.scales,
         y: {
+          ...commonOptions.scales.y,
           beginAtZero: true,
-          title: { display: true, text: "BTC" },
+          title: {
+            ...commonOptions.scales.y.title,
+            display: true,
+            text: "BTC",
+          },
         },
-        x: { title: { display: true, text: "Years" } },
+        x: {
+          ...commonOptions.scales.x,
+          title: {
+            ...commonOptions.scales.x.title,
+            display: true,
+            text: "Years",
+          },
+        },
       },
       plugins: {
         ...commonOptions.plugins,
@@ -293,11 +357,24 @@ export const useStaticChartSystem = ({
     const resultChartConfig = {
       ...commonOptions,
       scales: {
+        ...commonOptions.scales,
         y: {
+          ...commonOptions.scales.y,
           beginAtZero: true,
-          title: { display: true, text: "BTC" },
+          title: {
+            ...commonOptions.scales.y.title,
+            display: true,
+            text: "BTC",
+          },
         },
-        x: { title: { display: true, text: "Years" } },
+        x: {
+          ...commonOptions.scales.x,
+          title: {
+            ...commonOptions.scales.x.title,
+            display: true,
+            text: "Years",
+          },
+        },
       },
       plugins: {
         ...commonOptions.plugins,
@@ -366,14 +443,24 @@ export const useStaticChartSystem = ({
     const usdIncomeChartConfig = {
       ...commonOptions,
       scales: {
+        ...commonOptions.scales,
         y: {
+          ...commonOptions.scales.y,
           beginAtZero: true,
           title: {
+            ...commonOptions.scales.y.title,
             display: true,
             text: "USD Income/Expenses (thousands)",
           },
         },
-        x: { title: { display: true, text: "Years" } },
+        x: {
+          ...commonOptions.scales.x,
+          title: {
+            ...commonOptions.scales.x.title,
+            display: true,
+            text: "Years",
+          },
+        },
       },
       plugins: {
         ...commonOptions.plugins,
@@ -390,14 +477,24 @@ export const useStaticChartSystem = ({
     const incomeBtcChartConfig = {
       ...commonOptions,
       scales: {
+        ...commonOptions.scales,
         y: {
+          ...commonOptions.scales.y,
           beginAtZero: true,
           title: {
+            ...commonOptions.scales.y.title,
             display: true,
             text: "BTC Equivalent",
           },
         },
-        x: { title: { display: true, text: "Years" } },
+        x: {
+          ...commonOptions.scales.x,
+          title: {
+            ...commonOptions.scales.x.title,
+            display: true,
+            text: "Years",
+          },
+        },
       },
       plugins: {
         ...commonOptions.plugins,
@@ -414,14 +511,24 @@ export const useStaticChartSystem = ({
     const incomePotentialChartConfig = {
       ...commonOptions,
       scales: {
+        ...commonOptions.scales,
         y: {
+          ...commonOptions.scales.y,
           type: "logarithmic" as const,
           title: {
+            ...commonOptions.scales.y.title,
             display: true,
             text: "USD Income/Expenses (thousands, log scale)",
           },
         },
-        x: { title: { display: true, text: "Activation Year" } },
+        x: {
+          ...commonOptions.scales.x,
+          title: {
+            ...commonOptions.scales.x.title,
+            display: true,
+            text: "Activation Year",
+          },
+        },
       },
       plugins: {
         ...commonOptions.plugins,
@@ -474,7 +581,7 @@ export const useStaticChartSystem = ({
       inflationChartConfig,
       btcExchangeChartConfig,
     };
-  }, [formData.activationYear]); // Removed onUpdateFormData from dependencies
+  }, [formData.activationYear, theme]); // Include theme for chart options re-computation
 
   return {
     // Chart data

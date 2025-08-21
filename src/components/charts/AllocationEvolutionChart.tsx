@@ -9,7 +9,9 @@ import {
 } from "chart.js";
 import React, { useMemo } from "react";
 import { Bar } from "react-chartjs-2";
+import { useTheme } from "../../contexts/ThemeContext";
 import { FormDataSubset } from "../../types";
+import { getAllChartColors } from "../../utils/chartTheme";
 
 ChartJS.register(
   CategoryScale,
@@ -29,6 +31,8 @@ export const AllocationEvolutionChart: React.FC<Props> = ({
   formData,
   className = "",
 }) => {
+  const { theme } = useTheme();
+
   const chartData = useMemo(() => {
     const {
       timeHorizon,
@@ -42,6 +46,8 @@ export const AllocationEvolutionChart: React.FC<Props> = ({
       speculationEndYield,
       enableAnnualReallocation = false,
     } = formData;
+
+    const { datasets: datasetColors } = getAllChartColors(theme);
 
     // Calculate initial allocation in BTC based on full stack
     const initialSavings = btcStack * (savingsPct / 100);
@@ -125,95 +131,141 @@ export const AllocationEvolutionChart: React.FC<Props> = ({
         {
           label: "Savings (₿)",
           data: savingsData,
-          backgroundColor: "rgba(34, 197, 94, 0.8)", // green
-          borderColor: "rgba(34, 197, 94, 1)",
-          borderWidth: 1,
+          backgroundColor: datasetColors.success, // Use solid color instead of transparent
+          borderColor: datasetColors.success,
+          borderWidth: 0, // Remove border to eliminate wireframe effect
+          barThickness: "flex" as const,
         },
         {
           label: "Investments (₿)",
           data: investmentsData,
-          backgroundColor: "rgba(59, 130, 246, 0.8)", // blue
-          borderColor: "rgba(59, 130, 246, 1)",
-          borderWidth: 1,
+          backgroundColor: datasetColors.info, // Use solid color instead of transparent
+          borderColor: datasetColors.info,
+          borderWidth: 0, // Remove border to eliminate wireframe effect
+          barThickness: "flex" as const,
         },
         {
           label: "Speculation (₿)",
           data: speculationData,
-          backgroundColor: "rgba(239, 68, 68, 0.8)", // red
-          borderColor: "rgba(239, 68, 68, 1)",
-          borderWidth: 1,
+          backgroundColor: datasetColors.error, // Use solid color instead of transparent
+          borderColor: datasetColors.error,
+          borderWidth: 0, // Remove border to eliminate wireframe effect
+          barThickness: "flex" as const,
         },
       ],
     };
-  }, [formData]);
+  }, [formData, theme]);
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top" as const,
+  const options = useMemo(() => {
+    const { theme: themeColors } = getAllChartColors(theme);
+
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "top" as const,
+          labels: {
+            color: themeColors.textPrimary,
+            font: {
+              family: "Inter, system-ui, sans-serif",
+            },
+          },
+        },
+        title: {
+          display: false, // Using custom header instead
+        },
+        tooltip: {
+          mode: "index" as const,
+          intersect: false,
+          backgroundColor: themeColors.surfaceAlt,
+          titleColor: themeColors.textPrimary,
+          bodyColor: themeColors.textPrimary,
+          borderColor: themeColors.accent,
+          borderWidth: 1,
+          callbacks: {
+            afterLabel: (context: any) => {
+              const datasetIndex = context.datasetIndex;
+              const year = context.dataIndex;
+              const total = chartData.datasets.reduce(
+                (sum, dataset) => sum + dataset.data[year],
+                0,
+              );
+              const percentage = ((context.raw / total) * 100).toFixed(1);
+              return `${percentage}% of total`;
+            },
+            footer: (tooltipItems: any[]) => {
+              const year = tooltipItems[0].dataIndex;
+              const total = chartData.datasets.reduce(
+                (sum, dataset) => sum + dataset.data[year],
+                0,
+              );
+              return `Total: ${total.toFixed(3)} ₿`;
+            },
+          },
+        },
       },
-      title: {
-        display: true,
-        text: "BTC Allocation Evolution Over Time",
+      scales: {
+        x: {
+          stacked: true,
+          title: {
+            display: true,
+            text: "Time",
+            color: themeColors.textPrimary,
+            font: {
+              family: "Inter, system-ui, sans-serif",
+            },
+          },
+          ticks: {
+            color: themeColors.textSecondary,
+            font: {
+              family: "JetBrains Mono, monospace",
+            },
+          },
+          grid: {
+            color: themeColors.border,
+          },
+        },
+        y: {
+          stacked: true,
+          title: {
+            display: true,
+            text: "BTC Amount",
+            color: themeColors.textPrimary,
+            font: {
+              family: "Inter, system-ui, sans-serif",
+            },
+          },
+          ticks: {
+            color: themeColors.textSecondary,
+            font: {
+              family: "JetBrains Mono, monospace",
+            },
+            callback: function (value: any) {
+              return `${value.toFixed(2)} ₿`;
+            },
+          },
+          grid: {
+            color: themeColors.border,
+          },
+        },
       },
-      tooltip: {
+      interaction: {
         mode: "index" as const,
         intersect: false,
-        callbacks: {
-          afterLabel: (context: any) => {
-            const datasetIndex = context.datasetIndex;
-            const year = context.dataIndex;
-            const total = chartData.datasets.reduce(
-              (sum, dataset) => sum + dataset.data[year],
-              0,
-            );
-            const percentage = ((context.raw / total) * 100).toFixed(1);
-            return `${percentage}% of total`;
-          },
-          footer: (tooltipItems: any[]) => {
-            const year = tooltipItems[0].dataIndex;
-            const total = chartData.datasets.reduce(
-              (sum, dataset) => sum + dataset.data[year],
-              0,
-            );
-            return `Total: ${total.toFixed(3)} ₿`;
-          },
-        },
       },
-    },
-    scales: {
-      x: {
-        stacked: true,
-        title: {
-          display: true,
-          text: "Time",
-        },
-      },
-      y: {
-        stacked: true,
-        title: {
-          display: true,
-          text: "BTC Amount",
-        },
-        ticks: {
-          callback: function (value: any) {
-            return `${value.toFixed(2)} ₿`;
-          },
-        },
-      },
-    },
-    interaction: {
-      mode: "index" as const,
-      intersect: false,
-    },
-  };
+    };
+  }, [chartData, theme]); // Re-compute when theme changes
 
   return (
-    <div className={`bg-white p-4 rounded-lg shadow ${className}`}>
+    <div
+      className={`card-themed p-4 border border-bitcoin-orange shadow ${className}`}
+    >
+      <h3 className="font-heading text-lg font-bold text-bitcoin-orange mb-4 uppercase tracking-wide">
+        📊 BTC ALLOCATION EVOLUTION OVER TIME
+      </h3>
       <div style={{ height: "400px" }}>
-        <Bar data={chartData} options={options} />
+        <Bar key={theme} data={chartData} options={options} />
       </div>
     </div>
   );

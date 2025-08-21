@@ -21,8 +21,8 @@ export const PortfolioMixInsights: React.FC<Props> = ({
     portfolioMix;
 
   return (
-    <div className="bg-white p-3 rounded border">
-      <p className="text-blue-700 text-sm">
+    <div className="card-themed p-3 border border-accent">
+      <p className="text-info text-sm font-ui">
         📊 <strong>Portfolio Drift:</strong> Mix shifts from{" "}
         {formData.savingsPct}/{formData.investmentsPct}/
         {formData.speculationPct}% to approximately{" "}
@@ -30,7 +30,7 @@ export const PortfolioMixInsights: React.FC<Props> = ({
         {Math.round(finalInvestmentsPct / 5) * 5}/
         {Math.round(finalSpeculationPct / 5) * 5}%
         <br />
-        <span className="text-gray-600">
+        <span className="text-secondary">
           (Savings/Investments/Speculation - no rebalancing)
         </span>
       </p>

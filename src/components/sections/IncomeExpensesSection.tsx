@@ -129,14 +129,14 @@ export const IncomeExpensesSection: React.FC<Props> = ({
       />
 
       {/* Section 1: Income Configuration */}
-      <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-400">
-        <h4 className="font-semibold text-purple-800 mb-3">
-          💰 Income Configuration
+      <div className="p-6 bg-surface-alt rounded-none border-l-4 border-bitcoin-orange">
+        <h4 className="font-poppins text-lg font-bold text-bitcoin-orange mb-4 uppercase tracking-wide">
+          💰 INCOME CONFIGURATION
         </h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block font-medium mb-1">
-              Income Bucket Allocation (%):
+            <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+              INCOME BUCKET ALLOCATION (%):
             </label>
             <input
               type="number"
@@ -144,18 +144,18 @@ export const IncomeExpensesSection: React.FC<Props> = ({
               onChange={(e) =>
                 updateFormData({ incomeAllocationPct: Number(e.target.value) })
               }
-              className="w-full p-2 border rounded"
+              className="w-full p-3 bg-surface border-2 border-themed rounded-none text-primary font-mono text-lg focus-ring-themed"
               min="0"
               max="50"
             />
-            <p className="text-xs text-gray-600 mt-1">
+            <p className="text-xs text-secondary mt-2 font-mono">
               Percentage of BTC stack to convert to USD income pool at
               activation year
             </p>
           </div>
           <div>
-            <label className="block font-medium mb-1">
-              Reinvestment Rate (%):
+            <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+              REINVESTMENT RATE (%):
             </label>
             <input
               type="range"
@@ -165,34 +165,46 @@ export const IncomeExpensesSection: React.FC<Props> = ({
                   incomeReinvestmentPct: Number(e.target.value),
                 })
               }
-              className="w-full"
+              className="w-full h-2 bg-surface border border-themed rounded-none appearance-none slider-bitcoin focus-ring-themed"
               min="0"
               max="100"
             />
-            <span className="text-sm text-gray-600">
-              {formData.incomeReinvestmentPct}% reinvested,{" "}
-              {100 - formData.incomeReinvestmentPct}% available for expenses
-            </span>
+            <div className="flex justify-between mt-2">
+              <span className="text-xs text-secondary font-mono">0%</span>
+              <span className="text-sm font-bold text-bitcoin-orange font-inter">
+                {formData.incomeReinvestmentPct}% REINVESTED,{" "}
+                {100 - formData.incomeReinvestmentPct}% AVAILABLE
+              </span>
+              <span className="text-xs text-secondary font-mono">100%</span>
+            </div>
           </div>
           <div>
-            <label className="block font-medium mb-1">Activation Year:</label>
+            <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+              ACTIVATION YEAR:
+            </label>
             <input
               type="range"
               value={formData.activationYear}
               onChange={(e) =>
                 updateFormData({ activationYear: Number(e.target.value) })
               }
-              className="w-full"
+              className="w-full h-2 bg-surface border border-themed rounded-none appearance-none slider-bitcoin focus-ring-themed"
               min="0"
               max={formData.timeHorizon}
             />
-            <span className="text-sm text-gray-600">
-              Year {formData.activationYear} - When income starts
-            </span>
+            <div className="flex justify-between mt-2">
+              <span className="text-xs text-secondary font-mono">0</span>
+              <span className="text-sm font-bold text-bitcoin-orange font-inter">
+                YEAR {formData.activationYear} - WHEN INCOME STARTS
+              </span>
+              <span className="text-xs text-secondary font-mono">
+                {formData.timeHorizon}
+              </span>
+            </div>
           </div>
           <div>
-            <label className="block font-medium mb-1">
-              Starting Annual Expenses (USD):
+            <label className="block font-inter text-sm font-bold text-primary mb-2 uppercase tracking-wide">
+              STARTING ANNUAL EXPENSES (USD):
             </label>
             <input
               type="text"
@@ -217,9 +229,9 @@ export const IncomeExpensesSection: React.FC<Props> = ({
           title: "Income Yield Assumptions",
           emoji: "📈",
           colorClass: {
-            background: "bg-gray-50",
-            border: "border-gray-400",
-            text: "text-gray-800",
+            background: "bg-surface-alt",
+            border: "border-themed",
+            text: "text-primary",
           },
           dataKey: "incomeCustomRates",
           flatRateKey: "incomeFlat",
@@ -239,9 +251,9 @@ export const IncomeExpensesSection: React.FC<Props> = ({
       />
 
       {/* Section 3: Expenses Inflation Chart */}
-      <div className="p-4 bg-red-50 rounded-lg border-l-4 border-red-400">
-        <h4 className="font-semibold text-red-800 mb-3">
-          📊 Projected Expenses Growth
+      <div className="p-4 card-themed border border-bitcoin-orange">
+        <h4 className="font-semibold text-bitcoin-orange mb-3 font-heading tracking-wide uppercase">
+          📊 PROJECTED EXPENSES GROWTH
         </h4>
         <div style={{ height: "400px" }}>
           <ExpensesInflationChart formData={formData} />

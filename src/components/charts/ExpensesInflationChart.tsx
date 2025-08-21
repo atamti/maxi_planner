@@ -1,12 +1,15 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
+import { useTheme } from "../../contexts/ThemeContext";
 import { FormData } from "../../types";
+import { getAllChartColors } from "../../utils/chartTheme";
 
 interface Props {
   formData: FormData;
 }
 
 export const ExpensesInflationChart: React.FC<Props> = ({ formData }) => {
+  const { theme } = useTheme();
   const { timeHorizon, inflationCustomRates, activationYear } = formData;
 
   // Calculate expenses for each year based on inflation rates
@@ -21,28 +24,8 @@ export const ExpensesInflationChart: React.FC<Props> = ({ formData }) => {
     expenseValues.push(currentExpenses);
   }
 
-  const expensesChartData = {
-    labels: Array.from({ length: timeHorizon + 1 }, (_, i) => `Year ${i}`),
-    datasets: [
-      {
-        label: "Annual Expenses (USD)",
-        data: expenseValues,
-        borderColor: "#DC2626",
-        backgroundColor: "rgba(220, 38, 38, 0.1)",
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: expenseValues.map((_, i) =>
-          i === activationYear ? "#F59E0B" : "#DC2626",
-        ),
-        pointBorderColor: expenseValues.map((_, i) =>
-          i === activationYear ? "#F59E0B" : "#DC2626",
-        ),
-        pointRadius: expenseValues.map((_, i) =>
-          i === activationYear ? 6 : 3,
-        ),
-      },
-    ],
-  };
+  const colors = getAllChartColors(theme).theme;
+  const datasetColors = getAllChartColors(theme).datasets;
 
   const formatExpenses = (value: number): string => {
     if (value >= 1000000) {
@@ -54,8 +37,32 @@ export const ExpensesInflationChart: React.FC<Props> = ({ formData }) => {
     }
   };
 
+  const expensesChartData = {
+    labels: Array.from({ length: timeHorizon + 1 }, (_, i) => `Year ${i}`),
+    datasets: [
+      {
+        label: "Annual Expenses (USD)",
+        data: expenseValues,
+        borderColor: datasetColors.error,
+        backgroundColor: datasetColors.errorBg,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: expenseValues.map((_, i) =>
+          i === activationYear ? datasetColors.warning : datasetColors.error,
+        ),
+        pointBorderColor: expenseValues.map((_, i) =>
+          i === activationYear ? datasetColors.warning : datasetColors.error,
+        ),
+        pointRadius: expenseValues.map((_, i) =>
+          i === activationYear ? 6 : 3,
+        ),
+      },
+    ],
+  };
+
   return (
     <Line
+      key={theme} // Force re-render when theme changes
       data={expensesChartData}
       options={{
         maintainAspectRatio: false,
@@ -63,26 +70,60 @@ export const ExpensesInflationChart: React.FC<Props> = ({ formData }) => {
         scales: {
           y: {
             beginAtZero: true,
-            title: { display: true, text: "Annual Expenses (USD)" },
+            title: {
+              display: true,
+              text: "Annual Expenses (USD)",
+              color: colors.textSecondary,
+              font: { weight: "bold" },
+            },
             ticks: {
+              color: colors.textSecondary,
               callback: function (value) {
                 return formatExpenses(Number(value));
               },
             },
+            grid: {
+              color: colors.border,
+            },
           },
           x: {
-            title: { display: true, text: "Years" },
+            title: {
+              display: true,
+              text: "Years",
+              color: colors.textSecondary,
+              font: { weight: "bold" },
+            },
+            ticks: {
+              color: colors.textSecondary,
+            },
+            grid: {
+              color: colors.border,
+            },
           },
         },
         plugins: {
           title: {
             display: true,
-            text: "Projected Annual Expenses Growth",
+            text: "PROJECTED ANNUAL EXPENSES GROWTH",
+            color: colors.textPrimary,
+            font: {
+              weight: "bold",
+              size: 14,
+            },
           },
           legend: {
             position: "bottom",
+            labels: {
+              color: colors.textSecondary,
+              font: { weight: "bold" },
+            },
           },
           tooltip: {
+            backgroundColor: colors.surfaceAlt,
+            titleColor: colors.textPrimary,
+            bodyColor: colors.textPrimary,
+            borderColor: colors.accent,
+            borderWidth: 1,
             callbacks: {
               label: function (context) {
                 const isActivationYear = context.dataIndex === activationYear;

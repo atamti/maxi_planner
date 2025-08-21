@@ -1,12 +1,15 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
+import { useTheme } from "../../contexts/ThemeContext";
 import { FormData } from "../../types";
+import { getAllChartColors } from "../../utils/chartTheme";
 
 interface Props {
   formData: FormData;
 }
 
 export const UsdPurchasingPowerChart: React.FC<Props> = ({ formData }) => {
+  const { theme } = useTheme();
   const { timeHorizon, inflationCustomRates } = formData;
 
   // Calculate purchasing power for each year based on inflation rates
@@ -21,26 +24,30 @@ export const UsdPurchasingPowerChart: React.FC<Props> = ({ formData }) => {
     purchasingPowerValues.push(currentPurchasingPower);
   }
 
+  const colors = getAllChartColors(theme).theme;
+  const datasetColors = getAllChartColors(theme).datasets;
+
+  const formatPurchasingPower = (value: number): string => {
+    return `${value.toFixed(1)}%`;
+  };
+
   const purchasingPowerChartData = {
     labels: Array.from({ length: timeHorizon + 1 }, (_, i) => `Year ${i}`),
     datasets: [
       {
         label: "USD Purchasing Power",
         data: purchasingPowerValues,
-        borderColor: "#DC2626",
-        backgroundColor: "rgba(220, 38, 38, 0.1)",
+        borderColor: datasetColors.error,
+        backgroundColor: datasetColors.errorBg,
         fill: true,
         tension: 0.4,
       },
     ],
   };
 
-  const formatPurchasingPower = (value: number): string => {
-    return `${value.toFixed(1)}%`;
-  };
-
   return (
     <Line
+      key={theme} // Force re-render when theme changes
       data={purchasingPowerChartData}
       options={{
         maintainAspectRatio: false,
@@ -49,26 +56,60 @@ export const UsdPurchasingPowerChart: React.FC<Props> = ({ formData }) => {
           y: {
             beginAtZero: true,
             max: 100,
-            title: { display: true, text: "Purchasing Power (%)" },
+            title: {
+              display: true,
+              text: "Purchasing Power (%)",
+              color: colors.textSecondary,
+              font: { weight: "bold" },
+            },
             ticks: {
+              color: colors.textSecondary,
               callback: function (value) {
                 return formatPurchasingPower(Number(value));
               },
             },
+            grid: {
+              color: colors.border,
+            },
           },
           x: {
-            title: { display: true, text: "Years" },
+            title: {
+              display: true,
+              text: "Years",
+              color: colors.textSecondary,
+              font: { weight: "bold" },
+            },
+            ticks: {
+              color: colors.textSecondary,
+            },
+            grid: {
+              color: colors.border,
+            },
           },
         },
         plugins: {
           title: {
             display: true,
-            text: "USD Purchasing Power Decay Over Time",
+            text: "USD PURCHASING POWER DECAY OVER TIME",
+            color: colors.textPrimary,
+            font: {
+              weight: "bold",
+              size: 14,
+            },
           },
           legend: {
             position: "bottom",
+            labels: {
+              color: colors.textSecondary,
+              font: { weight: "bold" },
+            },
           },
           tooltip: {
+            backgroundColor: colors.surfaceAlt,
+            titleColor: colors.textPrimary,
+            bodyColor: colors.textPrimary,
+            borderColor: colors.accent,
+            borderWidth: 1,
             callbacks: {
               label: function (context) {
                 return `Purchasing Power: ${formatPurchasingPower(context.parsed.y)}`;

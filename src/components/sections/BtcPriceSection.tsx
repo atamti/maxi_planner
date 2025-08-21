@@ -56,9 +56,9 @@ export const BtcPriceSection: React.FC<Props> = ({
           title: "Appreciation Rate Assumptions",
           emoji: "📊",
           colorClass: {
-            background: "bg-gray-50",
-            border: "border-gray-400",
-            text: "text-gray-800",
+            background: "bg-surface-alt",
+            border: "border-themed",
+            text: "text-primary",
           },
           dataKey: "btcPriceCustomRates",
           flatRateKey: "btcPriceFlat",

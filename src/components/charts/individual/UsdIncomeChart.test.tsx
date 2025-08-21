@@ -53,7 +53,7 @@ describe("UsdIncomeChart", () => {
   it("should render the chart title", () => {
     render(<UsdIncomeChart data={mockData} config={mockConfig} />);
 
-    expect(screen.getByText("💵 USD Income Stream")).toBeInTheDocument();
+    expect(screen.getByText("💵 USD INCOME STREAM")).toBeInTheDocument();
   });
 
   it("should render the Line chart component", () => {
@@ -84,21 +84,21 @@ describe("UsdIncomeChart", () => {
 
     render(<UsdIncomeChart data={emptyData} config={mockConfig} />);
 
-    expect(screen.getByText("💵 USD Income Stream")).toBeInTheDocument();
+    expect(screen.getByText("💵 USD INCOME STREAM")).toBeInTheDocument();
     expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
 
   it("should handle null/undefined data", () => {
     render(<UsdIncomeChart data={null} config={mockConfig} />);
 
-    expect(screen.getByText("💵 USD Income Stream")).toBeInTheDocument();
+    expect(screen.getByText("💵 USD INCOME STREAM")).toBeInTheDocument();
     expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
 
   it("should handle null/undefined config", () => {
     render(<UsdIncomeChart data={mockData} config={null} />);
 
-    expect(screen.getByText("💵 USD Income Stream")).toBeInTheDocument();
+    expect(screen.getByText("💵 USD INCOME STREAM")).toBeInTheDocument();
     expect(screen.getByTestId("line-chart")).toBeInTheDocument();
   });
 
@@ -112,8 +112,8 @@ describe("UsdIncomeChart", () => {
     expect(mainDiv.tagName).toBe("DIV");
 
     // Check for title with proper styling
-    const title = screen.getByText("💵 USD Income Stream");
-    expect(title).toHaveClass("text-lg", "font-semibold", "mb-2");
+    const title = screen.getByText("💵 USD INCOME STREAM");
+    expect(title).toHaveClass("text-lg", "font-bold", "text-navy-900");
   });
 
   it("should render with multiple datasets", () => {

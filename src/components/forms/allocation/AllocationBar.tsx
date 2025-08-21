@@ -17,12 +17,12 @@ export const AllocationBar: React.FC<AllocationBarProps> = ({
   const { getBarColor } = useAllocationColors();
 
   return (
-    <div className="flex h-8 rounded-lg overflow-hidden border-2 border-gray-300">
+    <div className="flex h-8 rounded-none overflow-hidden border-2 border-themed">
       <div
         className={`${getBarColor(
           "savings",
           isHighlighted("savings"),
-        )} flex items-center justify-center text-white text-xs font-medium`}
+        )} flex items-center justify-center text-white text-xs font-mono font-bold`}
         style={{ width: `${savingsPct}%` }}
       >
         {savingsPct > 15 ? `${savingsPct}%` : ""}
@@ -31,13 +31,13 @@ export const AllocationBar: React.FC<AllocationBarProps> = ({
         className={`${getBarColor(
           "investments",
           isHighlighted("investments"),
-        )} flex items-center justify-center text-white text-xs font-medium`}
+        )} flex items-center justify-center text-white text-xs font-mono font-bold`}
         style={{ width: `${investmentsPct}%` }}
       >
         {investmentsPct > 15 ? `${investmentsPct}%` : ""}
       </div>
       <div
-        className={`${getBarColor("speculation", false)} flex items-center justify-center text-white text-xs font-medium`}
+        className={`${getBarColor("speculation", false)} flex items-center justify-center text-white text-xs font-mono font-bold`}
         style={{ width: `${speculationPct}%` }}
       >
         {speculationPct > 15 ? `${speculationPct}%` : ""}

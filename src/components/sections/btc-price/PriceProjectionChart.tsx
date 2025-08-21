@@ -10,9 +10,9 @@ export const PriceProjectionChart: React.FC<PriceProjectionChartProps> = ({
   formData,
 }) => {
   return (
-    <div className="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-400">
-      <h4 className="font-semibold text-orange-800 mb-3">
-        💹 Projected USD exchange rate
+    <div className="p-4 card-themed border border-bitcoin-orange">
+      <h4 className="font-semibold text-bitcoin-orange mb-3 font-heading tracking-wide uppercase">
+        💹 PROJECTED USD EXCHANGE RATE
       </h4>
       <div style={{ height: "400px" }}>
         <BtcExchangeChart formData={formData} />

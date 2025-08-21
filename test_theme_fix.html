@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: #22c55e; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+        .bitcoin-orange { color: #F7931A; }
+    </style>
+</head>
+<body>
+    <h1 class="bitcoin-orange">🚀 Chart Theme Fix Verification</h1>
+    
+    <div class="test-section">
+        <h2 class="info">✅ What We Fixed</h2>
+        <ul>
+            <li><strong>Race Condition Issue:</strong> Charts were reading theme colors from DOM before theme was applied</li>
+            <li><strong>getChartThemeColors():</strong> Now accepts theme parameter instead of reading from DOM</li>
+            <li><strong>getAllChartColors():</strong> Properly passes theme to both theme and dataset color functions</li>
+            <li><strong>Consistent Theme System:</strong> All chart components now use the same theme parameter approach</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2 class="success">🎯 Expected Results</h2>
+        <ul>
+            <li><strong>Initial Load:</strong> Charts should show proper colors immediately on page refresh</li>
+            <li><strong>Theme Toggle:</strong> Charts should update colors when switching between light/dark mode</li>
+            <li><strong>No White Lines:</strong> All chart elements should use proper Bitcoin Orange themed colors</li>
+            <li><strong>Consistent Behavior:</strong> Auto-refresh and manual refresh should show identical results</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2 class="info">🧪 How to Test</h2>
+        <ol>
+            <li>Open the main app at <a href="http://localhost:5175/" class="bitcoin-orange">http://localhost:5175/</a></li>
+            <li>Navigate to the Results section and view all charts</li>
+            <li>Try refreshing the page multiple times - charts should look consistent</li>
+            <li>Toggle between light and dark themes - charts should update properly</li>
+            <li>Check the BTC Allocation Evolution chart specifically - no more white lines!</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2 class="bitcoin-orange">🔧 Technical Implementation</h2>
+        <p><strong>Root Cause:</strong> The theme detection was happening after Chart.js initialization during page load, creating a timing mismatch.</p>
+        <p><strong>Solution:</strong> Made theme colors deterministic by removing DOM dependency and using direct theme parameter passing.</p>
+        <p><strong>Files Modified:</strong></p>
+        <ul>
+            <li><code>src/utils/chartTheme.ts</code> - Fixed getAllChartColors and getChartThemeColors</li>
+            <li><code>src/components/charts/AllocationEvolutionChart.tsx</code> - Added proper theme integration</li>
+            <li><code>src/components/charts/ExpensesInflationChart.tsx</code> - Updated to use getAllChartColors</li>
+            <li><code>src/components/charts/UsdPurchasingPowerChart.tsx</code> - Updated to use getAllChartColors</li>
+            <li><code>src/components/charts/BtcExchangeChart.tsx</code> - Updated to use getAllChartColors</li>
+            <li><code>src/components/charts/YieldChart.tsx</code> - Updated to use getAllChartColors</li>
+        </ul>
+    </div>
+
+    <script>
+        console.log('🎯 Theme Fix Test Page Loaded');
+        console.log('🔧 Navigate to http://localhost:5175/ to test the fix');
+    </script>
+</body>
+</html>

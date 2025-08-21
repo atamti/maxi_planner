@@ -114,19 +114,17 @@ export const AllocationSlidersV2: React.FC = () => {
       </div>
 
       {/* Total Display */}
-      <div className="mt-4 p-3 bg-gray-50 rounded">
+      <div className="mt-4 p-3 bg-surface-alt border border-[var(--color-border)] rounded-none">
         <div className="flex justify-between items-center">
-          <span className="font-medium">Total Allocation:</span>
-          <span
-            className={`font-bold ${isValid ? "text-green-600" : "text-red-600"}`}
-          >
+          <span className="font-medium text-primary">Total Allocation:</span>
+          <span className={`font-bold ${isValid ? "text-gain" : "text-loss"}`}>
             {totalAllocation}%
           </span>
         </div>
       </div>
 
       {/* Helper Text */}
-      <div className="mt-4 text-sm text-gray-600">
+      <div className="mt-4 text-sm text-secondary">
         <p>
           • <strong>Savings (₿):</strong> Conservative BTC holdings
         </p>

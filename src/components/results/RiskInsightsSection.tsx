@@ -28,14 +28,14 @@ export const RiskInsightsSection: React.FC<Props> = ({
     (formData.collateralPct > 0 && dynamicLoanValues);
 
   return (
-    <div className="bg-red-50 p-4 rounded-lg border border-red-200 mb-6">
-      <h3 className="text-lg font-semibold text-red-800 mb-3">
-        ⚠️ Risk Insights
+    <div className="card-themed p-4 border border-bitcoin-orange mb-6">
+      <h3 className="text-lg font-semibold text-bitcoin-orange mb-3 font-heading tracking-wide">
+        ⚠️ RISK INSIGHTS
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {hasRisks ? (
           <>
-            <ul className="list-disc pl-5 text-red-700 space-y-1">
+            <ul className="list-disc pl-5 text-primary space-y-1 font-ui">
               {formData.savingsPct < 100 && (
                 <li>All investment & speculation carries counterparty risk</li>
               )}
@@ -141,10 +141,10 @@ export const RiskInsightsSection: React.FC<Props> = ({
           </>
         ) : (
           <div className="col-span-2 text-center py-4">
-            <p className="text-green-700 font-medium">
-              ✅ Conservative Configuration
+            <p className="text-success font-medium font-ui">
+              ✅ CONSERVATIVE CONFIGURATION
             </p>
-            <p className="text-sm text-gray-600 mt-2">
+            <p className="text-sm text-secondary mt-2 font-ui">
               Your current settings represent a low-risk approach with 100%
               savings allocation and no income generation or leverage.
             </p>

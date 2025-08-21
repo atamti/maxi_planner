@@ -14,20 +14,25 @@ export const Card: React.FC<CardProps> = ({
   className = "",
   background = "white",
 }) => {
+  // Map legacy background prop to subtle variants within dark / light contexts.
   const bgClasses = {
-    white: "bg-white",
-    gray: "bg-gray-50",
-    blue: "bg-blue-50",
-    green: "bg-green-50",
-    yellow: "bg-yellow-50",
-    red: "bg-red-50",
-  };
+    white: "bg-white dark:bg-brand-black/70",
+    gray: "bg-gray-50 dark:bg-brand-black/60",
+    blue: "bg-blue-50 dark:bg-brand-navy/30",
+    green: "bg-green-50 dark:bg-brand-green/10",
+    yellow: "bg-yellow-50 dark:bg-brand-orange/10",
+    red: "bg-red-50 dark:bg-brand-red/10",
+  } as const;
 
   return (
     <div
-      className={`${bgClasses[background]} p-4 rounded-lg shadow border ${className}`}
+      className={`card-maxi ${bgClasses[background]} rounded-none p-4 ${className}`}
     >
-      {title && <h3 className="text-lg font-semibold mb-3">{title}</h3>}
+      {title && (
+        <h3 className="text-base font-heading font-bold tracking-wide text-brand-orange mb-3">
+          {title.toUpperCase()}
+        </h3>
+      )}
       {children}
     </div>
   );
@@ -54,16 +59,20 @@ export const CollapsibleSection: React.FC<SectionProps> = ({
     <div className={`mb-4 ${className}`}>
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between p-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
+        className="w-full flex items-center justify-between p-3 bg-brand-black/60 dark:hover:bg-brand-black/80 hover:bg-gray-200 border border-brand-orange/30 text-left font-heading tracking-wide text-sm text-brand-gray transition-colors duration-200 rounded-none"
       >
-        <span className="font-medium text-left">
+        <span className="font-medium flex-1">
           {icon && <span className="mr-2">{icon}</span>}
-          {title}
+          {title.toUpperCase()}
         </span>
-        <span className="text-lg font-bold">{isExpanded ? "−" : "+"}</span>
+        <span className="text-lg font-bold text-brand-orange">
+          {isExpanded ? "−" : "+"}
+        </span>
       </button>
       {isExpanded && (
-        <div className="mt-3 p-4 bg-white rounded-lg border">{children}</div>
+        <div className="mt-3 p-4 card-maxi bg-white dark:bg-brand-black/70 border border-brand-orange/30 rounded-none">
+          {children}
+        </div>
       )}
     </div>
   );
@@ -124,11 +133,15 @@ export const Button: React.FC<ButtonProps> = ({
   icon,
 }) => {
   const variantClasses = {
-    primary: "bg-blue-500 hover:bg-blue-600 text-white",
-    secondary: "bg-gray-500 hover:bg-gray-600 text-white",
-    danger: "bg-red-500 hover:bg-red-600 text-white",
-    success: "bg-green-500 hover:bg-green-600 text-white",
-  };
+    primary:
+      "btn-gradient-orange text-white shadow-glow-orange border border-brand-orange/50",
+    secondary:
+      "btn-secondary-navy text-white border border-brand-orange/30 hover:shadow-glow-orange",
+    danger:
+      "bg-brand-red text-white hover:bg-brand-red/90 border border-brand-red/60",
+    success:
+      "bg-brand-green text-white hover:bg-brand-green/90 border border-brand-green/60",
+  } as const;
 
   const sizeClasses = {
     sm: "px-3 py-1 text-sm",
@@ -140,13 +153,7 @@ export const Button: React.FC<ButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`
-        ${variantClasses[variant]} 
-        ${sizeClasses[size]} 
-        rounded transition-colors duration-200 
-        ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-        ${className}
-      `}
+      className={`${variantClasses[variant]} ${sizeClasses[size]} tracking-wide font-heading rounded-none transition-all duration-300 ease-aggressive focus-ring-maxi relative overflow-hidden ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
     >
       {icon && <span className="mr-2">{icon}</span>}
       {children}
@@ -166,17 +173,17 @@ export const Badge: React.FC<BadgeProps> = ({
   className = "",
 }) => {
   const variantClasses = {
-    info: "bg-blue-100 text-blue-800",
-    success: "bg-green-100 text-green-800",
-    warning: "bg-yellow-100 text-yellow-800",
-    error: "bg-red-100 text-red-800",
-  };
+    info: "bg-brand-navy/30 text-brand-orange border border-brand-orange/30",
+    success: "bg-brand-green/20 text-brand-green border border-brand-green/40",
+    warning:
+      "bg-brand-orange/20 text-brand-orange border border-brand-orange/50",
+    error: "bg-brand-red/20 text-brand-red border border-brand-red/50",
+  } as const;
 
   return (
     <span
       className={`
-      inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-      ${variantClasses[variant]} ${className}
+  inline-flex items-center px-2.5 py-0.5 rounded-none text-[10px] leading-tight font-heading tracking-wide ${variantClasses[variant]} ${className}
     `}
     >
       {children}

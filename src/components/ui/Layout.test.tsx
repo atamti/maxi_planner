@@ -86,7 +86,7 @@ describe("Layout Components", () => {
     it("should render section title", () => {
       render(<CollapsibleSection {...defaultProps} />);
 
-      expect(screen.getByText("Test Section")).toBeInTheDocument();
+      expect(screen.getByText("TEST SECTION")).toBeInTheDocument();
     });
 
     it("should show content when expanded", () => {
@@ -130,7 +130,7 @@ describe("Layout Components", () => {
         <CollapsibleSection {...defaultProps} className="custom-section" />,
       );
 
-      const sectionElement = screen.getByText("Test Section").closest("div");
+      const sectionElement = screen.getByText("TEST SECTION").closest("div");
       expect(sectionElement).toHaveClass("custom-section");
     });
   });

@@ -61,7 +61,7 @@ describe("ChartLabels", () => {
     const xLabel = container.querySelectorAll("text")[0];
 
     expect(xLabel).toHaveAttribute("font-size", "14"); // SVG uses font-size
-    expect(xLabel).toHaveAttribute("fill", "#333");
+    expect(xLabel).toHaveAttribute("fill", "var(--color-text-secondary)");
     expect(xLabel).toHaveAttribute("font-weight", "bold"); // SVG uses font-weight
   });
 

@@ -43,50 +43,52 @@ export const SaveLoadSection: React.FC<Props> = ({ formData, onLoad }) => {
   };
 
   // Add debug effect to see what's happening
-  React.useEffect(() => {
-    
-  }, [savedConfigs]);
+  React.useEffect(() => {}, [savedConfigs]);
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow mb-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">💾 Save & Load Configurations</h3>
+    <div className="card-themed rounded-none p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="font-poppins text-lg font-bold text-primary uppercase tracking-wide">
+          💾 SAVE & LOAD CONFIGURATIONS
+        </h3>
         <button
           onClick={() => setSaveDialogOpen(true)}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-medium transition-colors"
+          className="btn-gradient-orange px-4 py-2 text-sm font-semibold uppercase tracking-wide"
         >
-          💾 Save Current
+          💾 SAVE CURRENT
         </button>
       </div>
 
       {/* Save Dialog */}
       {saveDialogOpen && (
-        <div className="mb-4 p-4 bg-blue-50 rounded border border-blue-200">
-          <h4 className="font-medium mb-2">Save Current Configuration</h4>
-          <div className="flex gap-2">
+        <div className="mb-6 p-4 bg-surface-alt rounded-none border-2 border-bitcoin-orange/50">
+          <h4 className="font-inter font-bold text-primary mb-3 uppercase tracking-wide">
+            SAVE CURRENT CONFIGURATION
+          </h4>
+          <div className="flex gap-3">
             <input
               type="text"
               value={saveName}
               onChange={(e) => setSaveName(e.target.value)}
               placeholder="Enter configuration name..."
-              className="flex-1 p-2 border rounded"
+              className="flex-1 p-3 bg-surface border-2 border-themed rounded-none text-primary font-mono focus-ring-themed"
               onKeyPress={(e) => e.key === "Enter" && handleSave()}
             />
             <button
               onClick={handleSave}
               disabled={!saveName.trim()}
-              className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white px-4 py-2 rounded font-medium transition-colors"
+              className="btn-gradient-orange px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Save
+              SAVE
             </button>
             <button
               onClick={() => {
                 setSaveDialogOpen(false);
                 setSaveName("");
               }}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded font-medium transition-colors"
+              className="btn-secondary-navy px-4 py-2"
             >
-              Cancel
+              CANCEL
             </button>
           </div>
         </div>
@@ -94,9 +96,9 @@ export const SaveLoadSection: React.FC<Props> = ({ formData, onLoad }) => {
 
       {/* Saved Configurations List */}
       {savedConfigs.length > 0 ? (
-        <div className="space-y-2">
-          <div className="text-sm text-gray-600 mb-2">
-            Found {savedConfigs.length} saved configuration(s)
+        <div className="space-y-4">
+          <div className="text-sm text-secondary font-mono uppercase tracking-wide">
+            FOUND {savedConfigs.length} SAVED CONFIGURATION(S)
           </div>
           {savedConfigs.map((config) => (
             <div
@@ -174,20 +176,20 @@ export const SaveLoadSection: React.FC<Props> = ({ formData, onLoad }) => {
           ))}
         </div>
       ) : (
-        <div className="text-gray-500 text-center py-8">
-          No saved configurations yet. Save your current settings to get
-          started!
-          <div className="text-xs mt-2">
-            Check browser console for localStorage debug info
+        <div className="text-secondary text-center py-8 font-mono">
+          NO SAVED CONFIGURATIONS YET. SAVE YOUR CURRENT SETTINGS TO GET
+          STARTED!
+          <div className="text-xs mt-2 text-secondary/70 uppercase tracking-wide">
+            CHECK BROWSER CONSOLE FOR LOCALSTORAGE DEBUG INFO
           </div>
         </div>
       )}
 
-      <div className="mt-4 p-3 bg-yellow-50 rounded border border-yellow-200">
-        <p className="text-sm text-yellow-800">
-          💡 <strong>Note:</strong> Configurations are saved locally in your
-          browser. They will persist between sessions but won't be available on
-          other devices or browsers.
+      <div className="mt-6 p-4 bg-surface-alt rounded-none border-2 border-navy-900/50">
+        <p className="text-sm text-navy-900 font-mono uppercase tracking-wide">
+          💡 <span className="font-bold">NOTE:</span> CONFIGURATIONS ARE SAVED
+          LOCALLY IN YOUR BROWSER. THEY WILL PERSIST BETWEEN SESSIONS BUT WON'T
+          BE AVAILABLE ON OTHER DEVICES OR BROWSERS.
         </p>
       </div>
     </div>
