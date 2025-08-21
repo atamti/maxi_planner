@@ -162,16 +162,14 @@ describe("App", () => {
   it("should render application title", () => {
     render(<App />);
 
-    expect(screen.getByText("BTC maxi portfolio planner")).toBeInTheDocument();
+    expect(screen.getByText("BTC MAXI PORTFOLIO PLANNER")).toBeInTheDocument();
   });
 
   it("should render application description", () => {
     render(<App />);
 
     expect(
-      screen.getByText(
-        /Balance your stack with income requirments and risk tolerance/,
-      ),
+      screen.getByText(/STACK SATS\. MANAGE RISK\. LASER EYES ACTIVATED\./),
     ).toBeInTheDocument();
   });
 });

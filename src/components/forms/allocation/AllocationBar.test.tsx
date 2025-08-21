@@ -43,7 +43,7 @@ describe("AllocationBar", () => {
     const mainContainer = container.firstChild as HTMLElement;
     expect(mainContainer).toHaveClass("flex");
     expect(mainContainer).toHaveClass("h-8");
-    expect(mainContainer).toHaveClass("rounded-lg");
+    expect(mainContainer).toHaveClass("rounded-none");
   });
 
   it("should display percentages for segments > 15%", () => {

@@ -51,14 +51,14 @@ describe("IncomeExpensesSection", () => {
     it("should render main income configuration section", () => {
       render(<IncomeExpensesSection {...defaultProps} />);
 
-      expect(screen.getByText("💰 Income Configuration")).toBeInTheDocument();
+      expect(screen.getByText("💰 INCOME CONFIGURATION")).toBeInTheDocument();
       expect(
-        screen.getByText("Income Bucket Allocation (%):"),
+        screen.getByText("INCOME BUCKET ALLOCATION (%):"),
       ).toBeInTheDocument();
-      expect(screen.getByText("Reinvestment Rate (%):")).toBeInTheDocument();
-      expect(screen.getByText("Activation Year:")).toBeInTheDocument();
+      expect(screen.getByText("REINVESTMENT RATE (%):")).toBeInTheDocument();
+      expect(screen.getByText("ACTIVATION YEAR:")).toBeInTheDocument();
       expect(
-        screen.getByText("Starting Annual Expenses (USD):"),
+        screen.getByText("STARTING ANNUAL EXPENSES (USD):"),
       ).toBeInTheDocument();
     });
 
@@ -80,7 +80,7 @@ describe("IncomeExpensesSection", () => {
         screen.getByTestId("expenses-inflation-chart"),
       ).toBeInTheDocument();
       expect(
-        screen.getByText("📊 Projected Expenses Growth"),
+        screen.getByText("📊 PROJECTED EXPENSES GROWTH"),
       ).toBeInTheDocument();
     });
 
@@ -164,7 +164,7 @@ describe("IncomeExpensesSection", () => {
       const slider = screen.getByDisplayValue("40") as HTMLInputElement;
       expect(slider.value).toBe("40");
       expect(
-        screen.getByText("40% reinvested, 60% available for expenses"),
+        screen.getByText("40% REINVESTED, 60% AVAILABLE"),
       ).toBeInTheDocument();
     });
 
@@ -190,7 +190,7 @@ describe("IncomeExpensesSection", () => {
       );
 
       expect(
-        screen.getByText("25% reinvested, 75% available for expenses"),
+        screen.getByText("25% REINVESTED, 75% AVAILABLE"),
       ).toBeInTheDocument();
     });
 
@@ -219,7 +219,7 @@ describe("IncomeExpensesSection", () => {
       const slider = screen.getByDisplayValue("15") as HTMLInputElement;
       expect(slider.value).toBe("15");
       expect(
-        screen.getByText("Year 15 - When income starts"),
+        screen.getByText("YEAR 15 - WHEN INCOME STARTS"),
       ).toBeInTheDocument();
     });
 
@@ -527,7 +527,7 @@ describe("IncomeExpensesSection", () => {
         ),
       ).toBeInTheDocument();
       expect(
-        screen.getByText("Year 10 - When income starts"),
+        screen.getByText("YEAR 10 - WHEN INCOME STARTS"),
       ).toBeInTheDocument();
     });
 
@@ -543,10 +543,10 @@ describe("IncomeExpensesSection", () => {
       );
 
       expect(
-        screen.getByText("60% reinvested, 40% available for expenses"),
+        screen.getByText("60% REINVESTED, 40% AVAILABLE"),
       ).toBeInTheDocument();
       expect(
-        screen.getByText("Year 8 - When income starts"),
+        screen.getByText("YEAR 8 - WHEN INCOME STARTS"),
       ).toBeInTheDocument();
     });
   });

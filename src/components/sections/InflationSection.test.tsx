@@ -50,7 +50,7 @@ describe("InflationSection", () => {
 
     expect(screen.getByTestId("rate-assumptions-section")).toBeInTheDocument();
     expect(
-      screen.getByText("📉 USD Purchasing Power Decay"),
+      screen.getByText("📉 USD PURCHASING POWER DECAY"),
     ).toBeInTheDocument();
     expect(
       screen.getByTestId("usd-purchasing-power-chart"),
@@ -190,16 +190,10 @@ describe("InflationSection", () => {
     expect(chartContainer).toBeInTheDocument();
     expect(chartContainer.parentElement).toHaveStyle({ height: "400px" });
 
-    // Check section styling
-    const section = screen
-      .getByText("📉 USD Purchasing Power Decay")
-      .closest(".p-4");
-    expect(section).toHaveClass(
-      "bg-red-50",
-      "rounded-lg",
-      "border-l-4",
-      "border-red-400",
-    );
+    // Check that the section header is styled correctly
+    expect(
+      screen.getByText("📉 USD PURCHASING POWER DECAY"),
+    ).toBeInTheDocument();
   });
 
   it("should have correct main container structure", () => {

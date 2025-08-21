@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { DEFAULT_FORM_DATA } from "../../config/defaults";
+import { render } from "../../test/testUtils";
 import { FormData } from "../../types";
 import { YieldChart } from "./YieldChart";
 
@@ -208,8 +209,8 @@ describe("YieldChart", () => {
 
       const investmentDataset = chartData.datasets[0];
       expect(investmentDataset.label).toBe("Investments Yield (BTC %)");
-      expect(investmentDataset.borderColor).toBe("#F7931A");
-      expect(investmentDataset.backgroundColor).toBe("rgba(247, 147, 26, 0.2)");
+      expect(investmentDataset.borderColor).toBe("#F59E0B");
+      expect(investmentDataset.backgroundColor).toBe("rgba(245, 158, 11, 0.2)");
       expect(investmentDataset.fill).toBe(false);
     });
 
@@ -221,10 +222,8 @@ describe("YieldChart", () => {
 
       const speculationDataset = chartData.datasets[1];
       expect(speculationDataset.label).toBe("Speculation Yield (BTC %)");
-      expect(speculationDataset.borderColor).toBe("#666666");
-      expect(speculationDataset.backgroundColor).toBe(
-        "rgba(102, 102, 102, 0.2)",
-      );
+      expect(speculationDataset.borderColor).toBe("#22C55E");
+      expect(speculationDataset.backgroundColor).toBe("rgba(34, 197, 94, 0.2)");
       expect(speculationDataset.fill).toBe(false);
     });
   });

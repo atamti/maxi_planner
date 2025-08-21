@@ -17,7 +17,7 @@ function renderWithProvider() {
 async function expandSection() {
   const user = userEvent.setup();
   const sectionButton = screen.getByRole("button", {
-    name: /Economic Scenario/,
+    name: /🌍 ECONOMIC SCENARIO/,
   });
   await user.click(sectionButton);
 }
@@ -32,10 +32,10 @@ describe("EconomicScenariosSection", () => {
 
     // The section starts collapsed, check the title
     const sectionButton = screen.getByRole("button", {
-      name: /Economic Scenario/,
+      name: /🌍 ECONOMIC SCENARIO/,
     });
     expect(sectionButton).toBeInTheDocument();
-    expect(screen.getByText(/Economic Scenario:/)).toBeInTheDocument();
+    expect(screen.getByText(/ECONOMIC SCENARIO:/)).toBeInTheDocument();
 
     // Expand the section
     await expandSection();
@@ -79,7 +79,7 @@ describe("EconomicScenariosSection", () => {
     renderWithProvider();
 
     // Check the title contains the default scenario info
-    expect(screen.getByText(/Managed debasement/)).toBeInTheDocument();
+    expect(screen.getByText(/MANAGED DEBASEMENT/)).toBeInTheDocument();
     expect(screen.getByText(/10% USD/)).toBeInTheDocument();
     expect(screen.getByText(/46% BTC/)).toBeInTheDocument(); // Updated to reflect correct CAGR calculation
   });
@@ -89,7 +89,7 @@ describe("EconomicScenariosSection", () => {
 
     // Check that it uses CollapsibleSection styling
     const container = document.querySelector(
-      ".mb-4.border.border-gray-200.rounded-lg",
+      "[class*='mb-4'][class*='border']",
     );
     expect(container).toBeInTheDocument();
   });

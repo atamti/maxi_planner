@@ -42,9 +42,9 @@ describe("BtcPriceSection", () => {
   it("should render all main sections", () => {
     render(<BtcPriceSection {...defaultProps} />);
 
-    expect(screen.getByText("💰 Current BTC Price")).toBeInTheDocument();
+    expect(screen.getByText("💰 CURRENT BTC PRICE")).toBeInTheDocument();
     expect(
-      screen.getByText("💹 Projected USD exchange rate"),
+      screen.getByText("💹 PROJECTED USD EXCHANGE RATE"),
     ).toBeInTheDocument();
     expect(screen.getByTestId("rate-assumptions-section")).toBeInTheDocument();
     expect(screen.getByTestId("btc-exchange-chart")).toBeInTheDocument();
@@ -189,8 +189,12 @@ describe("BtcPriceSection", () => {
       "w-full",
       "p-2",
       "border",
-      "rounded",
+      "border-themed",
+      "bg-surface",
+      "text-primary",
       "font-mono",
+      "rounded-none",
+      "focus-ring-themed",
     );
     expect(exchangeRateInput).toHaveAttribute("type", "text");
   });
@@ -208,24 +212,23 @@ describe("BtcPriceSection", () => {
 
     // Check BTC Price section styling
     const btcPriceSection = screen
-      .getByText("💰 Current BTC Price")
+      .getByText("💰 CURRENT BTC PRICE")
       .closest(".p-4");
     expect(btcPriceSection).toHaveClass(
-      "bg-blue-50",
-      "rounded-lg",
-      "border-l-4",
-      "border-blue-400",
+      "p-4",
+      "card-themed",
+      "border",
+      "border-bitcoin-orange",
     );
 
     // Check Projected USD section styling
     const projectedSection = screen
-      .getByText("💹 Projected USD exchange rate")
+      .getByText("💹 PROJECTED USD EXCHANGE RATE")
       .closest(".p-4");
     expect(projectedSection).toHaveClass(
-      "bg-orange-50",
-      "rounded-lg",
-      "border-l-4",
-      "border-orange-400",
+      "card-themed",
+      "border",
+      "border-bitcoin-orange",
     );
   });
 

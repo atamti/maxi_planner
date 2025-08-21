@@ -12,7 +12,7 @@ describe("Layout Components", () => {
         </Card>,
       );
 
-      expect(screen.getByText("Test Card")).toBeInTheDocument();
+      expect(screen.getByText("TEST CARD")).toBeInTheDocument();
       expect(screen.getByText("Card content")).toBeInTheDocument();
     });
 
@@ -261,16 +261,16 @@ describe("Layout Components", () => {
         const button = screen.getByRole("button");
         switch (variant) {
           case "primary":
-            expect(button).toHaveClass("bg-blue-500", "hover:bg-blue-600");
+            expect(button).toHaveClass("btn-gradient-orange");
             break;
           case "secondary":
-            expect(button).toHaveClass("bg-gray-500", "hover:bg-gray-600");
+            expect(button).toHaveClass("btn-secondary-navy");
             break;
           case "danger":
-            expect(button).toHaveClass("bg-red-500", "hover:bg-red-600");
+            expect(button).toHaveClass("bg-brand-red");
             break;
           case "success":
-            expect(button).toHaveClass("bg-green-500", "hover:bg-green-600");
+            expect(button).toHaveClass("bg-brand-green");
             break;
         }
 
@@ -346,7 +346,7 @@ describe("Layout Components", () => {
       render(<Button onClick={vi.fn()}>Default Button</Button>);
 
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-blue-500", "px-4", "py-2");
+      expect(button).toHaveClass("btn-gradient-orange", "px-4", "py-2");
       expect(button).not.toBeDisabled();
     });
   });
@@ -369,16 +369,19 @@ describe("Layout Components", () => {
         const badge = container.firstChild as HTMLElement;
         switch (variant) {
           case "info":
-            expect(badge).toHaveClass("bg-blue-100", "text-blue-800");
+            expect(badge).toHaveClass("bg-brand-navy/30", "text-brand-orange");
             break;
           case "success":
-            expect(badge).toHaveClass("bg-green-100", "text-green-800");
+            expect(badge).toHaveClass("bg-brand-green/20", "text-brand-green");
             break;
           case "warning":
-            expect(badge).toHaveClass("bg-yellow-100", "text-yellow-800");
+            expect(badge).toHaveClass(
+              "bg-brand-orange/20",
+              "text-brand-orange",
+            );
             break;
           case "error":
-            expect(badge).toHaveClass("bg-red-100", "text-red-800");
+            expect(badge).toHaveClass("bg-brand-red/20", "text-brand-red");
             break;
         }
 
@@ -397,7 +400,10 @@ describe("Layout Components", () => {
     it("should use default variant", () => {
       const { container } = render(<Badge>Default Badge</Badge>);
 
-      expect(container.firstChild).toHaveClass("bg-blue-100", "text-blue-800");
+      expect(container.firstChild).toHaveClass(
+        "bg-brand-navy/30",
+        "text-brand-orange",
+      );
     });
 
     it("should have correct base styling", () => {
@@ -409,9 +415,9 @@ describe("Layout Components", () => {
         "items-center",
         "px-2.5",
         "py-0.5",
-        "rounded-full",
-        "text-xs",
-        "font-medium",
+        "rounded-none",
+        "text-[10px]",
+        "font-heading",
       );
     });
   });

@@ -91,7 +91,7 @@ describe("ActivationYearControl", () => {
     );
 
     expect(screen.getByText(/📅 ACTIVATION YEAR:/)).toBeInTheDocument();
-    expect(screen.getByText("5")).toBeInTheDocument();
+    expect(screen.getByText(/📅 ACTIVATION YEAR: 5/)).toBeInTheDocument();
   });
 
   it("should render the range input with correct properties", () => {
@@ -148,7 +148,7 @@ describe("ActivationYearControl", () => {
     );
 
     expect(screen.getByText(/📅 ACTIVATION YEAR:/)).toBeInTheDocument();
-    expect(screen.getByText("0")).toBeInTheDocument();
+    expect(screen.getByText(/📅 ACTIVATION YEAR: 0/)).toBeInTheDocument();
     expect(screen.getByText("Year 0 - When income starts")).toBeInTheDocument();
 
     const rangeInput = screen.getByRole("slider");
@@ -166,7 +166,7 @@ describe("ActivationYearControl", () => {
     );
 
     expect(screen.getByText(/📅 ACTIVATION YEAR:/)).toBeInTheDocument();
-    expect(screen.getByText("20")).toBeInTheDocument();
+    expect(screen.getByText(/📅 ACTIVATION YEAR: 20/)).toBeInTheDocument();
     expect(
       screen.getByText("Year 20 - When income starts"),
     ).toBeInTheDocument();
@@ -216,8 +216,8 @@ describe("ActivationYearControl", () => {
     expect(rangeInput).toHaveClass(
       "w-full",
       "h-2",
-      "bg-gray-200",
-      "rounded-lg",
+      "bg-surface",
+      "border",
       "appearance-none",
       "cursor-pointer",
     );
@@ -257,7 +257,7 @@ describe("ActivationYearControl", () => {
     );
 
     expect(screen.getByText(/📅 ACTIVATION YEAR:/)).toBeInTheDocument();
-    expect(screen.getByText("25")).toBeInTheDocument();
+    expect(screen.getByText(/📅 ACTIVATION YEAR: 25/)).toBeInTheDocument();
     expect(screen.getByText("Year 50")).toBeInTheDocument();
 
     const rangeInput = screen.getByRole("slider");

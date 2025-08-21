@@ -71,7 +71,7 @@ describe("LoanDetailsCard", () => {
       />,
     );
 
-    expect(screen.getByText("🏦 Loan Details (Year 5)")).toBeInTheDocument();
+    expect(screen.getByText("🏦 LOAN DETAILS (YEAR 5)")).toBeInTheDocument();
   });
 
   it("should display loan principal", () => {
@@ -82,7 +82,7 @@ describe("LoanDetailsCard", () => {
       />,
     );
 
-    expect(screen.getByText("Principal:")).toBeInTheDocument();
+    expect(screen.getByText("PRINCIPAL:")).toBeInTheDocument();
     expect(screen.getByText("$43,750")).toBeInTheDocument();
   });
 
@@ -94,7 +94,7 @@ describe("LoanDetailsCard", () => {
       />,
     );
 
-    expect(screen.getByText("Annual Interest:")).toBeInTheDocument();
+    expect(screen.getByText("ANNUAL INTEREST:")).toBeInTheDocument();
   });
 
   it("should display annual payments", () => {
@@ -105,7 +105,7 @@ describe("LoanDetailsCard", () => {
       />,
     );
 
-    expect(screen.getByText("Annual Payments:")).toBeInTheDocument();
+    expect(screen.getByText("ANNUAL PAYMENTS:")).toBeInTheDocument();
     expect(screen.getByText("$4,865")).toBeInTheDocument();
   });
 
@@ -117,7 +117,7 @@ describe("LoanDetailsCard", () => {
       />,
     );
 
-    expect(screen.getByText("LTV Ratio:")).toBeInTheDocument();
+    expect(screen.getByText("LTV RATIO:")).toBeInTheDocument();
     expect(screen.getByText("0.7%")).toBeInTheDocument();
   });
 
@@ -212,7 +212,7 @@ describe("LoanDetailsCard", () => {
       />,
     );
 
-    expect(screen.getByText("Liquidation Risk:")).toBeInTheDocument();
+    expect(screen.getByText("⚠️ LIQUIDATION RISK:")).toBeInTheDocument();
     expect(screen.getByText("$62,500")).toBeInTheDocument();
   });
 });

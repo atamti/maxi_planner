@@ -59,7 +59,7 @@ describe("PortfolioForm", () => {
         <PortfolioForm />
       </TestWrapper>,
     );
-    expect(screen.getByText("Portfolio Configuration")).toBeInTheDocument();
+    expect(screen.getByText("PORTFOLIO CONFIGURATION")).toBeInTheDocument();
   });
 
   it("should render all main sections", () => {
@@ -70,12 +70,12 @@ describe("PortfolioForm", () => {
     );
 
     // Check section titles
-    expect(screen.getByText(/1\. 💼 Portfolio Setup/)).toBeInTheDocument();
+    expect(screen.getByText(/1\. 💼 PORTFOLIO SETUP/)).toBeInTheDocument();
     expect(screen.getByText(/2\. 🌍 Economic Scenario/)).toBeInTheDocument();
-    expect(screen.getByText(/3\. 📊 Market Assumptions/)).toBeInTheDocument();
+    expect(screen.getByText(/3\. 📊 MARKET ASSUMPTIONS/)).toBeInTheDocument();
   });
 
-  it("should have Portfolio Setup section expanded by default", () => {
+  it("should have PORTFOLIO SETUP section expanded by default", () => {
     render(
       <TestWrapper>
         <PortfolioForm />
@@ -85,7 +85,7 @@ describe("PortfolioForm", () => {
     // Should show BTC Stack input since section is expanded
     expect(screen.getByDisplayValue("5")).toBeInTheDocument(); // BTC input
     expect(screen.getByDisplayValue("20")).toBeInTheDocument(); // Time horizon slider
-    expect(screen.getByText("20 years")).toBeInTheDocument(); // Time horizon display
+    expect(screen.getByText("20 YEARS")).toBeInTheDocument(); // Time horizon display
   });
 
   it("should render BTC stack input with correct value", () => {
@@ -141,10 +141,10 @@ describe("PortfolioForm", () => {
     fireEvent.change(slider, { target: { value: "30" } });
 
     // Check that the display text updates
-    expect(screen.getByText("30 years")).toBeInTheDocument();
+    expect(screen.getByText("30 YEARS")).toBeInTheDocument();
   });
 
-  it("should render allocation sliders in portfolio setup", () => {
+  it("should render allocation sliders in PORTFOLIO SETUP", () => {
     render(
       <TestWrapper>
         <PortfolioForm />
@@ -152,7 +152,7 @@ describe("PortfolioForm", () => {
     );
 
     expect(screen.getByTestId("allocation-sliders-v2")).toBeInTheDocument();
-    expect(screen.getByText("Initial Asset Allocation")).toBeInTheDocument();
+    expect(screen.getByText("INITIAL ASSET ALLOCATION")).toBeInTheDocument();
   });
 
   it("should render economic scenarios section", () => {
@@ -175,8 +175,8 @@ describe("PortfolioForm", () => {
       </TestWrapper>,
     );
 
-    // Market Assumptions should be collapsed by default
-    const marketButton = screen.getByText(/3\. 📊 Market Assumptions/);
+    // MARKET ASSUMPTIONS should be collapsed by default
+    const marketButton = screen.getByText(/3\. 📊 MARKET ASSUMPTIONS/);
     expect(marketButton.parentElement).toHaveTextContent("+");
 
     // Click to expand
@@ -188,7 +188,7 @@ describe("PortfolioForm", () => {
     expect(marketButton.parentElement).toHaveTextContent("+");
   });
 
-  it("should show inflation section when market assumptions expanded", async () => {
+  it("should show inflation section when MARKET ASSUMPTIONS expanded", async () => {
     const user = userEvent.setup();
     render(
       <TestWrapper>
@@ -196,22 +196,22 @@ describe("PortfolioForm", () => {
       </TestWrapper>,
     );
 
-    // Expand market assumptions
-    const marketButton = screen.getByText(/3\. 📊 Market Assumptions/);
+    // Expand MARKET ASSUMPTIONS
+    const marketButton = screen.getByText(/3\. 📊 MARKET ASSUMPTIONS/);
     await user.click(marketButton);
 
     // Should show inflation section header
-    expect(screen.getByText(/3a\. 💵 USD Inflation/)).toBeInTheDocument();
+    expect(screen.getByText(/3A\. 💵 USD INFLATION/)).toBeInTheDocument();
 
     // Click to expand inflation subsection
-    const inflationButton = screen.getByText(/3a\. 💵 USD Inflation/);
+    const inflationButton = screen.getByText(/3A\. 💵 USD INFLATION/);
     await user.click(inflationButton);
 
     // Now should show the actual inflation section component
     expect(screen.getByTestId("inflation-section")).toBeInTheDocument();
   });
 
-  it("should show btc price section when market assumptions expanded", async () => {
+  it("should show btc price section when MARKET ASSUMPTIONS expanded", async () => {
     const user = userEvent.setup();
     render(
       <TestWrapper>
@@ -219,17 +219,17 @@ describe("PortfolioForm", () => {
       </TestWrapper>,
     );
 
-    // Expand market assumptions
-    const marketButton = screen.getByText(/3\. 📊 Market Assumptions/);
+    // Expand MARKET ASSUMPTIONS
+    const marketButton = screen.getByText(/3\. 📊 MARKET ASSUMPTIONS/);
     await user.click(marketButton);
 
     // Should show BTC price section header
     expect(
-      screen.getByText(/3b\. ₿ BTC Price Appreciation/),
+      screen.getByText(/3B\. ₿ BTC PRICE APPRECIATION/),
     ).toBeInTheDocument();
 
     // Click to expand BTC price subsection
-    const btcButton = screen.getByText(/3b\. ₿ BTC Price Appreciation/);
+    const btcButton = screen.getByText(/3B\. ₿ BTC PRICE APPRECIATION/);
     await user.click(btcButton);
 
     // Now should show the actual BTC price section component
@@ -265,11 +265,11 @@ describe("PortfolioForm", () => {
 
     // Test minimum value
     fireEvent.change(slider, { target: { value: "1" } });
-    expect(screen.getByText("1 years")).toBeInTheDocument();
+    expect(screen.getByText("1 YEARS")).toBeInTheDocument();
 
     // Test maximum value
     fireEvent.change(slider, { target: { value: "50" } });
-    expect(screen.getByText("50 years")).toBeInTheDocument();
+    expect(screen.getByText("50 YEARS")).toBeInTheDocument();
   });
 
   it("should have correct input constraints", () => {
@@ -299,12 +299,12 @@ describe("PortfolioForm", () => {
       </TestWrapper>,
     );
 
-    // Portfolio Setup should show "−" (expanded)
-    const portfolioButton = screen.getByText(/1\. 💼 Portfolio Setup/);
+    // PORTFOLIO SETUP should show "−" (expanded)
+    const portfolioButton = screen.getByText(/1\. 💼 PORTFOLIO SETUP/);
     expect(portfolioButton.parentElement).toHaveTextContent("−");
 
-    // Market Assumptions should show "+" (collapsed)
-    const marketButton = screen.getByText(/3\. 📊 Market Assumptions/);
+    // MARKET ASSUMPTIONS should show "+" (collapsed)
+    const marketButton = screen.getByText(/3\. 📊 MARKET ASSUMPTIONS/);
     expect(marketButton.parentElement).toHaveTextContent("+");
 
     // Click to toggle
@@ -321,7 +321,7 @@ describe("PortfolioForm", () => {
 
     // Verify default values from context are displayed
     expect(screen.getByDisplayValue("5")).toBeInTheDocument(); // btcStack
-    expect(screen.getByText("20 years")).toBeInTheDocument(); // timeHorizon
+    expect(screen.getByText("20 YEARS")).toBeInTheDocument(); // timeHorizon
   });
 
   it("should render reset button", () => {
@@ -331,7 +331,7 @@ describe("PortfolioForm", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByText("🔄 Reset to Defaults")).toBeInTheDocument();
+    expect(screen.getByText("🔄 RESET TO DEFAULTS")).toBeInTheDocument();
   });
 
   it("should render income & cashflow section", () => {
@@ -341,7 +341,7 @@ describe("PortfolioForm", () => {
       </TestWrapper>,
     );
 
-    expect(screen.getByText(/5\. 💰 Income & Cashflow/)).toBeInTheDocument();
+    expect(screen.getByText(/5\. 💰 INCOME & CASHFLOW/)).toBeInTheDocument();
   });
 });
 
@@ -355,7 +355,7 @@ describe("PortfolioForm - CollapsibleSection", () => {
       </TestWrapper>,
     );
 
-    const marketButton = screen.getByText(/3\. 📊 Market Assumptions/);
+    const marketButton = screen.getByText(/3\. 📊 MARKET ASSUMPTIONS/);
 
     // Should be collapsed initially (showing "+")
     expect(marketButton.parentElement).toHaveTextContent("+");
@@ -368,6 +368,6 @@ describe("PortfolioForm - CollapsibleSection", () => {
     expect(marketButton.parentElement).toHaveTextContent("−");
 
     // Should show inflation section when expanded
-    expect(screen.getByText(/3a\. 💵 USD Inflation/)).toBeInTheDocument();
+    expect(screen.getByText(/3A\. 💵 USD INFLATION/)).toBeInTheDocument();
   });
 });

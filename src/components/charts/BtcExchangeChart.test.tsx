@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { DEFAULT_FORM_DATA } from "../../config/defaults";
+import { render } from "../../test/testUtils";
 import { FormData } from "../../types";
 import { BtcExchangeChart } from "./BtcExchangeChart";
 
@@ -187,8 +188,8 @@ describe("BtcExchangeChart", () => {
 
       const dataset = chartData.datasets[0];
       expect(dataset.label).toBe("BTC / USD ($Ms)");
-      expect(dataset.borderColor).toBe("#F7931A");
-      expect(dataset.backgroundColor).toBe("rgba(247, 147, 26, 0.1)");
+      expect(dataset.borderColor).toBe("#F59E0B");
+      expect(dataset.backgroundColor).toBe("rgba(245, 158, 11, 0.2)");
       expect(dataset.fill).toBe(true);
       expect(dataset.tension).toBe(0.4);
     });

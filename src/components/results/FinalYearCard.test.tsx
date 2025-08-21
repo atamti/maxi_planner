@@ -98,7 +98,7 @@ describe("FinalYearCard", () => {
     render(<FinalYearCard results={mockResults} formData={mockFormData} />);
 
     const negativeCashflow = screen.getByText("($70,000)");
-    expect(negativeCashflow).toHaveClass("text-red-600");
+    expect(negativeCashflow).toHaveClass("text-loss", "font-bold");
   });
 
   it("should format positive cashflows normally", () => {

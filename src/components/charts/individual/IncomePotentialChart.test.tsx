@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { render, screen } from "../../../test/testUtils";
 import { IncomePotentialChart } from "./IncomePotentialChart";
 
 // Mock Chart.js and react-chartjs-2
@@ -119,9 +119,16 @@ describe("IncomePotentialChart", () => {
 
     // Check for help text styling
     const helpText = screen.getByText(
-      "💡 Click on any point to set that year as your activation year",
+      "💡 CLICK ON ANY POINT TO SET THAT YEAR AS YOUR ACTIVATION YEAR",
     );
-    expect(helpText).toHaveClass("text-xs", "text-gray-600", "mt-2");
+    expect(helpText).toHaveClass(
+      "text-xs",
+      "text-secondary",
+      "mt-3",
+      "font-mono",
+      "uppercase",
+      "tracking-wide",
+    );
   });
 
   it("should handle empty data gracefully", () => {

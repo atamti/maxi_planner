@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { DEFAULT_FORM_DATA } from "../../config/defaults";
+import { render } from "../../test/testUtils";
 import { FormData } from "../../types";
 import { UsdPurchasingPowerChart } from "./UsdPurchasingPowerChart";
 
@@ -165,8 +166,8 @@ describe("UsdPurchasingPowerChart", () => {
 
       const dataset = chartData.datasets[0];
       expect(dataset.label).toBe("USD Purchasing Power");
-      expect(dataset.borderColor).toBe("#DC2626");
-      expect(dataset.backgroundColor).toBe("rgba(220, 38, 38, 0.1)");
+      expect(dataset.borderColor).toBe("#EF4444");
+      expect(dataset.backgroundColor).toBe("rgba(239, 68, 68, 0.2)");
       expect(dataset.fill).toBe(true);
       expect(dataset.tension).toBe(0.4);
     });
@@ -197,7 +198,7 @@ describe("UsdPurchasingPowerChart", () => {
 
       expect(chartOptions.plugins.title.display).toBe(true);
       expect(chartOptions.plugins.title.text).toBe(
-        "USD Purchasing Power Decay Over Time",
+        "USD PURCHASING POWER DECAY OVER TIME",
       );
       expect(chartOptions.plugins.legend.position).toBe("bottom");
     });

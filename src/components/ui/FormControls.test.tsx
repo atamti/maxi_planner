@@ -106,7 +106,7 @@ describe("FormControls Components", () => {
     it("should render with label and value", () => {
       render(<SliderInput {...defaultProps} />);
 
-      expect(screen.getByText("Test Slider")).toBeInTheDocument();
+      expect(screen.getByText("TEST SLIDER")).toBeInTheDocument();
       expect(screen.getByRole("slider")).toHaveValue("50");
     });
 
@@ -123,7 +123,7 @@ describe("FormControls Components", () => {
     it("should display min and max values", () => {
       render(<SliderInput {...defaultProps} min={10} max={90} />);
 
-      expect(screen.getByText("10 - 90")).toBeInTheDocument();
+      expect(screen.getByText("10-90")).toBeInTheDocument();
     });
 
     it("should display current value", () => {
@@ -142,7 +142,7 @@ describe("FormControls Components", () => {
       render(<SliderInput {...defaultProps} error="Slider error" />);
 
       const slider = screen.getByRole("slider");
-      expect(slider).toHaveClass("accent-red-500");
+      expect(slider).toHaveClass("[accent-color:#EF4444]");
       expect(screen.getByText("Slider error")).toBeInTheDocument();
     });
 
@@ -150,7 +150,7 @@ describe("FormControls Components", () => {
       render(<SliderInput {...defaultProps} warning="Slider warning" />);
 
       const slider = screen.getByRole("slider");
-      expect(slider).toHaveClass("accent-yellow-500");
+      expect(slider).toHaveClass("[accent-color:#F59E0B]");
       expect(screen.getByText("Slider warning")).toBeInTheDocument();
     });
 
@@ -159,7 +159,7 @@ describe("FormControls Components", () => {
 
       const slider = screen.getByRole("slider");
       expect(slider).toBeDisabled();
-      expect(slider).toHaveClass("opacity-50");
+      expect(slider).toHaveClass("opacity-40");
     });
 
     it("should apply step attribute", () => {
@@ -388,7 +388,7 @@ describe("FormControls Components", () => {
       );
 
       expect(screen.getByRole("slider")).toHaveValue("0");
-      expect(screen.getByText("0 - 0")).toBeInTheDocument();
+      expect(screen.getByText("0-0")).toBeInTheDocument();
     });
 
     it("should handle empty string value in SelectInput", () => {

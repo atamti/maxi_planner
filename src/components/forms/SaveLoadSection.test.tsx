@@ -53,7 +53,7 @@ describe("SaveLoadSection", () => {
     render(<SaveLoadSection {...defaultProps} />);
 
     expect(
-      screen.getByText("💾 Save & Load Configurations"),
+      screen.getByText("💾 SAVE & LOAD CONFIGURATIONS"),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /💾 Save Current/i }),
@@ -66,7 +66,7 @@ describe("SaveLoadSection", () => {
     expect(screen.getByText("Test Config 1")).toBeInTheDocument();
     expect(screen.getByText("Test Config 2")).toBeInTheDocument();
     expect(
-      screen.getByText("Found 2 saved configuration(s)"),
+      screen.getByText("FOUND 2 SAVED CONFIGURATION(S)"),
     ).toBeInTheDocument();
   });
 
@@ -87,7 +87,7 @@ describe("SaveLoadSection", () => {
     const saveButton = screen.getByRole("button", { name: /💾 Save Current/i });
     await user.click(saveButton);
 
-    expect(screen.getByText("Save Current Configuration")).toBeInTheDocument();
+    expect(screen.getByText("SAVE CURRENT CONFIGURATION")).toBeInTheDocument();
     expect(
       screen.getByPlaceholderText("Enter configuration name..."),
     ).toBeInTheDocument();
@@ -107,7 +107,7 @@ describe("SaveLoadSection", () => {
     );
     await user.type(nameInput, "My New Config");
 
-    const confirmSaveButton = screen.getByRole("button", { name: "Save" });
+    const confirmSaveButton = screen.getByRole("button", { name: "SAVE" });
     await user.click(confirmSaveButton);
 
     expect(mockSaveConfig).toHaveBeenCalledWith(
@@ -125,7 +125,7 @@ describe("SaveLoadSection", () => {
     await user.click(saveButton);
 
     // Try to save without entering name
-    const confirmSaveButton = screen.getByRole("button", { name: "Save" });
+    const confirmSaveButton = screen.getByRole("button", { name: "SAVE" });
     expect(confirmSaveButton).toBeDisabled();
 
     await user.click(confirmSaveButton);
@@ -168,7 +168,7 @@ describe("SaveLoadSection", () => {
     await user.type(nameInput, "Some text");
 
     // Cancel
-    const cancelButton = screen.getByRole("button", { name: "Cancel" });
+    const cancelButton = screen.getByRole("button", { name: "CANCEL" });
     await user.click(cancelButton);
 
     // Dialog should be closed
@@ -321,7 +321,7 @@ describe("SaveLoadSection - Empty State", () => {
     // The empty state would be tested in integration tests
     render(<SaveLoadSection {...defaultProps} />);
     expect(
-      screen.getByText("💾 Save & Load Configurations"),
+      screen.getByText("💾 SAVE & LOAD CONFIGURATIONS"),
     ).toBeInTheDocument();
   });
 });

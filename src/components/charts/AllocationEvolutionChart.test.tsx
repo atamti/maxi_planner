@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { render } from "../../test/testUtils";
 import { FormDataSubset } from "../../types";
 import { AllocationEvolutionChart } from "./AllocationEvolutionChart";
 
@@ -61,9 +62,9 @@ describe("AllocationEvolutionChart", () => {
     const formData = createMockFormData();
     render(<AllocationEvolutionChart formData={formData} />);
 
-    expect(screen.getByTestId("chart-title")).toHaveTextContent(
-      "BTC Allocation Evolution Over Time",
-    );
+    expect(
+      screen.getByText("📊 BTC ALLOCATION EVOLUTION OVER TIME"),
+    ).toBeInTheDocument();
   });
 
   it("should display three datasets for savings, investments, and speculation", () => {

@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { render, screen } from "../../../test/testUtils";
 import { IncomeBtcChart } from "./IncomeBtcChart";
 
 // Mock Chart.js and react-chartjs-2
@@ -116,9 +116,16 @@ describe("IncomeBtcChart", () => {
 
     // Check for explanatory text styling
     const explanatoryText = screen.getByText(
-      "📉 Shows how USD income and expenses lose purchasing power as BTC appreciates",
+      "📉 SHOWS HOW USD INCOME AND EXPENSES LOSE PURCHASING POWER AS BTC APPRECIATES",
     );
-    expect(explanatoryText).toHaveClass("text-xs", "text-gray-600", "mt-2");
+    expect(explanatoryText).toHaveClass(
+      "text-xs",
+      "text-secondary",
+      "mt-3",
+      "font-mono",
+      "uppercase",
+      "tracking-wide",
+    );
   });
 
   it("should handle empty data gracefully", () => {

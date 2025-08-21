@@ -64,7 +64,7 @@ describe("EscapeVelocitySection", () => {
       />,
     );
 
-    expect(screen.getByText("🚀 Escape Velocity Analysis")).toBeInTheDocument();
+    expect(screen.getByText("🚀 ESCAPE VELOCITY ANALYSIS")).toBeInTheDocument();
     expect(
       screen.getByText("When income exceeds expenses by activation year:"),
     ).toBeInTheDocument();

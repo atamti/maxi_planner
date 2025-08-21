@@ -149,7 +149,7 @@ describe("RateAssumptionsSection", () => {
         />,
       );
 
-      expect(screen.getByText("📈 Inflation Rate")).toBeInTheDocument();
+      expect(screen.getByText("📈 INFLATION RATE")).toBeInTheDocument();
     });
 
     it("should render DraggableRateChart with correct props", () => {
